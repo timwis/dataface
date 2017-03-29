@@ -1,0 +1,25 @@
+{
+  "main": "client/src/index.js",
+  "scripts": {
+    "start:client": "budo . --live --pushstate -- -t sheetify/transform",
+    "start:server": "node server/index.js",
+    "start": "npm-run-all --parallel start:*",
+    "budoversion": "budo --version"
+  },
+  "dependencies": {
+    "axios": "^0.15.3",
+    "bulma": "^0.4.0",
+    "choo": "^5.0.4",
+    "cors": "^2.8.1",
+    "dotenv": "^4.0.0",
+    "fastify": "^0.12.0",
+    "knex": "^0.12.9",
+    "nanocomponent": "^2.0.3",
+    "pg": "^6.1.5",
+    "squel": "^5.8.0"
+  },
+  "devDependencies": {
+    "budo": "mattdesl/budo#feature/livereload-rework",
+    "npm-run-all": "^4.0.2"
+  }
+}
