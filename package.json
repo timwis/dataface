@@ -1,7 +1,7 @@
 {
   "main": "client/src/index.js",
   "scripts": {
-    "start:client": "budo . --live --pushstate -- -t sheetify/transform",
+    "start:client": "budo . --live --pushstate -- -t [ sheetify/transform -u sheetify-cssnext ]",
     "start:server": "node server/index.js",
     "start": "npm-run-all --parallel start:*",
     "budoversion": "budo --version"
@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "budo": "mattdesl/budo#feature/livereload-rework",
-    "npm-run-all": "^4.0.2"
+    "npm-run-all": "^4.0.2",
+    "sheetify-cssnext": "^1.0.7"
   }
 }
