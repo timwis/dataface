@@ -7,12 +7,14 @@
     "budoversion": "budo --version"
   },
   "dependencies": {
+    "arrow-key-codes": "^1.0.0",
     "axios": "^0.15.3",
     "bulma": "^0.4.0",
-    "choo": "^5.0.4",
+    "choo": "^5.1.4",
     "cors": "^2.8.1",
     "dotenv": "^4.0.0",
     "fastify": "^0.12.0",
+    "keyboardjs": "^2.3.3",
     "knex": "^0.12.9",
     "nanocomponent": "^2.0.3",
     "pg": "^6.1.5",
@@ -20,6 +22,7 @@
   },
   "devDependencies": {
     "budo": "mattdesl/budo#feature/livereload-rework",
+    "choo-log": "^6.0.0",
     "npm-run-all": "^4.0.2",
     "sheetify-cssnext": "^1.0.7"
   }

@@ -7,10 +7,6 @@ module.exports = function store (state, emitter) {
     rows: null
   }
 
-  emitter.on('*', function (msg, data) {
-    console.log('event', msg, data)
-  })
-
   emitter.on('pushState', function (location) {
     const sheet = location.split('/').pop()
     emitter.emit('sheets:selectSheet', sheet)

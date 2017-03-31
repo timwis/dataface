@@ -33,7 +33,6 @@ module.exports = function home (state, emit) {
   `
 
   function onload (el) {
-    console.log('onload')
     emit('sheets:getList')
   }
 }
