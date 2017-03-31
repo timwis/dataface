@@ -3,6 +3,7 @@ const css = require('sheetify')
 const setCursor = require('../util').setCursor
 const keyboard = require('keyboardjs')
 
+const noop = () => {}
 const prefix = css`
   td {
     cursor: cell;
@@ -47,6 +48,7 @@ module.exports = function table (state, emit) {
     keyboard.bind('down', moveCell.bind(this, 'down'))
     keyboard.bind('left', moveCell.bind(this, 'left'))
     keyboard.bind('right', moveCell.bind(this, 'right'))
+    keyboard.bind('shift + enter', noop) // differentiate from just enter
     keyboard.bind('enter', enter)
   }
 
@@ -133,7 +135,6 @@ module.exports = function table (state, emit) {
         const nextColumnIndex = columnIndex + 1
         const lastColumnIndex = fields.length - 1
         payload.columnIndex = Math.min(nextColumnIndex, lastColumnIndex)
-        console.log(columnIndex, nextColumnIndex, lastColumnIndex)
         break
     }
     emit('table:selectCell', payload)
