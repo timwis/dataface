@@ -48,6 +48,8 @@ module.exports = function table (state, emit) {
     keyboard.bind('down', moveCell.bind(this, 'down'))
     keyboard.bind('left', moveCell.bind(this, 'left'))
     keyboard.bind('right', moveCell.bind(this, 'right'))
+    keyboard.bind('tab', moveCell.bind(this, 'right'))
+    keyboard.bind('shift + tab', moveCell.bind(this, 'left'))
     keyboard.bind('shift + enter', noop) // differentiate from just enter
     keyboard.bind('enter', enter)
   }
