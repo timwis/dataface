@@ -2,9 +2,15 @@ const html = require('choo/html')
 const css = require('sheetify')
 const setCursor = require('../util').setCursor
 const keyboard = require('keyboardjs')
+const offset = require('mouse-event-offset')
+
+const contextMenu = require('./context-menu.js')
 
 const noop = () => {}
 const prefix = css`
+  :host {
+    position: relative;
+  }
   td {
     cursor: cell;
     white-space: nowrap;
@@ -27,20 +33,30 @@ module.exports = function table (state, emit) {
   const { fields, rows } = state.activeSheet
   const selectedCell = state.selectedCell
 
+  const contextMenuItems = [
+    { label: 'Foo', onclick: () => console.log('foo') },
+    { label: 'Bar', onclick: () => console.log('bar') }
+  ]
+
   return html`
-    <table class="${prefix} table is-bordered is-striped is-narrow"
-           onload=${onload}>
-      <thead>
-        <tr>
-          ${fields.map((field) => html`
-            <th>${field.name}</th>
-          `)}
-        </tr>
-      </thead>
-      <tbody>
-        ${rows.map(tableRow)}
-      </tbody>
-    </table>
+    <div class=${prefix}>
+      <table class="table is-bordered is-striped is-narrow"
+             onload=${onload}>
+        <thead>
+          <tr>
+            ${fields.map((field) => html`
+              <th oncontextmenu=${showHeaderMenu}>${field.name}</th>
+            `)}
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(tableRow)}
+        </tbody>
+      </table>
+      ${state.contextMenu.visible
+        ? contextMenu(contextMenuItems, state.contextMenu, hideHeaderMenu)
+        : ''}
+    </div>
   `
 
   function onload (el) {
@@ -52,6 +68,17 @@ module.exports = function table (state, emit) {
     keyboard.bind('shift + tab', moveCell.bind(this, 'left'))
     keyboard.bind('shift + enter', noop) // differentiate from just enter
     keyboard.bind('enter', enter)
+  }
+
+  function showHeaderMenu (evt) {
+    const parentEl = evt.currentTarget.parentNode
+    const [x, y] = offset(evt, parentEl)
+    emit('table:contextMenu', { x, y, visible: true })
+    evt.preventDefault()
+  }
+
+  function hideHeaderMenu () {
+    emit('table:contextMenu', { visible: false })
   }
 
   function tableRow (row, rowIndex) {
