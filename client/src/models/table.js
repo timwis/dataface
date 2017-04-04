@@ -4,7 +4,7 @@ module.exports = function tableModel (state, emitter) {
     columnIndex: null,
     editing: false
   }
-  state.contextMenu = {
+  state.headerMenu = {
     x: 0,
     y: 0,
     visible: false
@@ -20,8 +20,8 @@ module.exports = function tableModel (state, emitter) {
     emitter.emit('render')
   })
 
-  emitter.on('table:contextMenu', ({ x, y, visible }) => {
-    state.contextMenu = { x, y, visible }
+  emitter.on('table:headerMenu', ({ x, y, visible }) => {
+    state.headerMenu = { x, y, visible }
     emitter.emit('render')
   })
 }

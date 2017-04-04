@@ -1,12 +1,11 @@
 const html = require('choo/html')
 const css = require('sheetify')
-const setCursor = require('../util').setCursor
 const keyboard = require('keyboardjs')
 const offset = require('mouse-event-offset')
 
+const setCursor = require('../util').setCursor
 const contextMenu = require('./context-menu.js')
 
-const noop = () => {}
 const prefix = css`
   :host {
     position: relative;
@@ -33,52 +32,67 @@ module.exports = function table (state, emit) {
   const { fields, rows } = state.activeSheet
   const selectedCell = state.selectedCell
 
-  const contextMenuItems = [
-    { label: 'Foo', onclick: () => console.log('foo') },
-    { label: 'Bar', onclick: () => console.log('bar') }
-  ]
+  const moveCellUp = moveCell.bind(this, 'up')
+  const moveCellDown = moveCell.bind(this, 'down')
+  const moveCellLeft = moveCell.bind(this, 'left')
+  const moveCellRight = moveCell.bind(this, 'right')
+  const noop = () => {}
 
   return html`
     <div class=${prefix}>
       <table class="table is-bordered is-striped is-narrow"
-             onload=${onload}>
+             onload=${onload} onunload=${onunload}>
         <thead>
           <tr>
-            ${fields.map((field) => html`
-              <th oncontextmenu=${showHeaderMenu}>${field.name}</th>
-            `)}
+            ${fields.map(tableHeader)}
           </tr>
         </thead>
         <tbody>
           ${rows.map(tableRow)}
         </tbody>
       </table>
-      ${state.contextMenu.visible
-        ? contextMenu(contextMenuItems, state.contextMenu, hideHeaderMenu)
-        : ''}
+      ${headerMenu(state.headerMenu)}
     </div>
   `
 
+  function headerMenu (headerMenuState) {
+    const items = [
+      { label: 'Set type', onclick: () => console.log('Clicked "set type"') },
+      { label: 'Remove column', onclick: () => console.log('Clicked "remove column"') }
+    ]
+    return headerMenuState.visible
+      ? contextMenu(items, headerMenuState, hideHeaderMenu)
+      : ''
+  }
+
   function onload (el) {
-    keyboard.bind('up', moveCell.bind(this, 'up'))
-    keyboard.bind('down', moveCell.bind(this, 'down'))
-    keyboard.bind('left', moveCell.bind(this, 'left'))
-    keyboard.bind('right', moveCell.bind(this, 'right'))
-    keyboard.bind('tab', moveCell.bind(this, 'right'))
-    keyboard.bind('shift + tab', moveCell.bind(this, 'left'))
+    keyboard.bind('up', moveCellUp)
+    keyboard.bind('down', moveCellDown)
+    keyboard.bind('left', moveCellLeft)
+    keyboard.bind('right', moveCellRight)
+    keyboard.bind('tab', moveCellRight)
+    keyboard.bind('shift + tab', moveCellLeft)
     keyboard.bind('shift + enter', noop) // differentiate from just enter
     keyboard.bind('enter', enter)
   }
 
-  function showHeaderMenu (evt) {
-    const parentEl = evt.currentTarget.parentNode
-    const [x, y] = offset(evt, parentEl)
-    emit('table:contextMenu', { x, y, visible: true })
-    evt.preventDefault()
+  function onunload (el) {
+    keyboard.unbind('up', moveCellUp)
+    keyboard.unbind('down', moveCellDown)
+    keyboard.unbind('left', moveCellLeft)
+    keyboard.unbind('right', moveCellRight)
+    keyboard.unbind('tab', moveCellRight)
+    keyboard.unbind('shift + tab', moveCellLeft)
+    keyboard.unbind('shift + enter', noop)
+    keyboard.unbind('enter', enter)
   }
 
-  function hideHeaderMenu () {
-    emit('table:contextMenu', { visible: false })
+  function tableHeader (field) {
+    return html`
+      <th oncontextmenu=${showHeaderMenu}>
+        ${field.name}
+      </th>
+    `
   }
 
   function tableRow (row, rowIndex) {
@@ -86,36 +100,62 @@ module.exports = function table (state, emit) {
       <tr>
         ${fields.map((field, columnIndex) => {
           const value = row[field.name] || ''
-          const selectCellCb = selectCell.bind(this, rowIndex, columnIndex, false)
-          const editCellCb = selectCell.bind(this, rowIndex, columnIndex, true)
 
           if (isSelectedCell(rowIndex, columnIndex)) {
             if (selectedCell.editing) {
-              return html`
-                <td class="selected editing"
-                    contenteditable="true"
-                    onblur=${deselectCell}
-                    onload=${setCursorInSelectedCell}>
-                  ${value}
-                </td>
-              `
+              return tableCellEditing(value)
             } else {
-              return html`
-                <td class="selected" ondblclick=${editCellCb}>
-                  ${value}
-                </td>
-              `
+              return tableCellSelected(value, rowIndex, columnIndex)
             }
           } else {
-            return html`
-              <td onclick=${selectCellCb} ondblclick=${editCellCb}>
-                ${value}
-              </td>
-            `
+            return tableCellDeselected(value, rowIndex, columnIndex)
           }
         })}
       </tr>
     `
+  }
+
+  function tableCellEditing (value) {
+    return html`
+      <td class="selected editing"
+          contenteditable="true"
+          onblur=${deselectCell}
+          onload=${setCursorInSelectedCell}>
+        ${value}
+      </td>
+    `
+  }
+
+  function tableCellSelected (value, rowIndex, columnIndex) {
+    const edit = selectCell.bind(this, rowIndex, columnIndex, true)
+
+    return html`
+      <td class="selected" ondblclick=${edit}>
+        ${value}
+      </td>
+    `
+  }
+
+  function tableCellDeselected (value, rowIndex, columnIndex) {
+    const select = selectCell.bind(this, rowIndex, columnIndex, false)
+    const edit = selectCell.bind(this, rowIndex, columnIndex, true)
+
+    return html`
+      <td onclick=${select} ondblclick=${edit}>
+        ${value}
+      </td>
+    `
+  }
+
+  function showHeaderMenu (evt) {
+    const parentEl = evt.currentTarget.parentNode
+    const [x, y] = offset(evt, parentEl)
+    emit('table:headerMenu', { x, y, visible: true })
+    evt.preventDefault()
+  }
+
+  function hideHeaderMenu () {
+    emit('table:headerMenu', { visible: false })
   }
 
   function setCursorInSelectedCell () {
