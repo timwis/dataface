@@ -1,4 +1,4 @@
-const db = require('./clients/postgres')
+const db = require('./clients/postgrest')
 
 module.exports = function store (state, emitter) {
   state.sheets = []
