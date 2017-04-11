@@ -1,8 +1,8 @@
 const PostgREST = require('postgrest-client')
 const keys = require('lodash/keys')
 
-const endpoint = 'http://localhost:3000'
-const db = new PostgREST(endpoint)
+const postgrestHost = process.env.POSTGREST_HOST
+const db = new PostgREST(postgrestHost)
 
 module.exports = {
   getTables () {
