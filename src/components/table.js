@@ -17,8 +17,17 @@ const prefix = css`
   }
   td.selected {
     cursor: inherit;
-    border: 2px #00d1b2 solid !important;
     box-sizing: border-box;
+    position: relative;
+  }
+  td.selected::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 2px #00d1b2 solid;
   }
   td.editing {
     cursor: inherit;
