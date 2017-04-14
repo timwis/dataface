@@ -1,0 +1,34 @@
+version: '2'
+services:
+  postgres:
+    image: postgres
+    volumes:
+      # - pgdata:/var/lib/postgresql/data
+      - ./db/contacts.sql:/docker-entrypoint-initdb.d/contacts.sql
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+  server:
+    depends_on:
+      - postgres
+    image: erasche/postgrest
+    ports:
+      - "3000:3000"
+    environment:
+      DB_URI: "postgres://postgres:pwd@postgres:5432/postgres"
+      DB_SCHEMA: public
+      DB_ANON_ROLE: postgres
+  client:
+    depends_on:
+      - server
+    image: jsixc/node-yarn-app:7
+    volumes:
+      - ./:/home/app
+    ports:
+      - "9966:9966"
+    environment:
+      POSTGREST_HOST: "http://localhost:3000"
+# volumes:
+  # pgdata:

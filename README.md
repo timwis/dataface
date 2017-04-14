@@ -1,9 +1,16 @@
 # Dataface
 Build and manage data with a spreadsheet-like interface. **Work in progress**.
 
-## Usage
-1. Run [PostgREST](https://postgrest.com)
-2. Install dependencies via `yarn install` or `npm install`
-3. Copy `.env.sample` to `.env` and fill in PostgREST host
-4. Run the application via `yarn start` or `npm start`
-5. View the application in the browser at `http://localhost:9966`
+## Development
+The `docker-compose.yml` file provides a postgres container, a
+[PostgREST][PostgREST] container, and a node-yarn-app container. To spin them
+all up, [install docker](https://www.docker.com/community-edition) and run
+`docker-compose up`.
+
+To run the client application by itself, pointing to a standalone PostgREST
+server, install dependencies via `yarn install`, then specify the
+`POSTGREST_ENVIRONMENT` variable and run `yarn start`, i.e.:
+
+```bash
+POSTGREST_HOST="http://localhost:3000" yarn start
+```
