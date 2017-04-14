@@ -14,3 +14,5 @@ server, install dependencies via `yarn install`, then specify the
 ```bash
 POSTGREST_HOST="http://localhost:3000" yarn start
 ```
+
+[PostgREST]: https://postgrest.com
