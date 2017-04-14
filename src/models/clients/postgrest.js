@@ -10,13 +10,14 @@ module.exports = {
       .set('Accept', '*/*') // https://github.com/begriffs/postgrest/issues/860
       .then((data) => keys(data.definitions).map((table) => ({name: table})))
       .then((tables) => {
-        console.log(tables)
         return tables
       })
   },
 
-  getRows (table, limit = 0, offset = 0) {
+  getRows (table, from = 0, to = 0) {
+    const rangeTo = to || from + 50
     return db.get(`/${table}`)
+      .range(from, rangeTo)
       .set('Accept', '*/*') // https://github.com/begriffs/postgrest/issues/860
   },
 
