@@ -22,18 +22,40 @@ module.exports = function grid (state, emit) {
     <div class=${prefix}>
       <table class="table is-bordered is-striped is-narrow"
              onload=${onload} onunload=${onunload}>
-        <thead>
+        <thead oncontextmenu=${showHeaderMenu}>
           <tr>
             ${fields.map(tableHeader)}
           </tr>
         </thead>
-        <tbody>
+        <tbody onclick=${clickCell} ondblclick=${dblClickCell}>
           ${rows.map(tableRow)}
         </tbody>
       </table>
       ${headerMenu(state.ui.headerMenu)}
     </div>
   `
+
+  function clickCell (evt) {
+    const el = evt.target
+    const rowIndex = +el.dataset.rowIndex
+    const columnIndex = +el.dataset.columnIndex
+    const isSelected = el.classList.contains('selected')
+    if (!isSelected) {
+      const payload = { rowIndex, columnIndex, editing: false }
+      emit('ui:selectCell', payload)
+    }
+  }
+
+  function dblClickCell (evt) {
+    const el = evt.target
+    const rowIndex = +el.dataset.rowIndex
+    const columnIndex = +el.dataset.columnIndex
+    const isEditing = el.classList.contains('editing')
+    if (!isEditing) {
+      const payload = { rowIndex, columnIndex, editing: true }
+      emit('ui:selectCell', payload)
+    }
+  }
 
   function headerMenu (headerMenuState) {
     const items = [
@@ -69,7 +91,7 @@ module.exports = function grid (state, emit) {
 
   function tableHeader (field) {
     return html`
-      <th oncontextmenu=${showHeaderMenu}>
+      <th>
         ${field.name}
       </th>
     `
@@ -107,28 +129,26 @@ module.exports = function grid (state, emit) {
   }
 
   function tableCellSelected (value, rowIndex, columnIndex) {
-    const edit = selectCell.bind(this, rowIndex, columnIndex, true)
-
     return html`
-      <td class="selected" ondblclick=${edit}>
+      <td class="selected"
+          data-row-index=${rowIndex}
+          data-column-index=${columnIndex}>
         ${value}
       </td>
     `
   }
 
   function tableCellDeselected (value, rowIndex, columnIndex) {
-    const select = selectCell.bind(this, rowIndex, columnIndex, false)
-    const edit = selectCell.bind(this, rowIndex, columnIndex, true)
-
     return html`
-      <td onclick=${select} ondblclick=${edit}>
+      <td data-row-index=${rowIndex}
+          data-column-index=${columnIndex}>
         ${value}
       </td>
     `
   }
 
   function showHeaderMenu (evt) {
-    const parentEl = evt.currentTarget.parentNode
+    const parentEl = evt.target.parentNode
     const [x, y] = offset(evt, parentEl)
     emit('ui:headerMenu', { x, y, visible: true })
     evt.preventDefault()
@@ -143,11 +163,6 @@ module.exports = function grid (state, emit) {
     // It's probably a bug with nanomorph, technically
     const el = document.querySelector('.selected')
     setCursor(el)
-  }
-
-  function selectCell (rowIndex, columnIndex, editing, evt) {
-    const payload = { rowIndex, columnIndex, editing }
-    emit('ui:selectCell', payload)
   }
 
   function deselectCell (evt) {

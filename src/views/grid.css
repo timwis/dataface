@@ -1,10 +1,10 @@
 :host {
   position: relative;
+  user-select: none;
 }
 td {
   cursor: cell;
   white-space: nowrap;
-  user-select: none;
 }
 td.selected {
   cursor: inherit;
