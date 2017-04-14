@@ -5,6 +5,7 @@ services:
     volumes:
       # - pgdata:/var/lib/postgresql/data
       - ./db/contacts.sql:/docker-entrypoint-initdb.d/contacts.sql
+      - ./db/projects.sql:/docker-entrypoint-initdb.d/projects.sql
     ports:
       - "5432:5432"
     restart: always

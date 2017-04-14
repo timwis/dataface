@@ -3,10 +3,10 @@ const css = require('sheetify')
 const keyboard = require('keyboardjs')
 const offset = require('mouse-event-offset')
 
-const setCursor = require('../../util').setCursor
-const contextMenu = require('../context-menu.js')
+const setCursor = require('../util').setCursor
+const contextMenu = require('../components/context-menu.js')
 
-const prefix = css('./styles.css')
+const prefix = css('./table.css')
 
 module.exports = function table (state, emit) {
   const { fields, rows } = state.activeSheet
