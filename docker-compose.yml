@@ -10,7 +10,7 @@ services:
     restart: always
     environment:
       POSTGRES_USER: postgres
-  web:
+  server:
     depends_on:
       - postgres
     image: erasche/postgrest
@@ -20,5 +20,15 @@ services:
       DB_URI: "postgres://postgres:pwd@postgres:5432/postgres"
       DB_SCHEMA: public
       DB_ANON_ROLE: postgres
+  client:
+    depends_on:
+      - server
+    build: .
+    volumes:
+      - ./:/usr/src/app
+    ports:
+      - "9966:9966"
+    environment:
+      POSTGREST_HOST: "http://localhost:3000"
 # volumes:
   # pgdata:

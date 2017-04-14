@@ -1,7 +1,7 @@
 {
   "main": "client/src/index.js",
   "scripts": {
-    "start": "budo . --live --pushstate --title Dataface -- -t [ sheetify/transform -u sheetify-cssnext ] -t [ localenvify ]",
+    "start": "echo test && budo . --live --pushstate --title Dataface -- -t [ sheetify/transform -u sheetify-cssnext ] -t [ localenvify ]",
     "test": "ava"
   },
   "dependencies": {
@@ -13,7 +13,8 @@
     "localenvify": "^1.0.1",
     "mouse-event-offset": "^3.0.2",
     "nanocomponent": "^2.0.3",
-    "postgrest-client": "^1.1.2"
+    "postgrest-client": "^1.1.2",
+    "sheetify": "^6.0.1"
   },
   "devDependencies": {
     "ava": "^0.18.2",
