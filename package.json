@@ -1,5 +1,5 @@
 {
-  "main": "client/src/index.js",
+  "main": "src/index.js",
   "scripts": {
     "start": "echo test && budo . --live --pushstate --title Dataface -- -t [ sheetify/transform -u sheetify-cssnext ] -t [ localenvify ]",
     "test": "ava"

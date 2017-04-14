@@ -4,7 +4,7 @@ services:
     image: postgres
     volumes:
       # - pgdata:/var/lib/postgresql/data
-      - ./scripts/contacts.sql:/docker-entrypoint-initdb.d/contacts.sql
+      - ./db/contacts.sql:/docker-entrypoint-initdb.d/contacts.sql
     ports:
       - "5432:5432"
     restart: always
@@ -23,9 +23,9 @@ services:
   client:
     depends_on:
       - server
-    build: .
+    image: jsixc/node-yarn-app:7
     volumes:
-      - ./:/usr/src/app
+      - ./:/home/app
     ports:
       - "9966:9966"
     environment:
