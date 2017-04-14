@@ -14,10 +14,11 @@ module.exports = {
       })
   },
 
-  getRows (table, from = 0, to = 0) {
-    const rangeTo = to || from + 50
+  getRows (table, limit = 0, offset = 0) {
+    const from = offset
+    const to = offset + limit
     return db.get(`/${table}`)
-      .range(from, rangeTo)
+      .range(from, to)
       .order('id', true) // ascending
       .set('Accept', '*/*') // https://github.com/begriffs/postgrest/issues/860
   },
