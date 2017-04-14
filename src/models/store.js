@@ -1,47 +1,53 @@
 const db = require('./clients/postgrest')
 
 module.exports = function store (state, emitter) {
-  state.sheets = []
-  state.activeSheet = {
-    fields: null,
-    rows: null
+  state.store = {
+    sheets: [],
+    activeSheet: {
+      fields: null,
+      rows: null,
+      name: null
+    }
   }
 
   emitter.on('pushState', function (location) {
     const sheet = location.split('/').pop()
-    emitter.emit('sheets:selectSheet', sheet)
+    emitter.emit('store:selectSheet', sheet)
   })
 
-  emitter.on('sheets:getList', async function () {
+  emitter.on('store:getList', async function () {
     try {
-      state.sheets = await db.getTables()
+      state.store.sheets = await db.getTables()
       const activeSheetName = getActiveSheet()
-      emitter.emit('sheets:selectSheet', activeSheetName)
+      emitter.emit('store:selectSheet', activeSheetName)
       emitter.emit('render')
     } catch (err) {
       console.error(err)
     }
   })
 
-  emitter.on('sheets:selectSheet', async function (table) {
+  emitter.on('store:selectSheet', async function (table) {
     try {
-      state.activeSheet.rows = await db.getRows(table, 30)
-      state.activeSheet.fields = await db.getSchema(table)
-      state.activeSheet.name = table
+      state.store.activeSheet = {
+        rows: await db.getRows(table, 30),
+        fields: await db.getSchema(table),
+        name: table
+      }
       emitter.emit('render')
     } catch (err) {
       console.error(err)
     }
   })
 
-  emitter.on('sheet:update', async function (data) {
+  emitter.on('store:update', async function (data) {
     try {
-      const table = state.activeSheet.name
       const { rowIndex, updates } = data
-      const id = state.activeSheet.rows[rowIndex].id
+      const activeSheet = state.store.activeSheet
+      const table = activeSheet.name
+      const id = activeSheet.rows[rowIndex].id
       const conditions = { id }
       const newRow = await db.update(table, updates, conditions)
-      state.activeSheet.rows[rowIndex] = newRow
+      state.store.activeSheet.rows[rowIndex] = newRow
       emitter.emit('render')
     } catch (err) {
       console.error(err)
@@ -52,8 +58,8 @@ module.exports = function store (state, emitter) {
     // Use param if exists, otherwise use first table in list
     if (state.params.sheet) {
       return state.params.sheet
-    } else if (state.sheets.length > 0) {
-      return state.sheets[0].name
+    } else if (state.store.sheets.length > 0) {
+      return state.store.sheets[0].name
     } else {
       return ''
     }

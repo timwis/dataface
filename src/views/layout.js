@@ -11,7 +11,7 @@ const prefix = css`
 `
 
 module.exports = (view) => (state, emit) => {
-  const { sheets, activeSheet } = state
+  const { sheets, activeSheet } = state.store
 
   return html`
     <body>
@@ -32,6 +32,6 @@ module.exports = (view) => (state, emit) => {
   `
 
   function onload (el) {
-    emit('sheets:getList')
+    emit('store:getList')
   }
 }

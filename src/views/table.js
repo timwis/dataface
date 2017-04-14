@@ -9,8 +9,8 @@ const contextMenu = require('../components/context-menu.js')
 const prefix = css('./table.css')
 
 module.exports = function table (state, emit) {
-  const { fields, rows } = state.activeSheet
-  const selectedCell = state.selectedCell
+  const { fields, rows } = state.store.activeSheet
+  const selectedCell = state.ui.selectedCell
 
   const moveCellUp = moveCell.bind(this, 'up')
   const moveCellDown = moveCell.bind(this, 'down')
@@ -31,7 +31,7 @@ module.exports = function table (state, emit) {
           ${rows.map(tableRow)}
         </tbody>
       </table>
-      ${headerMenu(state.headerMenu)}
+      ${headerMenu(state.ui.headerMenu)}
     </div>
   `
 
@@ -130,12 +130,12 @@ module.exports = function table (state, emit) {
   function showHeaderMenu (evt) {
     const parentEl = evt.currentTarget.parentNode
     const [x, y] = offset(evt, parentEl)
-    emit('table:headerMenu', { x, y, visible: true })
+    emit('ui:headerMenu', { x, y, visible: true })
     evt.preventDefault()
   }
 
   function hideHeaderMenu () {
-    emit('table:headerMenu', { visible: false })
+    emit('ui:headerMenu', { visible: false })
   }
 
   function setCursorInSelectedCell () {
@@ -147,23 +147,23 @@ module.exports = function table (state, emit) {
 
   function selectCell (rowIndex, columnIndex, editing, evt) {
     const payload = { rowIndex, columnIndex, editing }
-    emit('table:selectCell', payload)
+    emit('ui:selectCell', payload)
   }
 
   function deselectCell (evt) {
-    const { rowIndex, columnIndex } = state.selectedCell
+    const { rowIndex, columnIndex } = state.ui.selectedCell
     const value = evt.target.innerText
     save(rowIndex, columnIndex, value)
-    emit('table:deselectCell')
+    emit('ui:deselectCell')
   }
 
   function isSelectedCell (rowIndex, columnIndex) {
-    return state.selectedCell.rowIndex === rowIndex &&
-      state.selectedCell.columnIndex === columnIndex
+    return state.ui.selectedCell.rowIndex === rowIndex &&
+      state.ui.selectedCell.columnIndex === columnIndex
   }
 
   function moveCell (direction, evt) {
-    const { rowIndex, columnIndex, editing } = state.selectedCell
+    const { rowIndex, columnIndex, editing } = state.ui.selectedCell
     const payload = {}
 
     // Don't do anything if no cell is selected or editing
@@ -189,12 +189,12 @@ module.exports = function table (state, emit) {
         payload.columnIndex = Math.min(nextColumnIndex, lastColumnIndex)
         break
     }
-    emit('table:selectCell', payload)
+    emit('ui:selectCell', payload)
     evt.preventDefault()
   }
 
   function enter (evt) {
-    const { rowIndex, columnIndex, editing } = state.selectedCell
+    const { rowIndex, columnIndex, editing } = state.ui.selectedCell
 
     // Don't do anything if no cell is selected
     if (rowIndex === null) return
@@ -205,7 +205,7 @@ module.exports = function table (state, emit) {
     }
 
     // Set editing to opposite of current state
-    emit('table:selectCell', {editing: !editing})
+    emit('ui:selectCell', {editing: !editing})
     evt.preventDefault()
   }
 
@@ -214,7 +214,7 @@ module.exports = function table (state, emit) {
     const oldValue = rows[rowIndex][field]
     if (value !== oldValue) {
       const updates = { [field]: value }
-      emit('sheet:update', { rowIndex, updates })
+      emit('store:update', { rowIndex, updates })
     }
   }
 }

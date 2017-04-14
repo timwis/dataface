@@ -6,8 +6,8 @@ const layout = require('./views/layout')
 const table = require('./views/table')
 
 const app = choo()
-app.use(require('./models/sheet'))
-app.use(require('./models/table'))
+app.use(require('./models/store'))
+app.use(require('./models/ui'))
 
 const isDebug = process.env.NODE_ENV !== 'production'
 if (isDebug) app.use(require('choo-log')())
