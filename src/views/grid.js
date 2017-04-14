@@ -6,9 +6,9 @@ const offset = require('mouse-event-offset')
 const setCursor = require('../util').setCursor
 const contextMenu = require('../components/context-menu.js')
 
-const prefix = css('./table.css')
+const prefix = css('./grid.css')
 
-module.exports = function table (state, emit) {
+module.exports = function grid (state, emit) {
   const { fields, rows } = state.store.activeSheet
   const selectedCell = state.ui.selectedCell
 
