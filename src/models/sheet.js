@@ -34,6 +34,20 @@ module.exports = function store (state, emitter) {
     }
   })
 
+  emitter.on('sheet:update', async function (data) {
+    try {
+      const table = state.activeSheet.name
+      const { rowIndex, updates } = data
+      const id = state.activeSheet.rows[rowIndex].id
+      const conditions = { id }
+      const newRow = await db.update(table, updates, conditions)
+      state.activeSheet.rows[rowIndex] = newRow
+      emitter.emit('render')
+    } catch (err) {
+      console.error(err)
+    }
+  })
+
   function getActiveSheet () {
     // Use param if exists, otherwise use first table in list
     if (state.params.sheet) {

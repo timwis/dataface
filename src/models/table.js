@@ -10,8 +10,8 @@ module.exports = function tableModel (state, emitter) {
     visible: false
   }
 
-  emitter.on('table:selectCell', ({ rowIndex, columnIndex, editing }) => {
-    state.selectedCell = { rowIndex, columnIndex, editing }
+  emitter.on('table:selectCell', (data) => {
+    Object.assign(state.selectedCell, data)
     emitter.emit('render')
   })
 

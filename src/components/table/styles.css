@@ -1,0 +1,28 @@
+:host {
+  position: relative;
+}
+td {
+  cursor: cell;
+  white-space: nowrap;
+  user-select: none;
+}
+td.selected {
+  cursor: inherit;
+  box-sizing: border-box;
+  position: relative;
+}
+td.selected::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 2px #00d1b2 solid;
+}
+td.editing {
+  cursor: inherit;
+  outline: none;
+  background-color: #fff;
+  box-shadow: 0 0 5px 3px #ccc;
+}

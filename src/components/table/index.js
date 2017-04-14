@@ -3,39 +3,10 @@ const css = require('sheetify')
 const keyboard = require('keyboardjs')
 const offset = require('mouse-event-offset')
 
-const setCursor = require('../util').setCursor
-const contextMenu = require('./context-menu.js')
+const setCursor = require('../../util').setCursor
+const contextMenu = require('../context-menu.js')
 
-const prefix = css`
-  :host {
-    position: relative;
-  }
-  td {
-    cursor: cell;
-    white-space: nowrap;
-    user-select: none;
-  }
-  td.selected {
-    cursor: inherit;
-    box-sizing: border-box;
-    position: relative;
-  }
-  td.selected::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border: 2px #00d1b2 solid;
-  }
-  td.editing {
-    cursor: inherit;
-    outline: none;
-    background-color: #fff;
-    box-shadow: 0 0 5px 3px #ccc;
-  }
-`
+const prefix = css('./styles.css')
 
 module.exports = function table (state, emit) {
   const { fields, rows } = state.activeSheet
@@ -180,6 +151,9 @@ module.exports = function table (state, emit) {
   }
 
   function deselectCell (evt) {
+    const { rowIndex, columnIndex } = state.selectedCell
+    const value = evt.target.innerText
+    save(rowIndex, columnIndex, value)
     emit('table:deselectCell')
   }
 
@@ -190,7 +164,7 @@ module.exports = function table (state, emit) {
 
   function moveCell (direction, evt) {
     const { rowIndex, columnIndex, editing } = state.selectedCell
-    const payload = { rowIndex, columnIndex, editing: false }
+    const payload = {}
 
     // Don't do anything if no cell is selected or editing
     if (rowIndex === null || editing) return
@@ -225,12 +199,22 @@ module.exports = function table (state, emit) {
     // Don't do anything if no cell is selected
     if (rowIndex === null) return
 
-    const payload = {
-      rowIndex,
-      columnIndex,
-      editing: !editing
+    if (editing) {
+      const value = evt.target.innerText
+      save(rowIndex, columnIndex, value)
     }
-    emit('table:selectCell', payload)
+
+    // Set editing to opposite of current state
+    emit('table:selectCell', {editing: !editing})
     evt.preventDefault()
+  }
+
+  function save (rowIndex, columnIndex, value) {
+    const field = fields[columnIndex].name
+    const oldValue = rows[rowIndex][field]
+    if (value !== oldValue) {
+      const updates = { [field]: value }
+      emit('sheet:update', { rowIndex, updates })
+    }
   }
 }

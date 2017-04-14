@@ -5135,7 +5135,7 @@ yallist@^2.0.0:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/yallist/-/yallist-2.1.2.tgz#1c11f9218f076089a47dd512f93c6699a6a81d52"
 
-yo-yoify@^3.5.0:
+yo-yoify@^3.5.0, yo-yoify@^3.7.0:
   version "3.7.0"
   resolved "https://registry.yarnpkg.com/yo-yoify/-/yo-yoify-3.7.0.tgz#1de9673427946ddd81f6a94fae56dd297c9d242a"
   dependencies:
