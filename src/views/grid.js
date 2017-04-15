@@ -121,7 +121,7 @@ module.exports = function grid (state, emit) {
     return html`
       <td class="selected editing"
           contenteditable="true"
-          onblur=${deselectCell}
+          onblur=${onBlurCell}
           onload=${setCursorInSelectedCell}>
         ${value}
       </td>
@@ -165,11 +165,13 @@ module.exports = function grid (state, emit) {
     setCursor(el)
   }
 
-  function deselectCell (evt) {
-    const { rowIndex, columnIndex } = state.ui.selectedCell
+  function onBlurCell (evt) {
+    const { rowIndex, columnIndex, editing } = state.ui.selectedCell
     const value = evt.target.innerText
     save(rowIndex, columnIndex, value)
-    emit('ui:deselectCell')
+    if (editing) { // will be false if user hit enter b/c of enter listener
+      emit('ui:selectCell', {editing: false})
+    }
   }
 
   function isSelectedCell (rowIndex, columnIndex) {
@@ -209,15 +211,10 @@ module.exports = function grid (state, emit) {
   }
 
   function enter (evt) {
-    const { rowIndex, columnIndex, editing } = state.ui.selectedCell
+    const { rowIndex, editing } = state.ui.selectedCell
 
     // Don't do anything if no cell is selected
     if (rowIndex === null) return
-
-    if (editing) {
-      const value = evt.target.innerText
-      save(rowIndex, columnIndex, value)
-    }
 
     // Set editing to opposite of current state
     emit('ui:selectCell', {editing: !editing})

@@ -17,11 +17,6 @@ module.exports = function ui (state, emitter) {
     emitter.emit('render')
   })
 
-  emitter.on('ui:deselectCell', () => {
-    state.ui.selectedCell.editing = false
-    emitter.emit('render')
-  })
-
   emitter.on('ui:headerMenu', ({ x, y, visible }) => {
     state.ui.headerMenu = { x, y, visible }
     emitter.emit('render')
