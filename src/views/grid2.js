@@ -1,55 +1,45 @@
 const html = require('choo/html')
 const css = require('sheetify')
-const Nanocomponent = require('nanocomponent')
-const Clusterize = require('clusterize.js')
-
-css('clusterize.js/clusterize.css')
+const CacheComponent = require('cache-component')
+const HyperList = require('hyperlist').default
 
 const prefix = css`
-  :host {
-    max-height: 100%;
+  thead, tbody {
+    display: block;
   }
 `
 
-class Grid extends Nanocomponent {
+class Grid extends CacheComponent {
   _render (fields, rows) {
-    console.log('rendering')
-    this.fields = fields
-    this.rows = rows
+    const tbody = document.createElement('tbody')
+
+    HyperList.create(tbody, {
+      height: 500,
+      itemHeight: 34,
+      total: rows.length,
+      generate: (index) => this.tableRow(fields, rows[index], index)
+    })
+
+    // Set scrollTop = 0 (in case switching between sheets)
+    window.setTimeout(() => document.querySelector('tbody').scrollTop = 0, 1)
 
     return html`
-      <div class="clusterize-scroll ${prefix}" id="clusterize-scroll">
+      <div class=${prefix}>
         <table class="table is-bordered is-striped is-narrow">
           <thead>
             <tr>${fields.map(this.tableHeader)}</tr>
           </thead>
-          <tbody class="clusterize-content" id="clusterize-content">
-          </tbody>
+          ${tbody}
         </table>
       </div>
     `
   }
 
   _update (fields, rows) {
-    if (this.clusterize) { // TODO: Update headers
-      this.fields = fields
-      this.rows = rows
-      this.clusterize.update(this.getClusterizeData())
-    }
-    return false
+    return true
   }
 
   _load () {
-    console.log('initializing')
-    this.clusterize = new Clusterize({
-      scrollId: 'clusterize-scroll',
-      contentId: 'clusterize-content',
-      rows: this.getClusterizeData()
-    })
-  }
-
-  getClusterizeData () {
-    return this.rows.map(this.tableRow.bind(this))
   }
 
   tableHeader (field) {
@@ -60,20 +50,20 @@ class Grid extends Nanocomponent {
     `
   }
 
-  tableRow (row, rowIndex) {
-    return `
+  tableRow (fields, row, rowIndex) {
+    return html`
       <tr>
-        ${this.fields.map((field, columnIndex) => {
+        ${fields.map((field, columnIndex) => {
           const value = row[field.name] || ''
 
           return this.tableCellDeselected(value, rowIndex, columnIndex)
-        }).join('')}
+        })}
       </tr>
     `
   }
 
   tableCellDeselected (value, rowIndex, columnIndex) {
-    return `
+    return html`
       <td data-row-index=${rowIndex}
           data-column-index=${columnIndex}>
         ${value}

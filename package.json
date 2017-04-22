@@ -7,8 +7,9 @@
   "dependencies": {
     "arrow-key-codes": "^1.0.0",
     "bulma": "^0.4.0",
+    "cache-component": "^4.0.0",
     "choo": "^5.1.4",
-    "clusterize.js": "^0.17.6",
+    "hyperlist": "^1.0.0-alpha-5",
     "insert-css": "^2.0.0",
     "keyboardjs": "^2.3.3",
     "localenvify": "^1.0.1",
