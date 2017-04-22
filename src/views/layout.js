@@ -1,14 +1,20 @@
 const html = require('choo/html')
-const css = require('sheetify')
 
 const nav = require('../components/nav')
 const menu = require('../components/menu')
 
-const prefix = css`
+require('insert-css')(`
+  html, body, .container, .columns, .table-container {
+    height: 100%
+  }
+  body {
+    display: flex;
+    flex-direction: column;
+  }
   .table-container {
     overflow-x: auto;
   }
-`
+`)
 
 module.exports = (view) => (state, emit) => {
   const { sheets, activeSheet } = state.store
@@ -16,7 +22,7 @@ module.exports = (view) => (state, emit) => {
   return html`
     <body>
       ${nav()}
-      <div class="container ${prefix}">
+      <div class="container">
         <div class="columns" onload=${onload}>
           <div class="column is-one-quarter">
             ${menu(sheets, activeSheet.name)}

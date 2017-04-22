@@ -29,7 +29,7 @@ module.exports = function store (state, emitter) {
   emitter.on('store:selectSheet', async function (table) {
     try {
       state.store.activeSheet = {
-        rows: await db.getRows(table, 30),
+        rows: await db.getRows(table),
         fields: await db.getSchema(table),
         name: table
       }

@@ -3,7 +3,7 @@ const css = require('sheetify')
 css('bulma/css/bulma.css')
 
 const layout = require('./views/layout')
-const grid = require('./views/grid')
+const grid = require('./views/grid2')
 
 const app = choo()
 app.use(require('./models/store'))
