@@ -947,14 +947,6 @@ bulma@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/bulma/-/bulma-0.4.0.tgz#2a0b07555d53bb4eb17861e3159e2616c21dfa6c"
 
-cache-component@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/cache-component/-/cache-component-4.0.0.tgz#88dad828ae5f0902defa9a73d83d6f4dcb7733f2"
-  dependencies:
-    global "^4.3.1"
-    nanomorph "^4.0.4"
-    on-load "^3.2.0"
-
 cached-path-relative@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/cached-path-relative/-/cached-path-relative-1.0.1.tgz#d09c4b52800aa4c078e2dd81a869aac90d2e54e7"
@@ -2102,7 +2094,7 @@ glob@^7.0.3, glob@^7.0.5, glob@^7.1.0:
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
-global@^4.3.0, global@^4.3.1:
+global@^4.3.0:
   version "4.3.1"
   resolved "https://registry.yarnpkg.com/global/-/global-4.3.1.tgz#5f757908c7cbabce54f386ae440e11e26b7916df"
   dependencies:
@@ -3114,7 +3106,7 @@ nanobus@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/nanobus/-/nanobus-3.0.0.tgz#1436257ab89dbe50bbcf95cfa9a411965453c80c"
 
-nanocomponent@4.0.0:
+nanocomponent@4.0.0, nanocomponent@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/nanocomponent/-/nanocomponent-4.0.0.tgz#31d0fe4690b70d6608d43ef00c276c4851c0fc51"
   dependencies:
@@ -3127,10 +3119,6 @@ nanologger@^1.0.1, nanologger@^1.0.2:
 nanomorph@^4.0.0, nanomorph@^4.0.3:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/nanomorph/-/nanomorph-4.0.3.tgz#0bf10f005e3ac9700d894efcb93aa0b8020f6ace"
-
-nanomorph@^4.0.4:
-  version "4.0.4"
-  resolved "https://registry.yarnpkg.com/nanomorph/-/nanomorph-4.0.4.tgz#aaa5bd4feecde0c51049351d075a5f6266c6b1aa"
 
 nanomount@^1.0.0:
   version "1.0.1"

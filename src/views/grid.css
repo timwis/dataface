@@ -2,6 +2,9 @@
   position: relative;
   user-select: none;
 }
+thead, tbody {
+  display: block;
+}
 td {
   cursor: cell;
   white-space: nowrap;

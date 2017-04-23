@@ -7,7 +7,6 @@
   "dependencies": {
     "arrow-key-codes": "^1.0.0",
     "bulma": "^0.4.0",
-    "cache-component": "^4.0.0",
     "choo": "^5.1.4",
     "hyperlist": "^1.0.0-alpha-5",
     "insert-css": "^2.0.0",
@@ -15,6 +14,7 @@
     "localenvify": "^1.0.1",
     "microcomponent": "^3.1.0",
     "mouse-event-offset": "^3.0.2",
+    "nanocomponent": "^4.0.0",
     "postgrest-client": "^1.1.2",
     "sheetify": "^6.0.1"
   },
