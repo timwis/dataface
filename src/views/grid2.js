@@ -17,16 +17,17 @@ const hyperList = new HyperList('tbody', opts)
 module.exports = function grid (state, emit) {
   const { fields, rows } = state.store.activeSheet
   const selectedCell = Object.assign({}, state.ui.selectedCell)
-  const tbody = hyperList.render({ fields, rows, selectedCell })
-  tbody.onclick = onClickCell
-  tbody.ondblclick = onDblClickCell
-  tbody.addEventListener('blur', onBlurCell, true)
 
   const moveCellUp = moveCell.bind(this, 'up')
   const moveCellDown = moveCell.bind(this, 'down')
   const moveCellLeft = moveCell.bind(this, 'left')
   const moveCellRight = moveCell.bind(this, 'right')
   const noop = () => {}
+
+  const tbody = hyperList.render({ fields, rows, selectedCell })
+  tbody.onclick = onClickCell
+  tbody.ondblclick = onDblClickCell
+  tbody.addEventListener('blur', onBlurCell, true)
 
   return html`
     <div class=${prefix} onload=${onLoad} onunload=${onUnload}>
