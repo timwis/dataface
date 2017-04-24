@@ -2,8 +2,10 @@ const html = require('choo/html')
 const css = require('sheetify')
 const keyboard = require('keyboardjs')
 const HyperList = require('hyperlist-component')
+const offset = require('mouse-event-offset')
 
 const setCursor = require('../util').setCursor
+const contextMenu = require('../components/context-menu.js')
 const prefix = css('./grid.css')
 
 const opts = {
@@ -32,13 +34,35 @@ module.exports = function grid (state, emit) {
   return html`
     <div class=${prefix} onload=${onLoad} onunload=${onUnload}>
       <table class="table is-bordered is-striped is-narrow">
-        <thead>
+        <thead oncontextmenu=${onHeaderMenu}>
           <tr>${fields.map(tableHeader)}</tr>
         </thead>
         ${tbody}
       </table>
+      ${headerMenu(state.ui.headerMenu)}
     </div>
   `
+
+  function headerMenu (headerMenuState) {
+    const items = [
+      { label: 'Set type', onclick: () => console.log('Clicked "set type"') },
+      { label: 'Remove column', onclick: () => console.log('Clicked "remove column"') }
+    ]
+    return headerMenuState.visible
+      ? contextMenu(items, headerMenuState, hideHeaderMenu)
+      : ''
+  }
+
+  function onHeaderMenu (evt) {
+    const parentEl = evt.target.parentNode
+    const [x, y] = offset(evt, parentEl)
+    emit('ui:headerMenu', { x, y, visible: true })
+    evt.preventDefault()
+  }
+
+  function hideHeaderMenu () {
+    emit('ui:headerMenu', { visible: false })
+  }
 
   function onClickCell (evt) {
     const el = evt.target
