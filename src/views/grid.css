@@ -2,15 +2,21 @@
   position: relative;
   user-select: none;
 }
-thead, tbody {
+tbody {
   display: block;
 }
-td {
+thead, tbody tr {
+  width: 100%;
+  display: table;
+  table-layout: fixed;
+}
+td:not(.editing) {
   cursor: cell;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 td.selected {
-  cursor: inherit;
   box-sizing: border-box;
   position: relative;
 }
@@ -24,8 +30,9 @@ td.selected::before {
   border: 2px #00d1b2 solid;
 }
 td.editing {
-  cursor: inherit;
+  cursor: text;
   outline: none;
   background-color: #fff;
   box-shadow: 0 0 5px 3px #ccc;
+  z-index: 999;
 }
