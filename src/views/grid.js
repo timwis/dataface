@@ -3,6 +3,7 @@ const css = require('sheetify')
 const keyboard = require('keyboardjs')
 const HyperList = require('hyperlist-component')
 const offset = require('mouse-event-offset')
+const onload = require('on-load')
 
 const setCursor = require('../util').setCursor
 const contextMenu = require('../components/context-menu.js')
@@ -27,13 +28,12 @@ module.exports = function grid (state, emit) {
   const noop = () => {}
 
   const tbody = hyperList.render({ fields, rows, selectedCell })
-  tbody.onclick = onClickCell
-  tbody.ondblclick = onDblClickCell
   tbody.addEventListener('blur', onBlurCell, true)
 
   return html`
     <div class=${prefix} onload=${onLoad} onunload=${onUnload}>
-      <table class="table is-bordered is-striped is-narrow">
+      <table class="table is-bordered is-striped is-narrow"
+        onclick=${onClickCell} ondblclick=${onDblClickCell}>
         <thead oncontextmenu=${onHeaderMenu}>
           <tr>${fields.map(tableHeader)}</tr>
         </thead>
@@ -128,7 +128,7 @@ module.exports = function grid (state, emit) {
     switch (direction) {
       case 'up':
         const prevRowIndex = rowIndex - 1
-        payload.rowIndex = Math.max(prevRowIndex, 0)
+        payload.rowIndex = Math.max(prevRowIndex, -1) // -1 is header
         break
       case 'down':
         const nextRowIndex = rowIndex + 1
@@ -168,14 +168,20 @@ module.exports = function grid (state, emit) {
       emit('store:update', { rowIndex, updates })
     }
   }
-}
 
-function tableHeader (field) {
-  return html`
-    <th>
-      ${field.name}
-    </th>
-  `
+  function tableHeader (field, columnIndex) {
+    const selectedCell = state.ui.selectedCell
+    const opts = {
+      value: field.name,
+      rowIndex: -1,
+      columnIndex,
+      isHeader: true,
+      isSelected: (selectedCell.rowIndex === -1) &&
+                  (selectedCell.columnIndex === columnIndex),
+      isEditing: selectedCell.editing
+    }
+    return tableCell(opts)
+  }
 }
 
 function tableRow (state, rowIndex) {
@@ -185,54 +191,40 @@ function tableRow (state, rowIndex) {
   return html`
     <tr>
       ${fields.map((field, columnIndex) => {
-        const value = row[field.name] || ''
-
-        if (isSelectedCell(rowIndex, columnIndex)) {
-          if (selectedCell.editing) {
-            return tableCellEditing(value)
-          } else {
-            return tableCellSelected(value, rowIndex, columnIndex)
-          }
-        } else {
-          return tableCellDeselected(value, rowIndex, columnIndex)
+        const tableCellOpts = {
+          value: row[field.name] || '',
+          rowIndex,
+          columnIndex,
+          isHeader: false,
+          isSelected: (rowIndex === selectedCell.rowIndex) &&
+                      (columnIndex === selectedCell.columnIndex),
+          isEditing: selectedCell.editing
         }
+        return tableCell(tableCellOpts)
       })}
     </tr>
   `
+}
 
-  function isSelectedCell (rowIndex, columnIndex) {
-    return rowIndex === selectedCell.rowIndex &&
-      columnIndex === selectedCell.columnIndex
+function tableCell (opts) {
+  const tagName = opts.isHeader ? 'th' : 'td'
+  const el = document.createElement(tagName)
+  el.innerText = opts.value
+
+  el.dataset.rowIndex = opts.rowIndex
+  el.dataset.columnIndex = opts.columnIndex
+
+  if (opts.isSelected) {
+    el.classList.add('selected')
   }
-}
 
-function tableCellEditing (value) {
-  return html`
-    <td class="selected editing"
-        contenteditable="true"
-        onload=${setCursorInSelectedCell}>
-      ${value}
-    </td>
-  `
-}
+  if (opts.isSelected && opts.isEditing) {
+    el.classList.add('editing')
+    el.setAttribute('contenteditable', true)
+    onload(el, setCursorInSelectedCell)
+  }
 
-function tableCellSelected (value, rowIndex, columnIndex) {
-  return html`
-    <td class="selected"
-        data-row-index=${rowIndex}
-        data-column-index=${columnIndex}>
-      ${value}
-    </td>
-  `
-}
-
-function tableCellDeselected (value, rowIndex, columnIndex) {
-  return html`
-    <td data-row-index=${rowIndex}
-        data-column-index=${columnIndex}>
-      ${value}
-    </td>
-  `
+  return el
 }
 
 function setCursorInSelectedCell () {

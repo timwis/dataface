@@ -2265,9 +2265,20 @@ https-browserify@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/https-browserify/-/https-browserify-1.0.0.tgz#ec06c10e0a34c0f2faf199f7fd7fc78fffd03c73"
 
+hyperlist-component@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/hyperlist-component/-/hyperlist-component-0.1.0.tgz#130b0f40b694a6299bf1889c5e4d9f49fbe84911"
+  dependencies:
+    hyperlist "^1.0.0-alpha-6"
+    nanocomponent "^4.0.0"
+
 hyperlist@^1.0.0-alpha-5:
   version "1.0.0-alpha-5"
   resolved "https://registry.yarnpkg.com/hyperlist/-/hyperlist-1.0.0-alpha-5.tgz#6496990533ccf0573a788061aa49b8360f562f40"
+
+hyperlist@^1.0.0-alpha-6:
+  version "1.0.0-alpha-6"
+  resolved "https://registry.yarnpkg.com/hyperlist/-/hyperlist-1.0.0-alpha-6.tgz#98ddd464e9edaa33893177b93a53875c2e8b1395"
 
 hyperscript-attribute-to-property@^1.0.0:
   version "1.0.0"

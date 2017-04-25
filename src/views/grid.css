@@ -10,16 +10,19 @@ thead, tbody tr {
   display: table;
   table-layout: fixed;
 }
+th:not(.editing),
 td:not(.editing) {
   cursor: cell;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+th.selected,
 td.selected {
   box-sizing: border-box;
   position: relative;
 }
+th.selected::before,
 td.selected::before {
   content: "";
   position: absolute;
@@ -29,6 +32,7 @@ td.selected::before {
   bottom: 0;
   border: 2px #00d1b2 solid;
 }
+th.editing,
 td.editing {
   cursor: text;
   outline: none;

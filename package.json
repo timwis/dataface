@@ -16,6 +16,7 @@
     "microcomponent": "^3.1.0",
     "mouse-event-offset": "^3.0.2",
     "nanocomponent": "^4.0.0",
+    "on-load": "^3.2.0",
     "postgrest-client": "^1.1.2",
     "sheetify": "^6.0.1"
   },
