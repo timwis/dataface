@@ -9,6 +9,7 @@
     "bulma": "^0.4.0",
     "choo": "^5.1.4",
     "hyperlist": "^1.0.0-alpha-5",
+    "hyperlist-component": "^0.1.0",
     "insert-css": "^2.0.0",
     "keyboardjs": "^2.3.3",
     "localenvify": "^1.0.1",
