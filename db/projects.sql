@@ -1,5 +1,5 @@
 create table projects (
-	id INT PRIMARY KEY,
+	id SERIAL PRIMARY KEY,
 	title TEXT,
 	color VARCHAR(50),
 	city VARCHAR(50)

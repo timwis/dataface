@@ -3,11 +3,11 @@ services:
   postgres:
     image: postgres
     volumes:
-      # - pgdata:/var/lib/postgresql/data
+      - ./db/get_schema.sql:/docker-entrypoint-initdb.d/get_schema.sql
       - ./db/contacts.sql:/docker-entrypoint-initdb.d/contacts.sql
       - ./db/projects.sql:/docker-entrypoint-initdb.d/projects.sql
     ports:
-      - "5432:5432"
+      - "5433:5432"
     restart: always
     environment:
       POSTGRES_USER: postgres
@@ -18,7 +18,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DB_URI: "postgres://postgres:pwd@postgres:5432/postgres"
+      DB_URI: "postgres://postgres:pwd@postgres:5433/postgres"
       DB_SCHEMA: public
       DB_ANON_ROLE: postgres
   client:
@@ -31,5 +31,3 @@ services:
       - "9966:9966"
     environment:
       POSTGREST_HOST: "http://localhost:3000"
-# volumes:
-  # pgdata:
