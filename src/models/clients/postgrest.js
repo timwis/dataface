@@ -8,9 +8,10 @@ module.exports = {
   getTables () {
     return db.get('/')
       .set('Accept', '*/*') // https://github.com/begriffs/postgrest/issues/860
-      .then((data) => keys(data.definitions).map((table) => ({name: table})))
-      .then((tables) => {
-        return tables
+      .then((data) => {
+        return keys(data.definitions)
+          .filter((table) => !table.startsWith('(rpc)'))
+          .map((table) => ({name: table}))
       })
   },
 
@@ -24,19 +25,9 @@ module.exports = {
   },
 
   getSchema (table) {
-    return db.get('/')
+    return db.post('/rpc/get_schema')
+      .send({ table_name_param: table })
       .set('Accept', '*/*') // https://github.com/begriffs/postgrest/issues/860
-      .then((data) => {
-        const keys = data.definitions[table].properties
-        const fields = []
-        for (let key in keys) {
-          fields.push({
-            name: key,
-            type: keys[key].type
-          })
-        }
-        return fields
-      })
   },
 
   update (table, updates, conditions) {
