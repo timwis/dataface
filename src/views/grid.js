@@ -181,7 +181,7 @@ module.exports = function grid (state, emit) {
   }
 
   function save (rowIndex, columnIndex, value) {
-    const field = fields[columnIndex].name
+    const field = state.store.activeSheet.fields[columnIndex].name
     const oldValue = rows[rowIndex][field]
     if (value !== oldValue) {
       const updates = { [field]: value }
