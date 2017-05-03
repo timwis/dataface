@@ -54,6 +54,21 @@ module.exports = function store (state, emitter) {
     }
   })
 
+  emitter.on('store:deleteRow', async function (data) {
+    try {
+      const { rowIndex } = data
+      const activeSheet = state.store.activeSheet
+      const table = activeSheet.name
+      const id = activeSheet.rows[rowIndex].id
+      const conditions = { id }
+      await db.deleteRow(table, conditions)
+      state.store.activeSheet.rows.splice(rowIndex, 1)
+      emitter.emit('render')
+    } catch (err) {
+      console.error(err)
+    }
+  })
+
   function getActiveSheet () {
     // Use param if exists, otherwise use first table in list
     if (state.params.sheet) {

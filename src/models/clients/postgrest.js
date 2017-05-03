@@ -36,5 +36,10 @@ module.exports = {
       .set('Accept', 'application/vnd.pgrst.object+json') // return obj not array
       .match(conditions)
       .send(updates)
+  },
+
+  deleteRow (table, conditions) {
+    return db.delete(`/${table}`)
+      .match(conditions)
   }
 }

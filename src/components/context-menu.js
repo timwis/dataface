@@ -4,7 +4,7 @@ const css = require('sheetify')
 const prefix = css`
   :host {
     width: 250px;
-    position: absolute;
+    position: fixed;
     z-index: 999;
     background-color: #fff;
     box-shadow: 0 2px 6px 0 #ccc;

@@ -2,7 +2,6 @@ const html = require('choo/html')
 const css = require('sheetify')
 const keyboard = require('keyboardjs')
 const HyperList = require('hyperlist-component')
-const offset = require('mouse-event-offset')
 const onload = require('on-load')
 
 const setCursor = require('../util').setCursor
@@ -29,17 +28,19 @@ module.exports = function grid (state, emit) {
 
   const tbody = hyperList.render({ fields, rows, selectedCell })
   tbody.addEventListener('blur', onBlurCell, true)
+  tbody.oncontextmenu = onMenu.bind(null, 'row')
 
   return html`
     <div class=${prefix} onload=${onLoad} onunload=${onUnload}>
       <table class="table is-bordered is-striped is-narrow"
         onclick=${onClickCell} ondblclick=${onDblClickCell}>
-        <thead oncontextmenu=${onHeaderMenu}>
+        <thead oncontextmenu=${onMenu.bind(null, 'header')}>
           <tr>${fields.map(tableHeader)}</tr>
         </thead>
         ${tbody}
       </table>
       ${headerMenu(state.ui.headerMenu)}
+      ${rowMenu(state.ui.rowMenu)}
     </div>
   `
 
@@ -49,19 +50,37 @@ module.exports = function grid (state, emit) {
       { label: 'Remove column', onclick: () => console.log('Clicked "remove column"') }
     ]
     return headerMenuState.visible
-      ? contextMenu(items, headerMenuState, hideHeaderMenu)
+      ? contextMenu(items, headerMenuState, hideMenus)
       : ''
   }
 
-  function onHeaderMenu (evt) {
-    const parentEl = evt.target.parentNode
-    const [x, y] = offset(evt, parentEl)
-    emit('ui:headerMenu', { x, y, visible: true })
+  function rowMenu (rowMenuState) {
+    const rowIndex = rowMenuState.rowIndex
+    const items = [
+      { label: 'Remove row', onclick: onDeleteRow.bind(null, rowIndex) }
+    ]
+    return rowMenuState.visible
+      ? contextMenu(items, rowMenuState, hideMenus)
+      : ''
+  }
+
+  function onDeleteRow (rowIndex, evt) {
+    console.log('deleting', rowIndex)
+    emit('store:deleteRow', {rowIndex})
+  }
+
+  function onMenu (menu, evt) {
+    const eventName = menu === 'header' ? 'ui:headerMenu' : 'ui:rowMenu'
+    const x = evt.pageX || evt.clientX
+    const y = evt.pageY || evt.clientY
+    const rowIndex = +evt.target.dataset.rowIndex
+    emit(eventName, { x, y, rowIndex, visible: true })
     evt.preventDefault()
   }
 
-  function hideHeaderMenu () {
+  function hideMenus () {
     emit('ui:headerMenu', { visible: false })
+    emit('ui:rowMenu', { visible: false })
   }
 
   function onClickCell (evt) {
@@ -184,8 +203,8 @@ module.exports = function grid (state, emit) {
   }
 }
 
-function tableRow (state, rowIndex) {
-  const { fields, rows, selectedCell } = state
+function tableRow (tableRowState, rowIndex) {
+  const { fields, rows, selectedCell } = tableRowState
   const row = rows[rowIndex]
 
   return html`
