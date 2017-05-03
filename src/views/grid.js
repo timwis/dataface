@@ -26,7 +26,8 @@ module.exports = function grid (state, emit) {
   const moveCellRight = moveCell.bind(this, 'right')
   const noop = () => {}
 
-  const tbody = hyperList.render({ fields, rows, selectedCell })
+  const tableRowState = { fields, rows, selectedCell, rowMenu: state.ui.rowMenu }
+  const tbody = hyperList.render(tableRowState)
   tbody.addEventListener('blur', onBlurCell, true)
   tbody.oncontextmenu = onMenu.bind(null, 'row')
 
@@ -204,11 +205,12 @@ module.exports = function grid (state, emit) {
 }
 
 function tableRow (tableRowState, rowIndex) {
-  const { fields, rows, selectedCell } = tableRowState
+  const { fields, rows, selectedCell, rowMenu } = tableRowState
   const row = rows[rowIndex]
+  const classList = rowMenu.rowIndex === rowIndex ? 'row-selected' : ''
 
   return html`
-    <tr>
+    <tr class=${classList}>
       ${fields.map((field, columnIndex) => {
         const tableCellOpts = {
           value: row[field.name] || '',

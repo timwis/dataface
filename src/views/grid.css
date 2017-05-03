@@ -40,3 +40,6 @@ td.editing {
   box-shadow: 0 0 5px 3px #ccc;
   z-index: 999;
 }
+tr.row-selected {
+  background-color: #a2bfbb !important;
+}
