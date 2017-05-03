@@ -69,6 +69,23 @@ module.exports = function store (state, emitter) {
     }
   })
 
+  emitter.on('store:renameField', async function (data) {
+    try {
+      const { columnIndex, oldValue, value } = data
+      const table = state.store.activeSheet.name
+      await db.renameField(table, oldValue, value)
+      state.store.activeSheet.fields[columnIndex].name = value
+      state.store.activeSheet.rows.map((row) => {
+        row[value] = row[oldValue]
+        delete row[oldValue]
+        return row
+      })
+      emitter.emit('render')
+    } catch (err) {
+      console.error(err)
+    }
+  })
+
   function getActiveSheet () {
     // Use param if exists, otherwise use first table in list
     if (state.params.sheet) {

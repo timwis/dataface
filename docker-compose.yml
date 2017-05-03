@@ -3,7 +3,8 @@ services:
   postgres:
     image: postgres
     volumes:
-      - ./db/get_schema.sql:/docker-entrypoint-initdb.d/get_schema.sql
+      - ./db/get-schema.sql:/docker-entrypoint-initdb.d/get-schema.sql
+      - ./db/rename-column.sql:/docker-entrypoint-initdb.d/rename-column.sql
       - ./db/contacts.sql:/docker-entrypoint-initdb.d/contacts.sql
       - ./db/projects.sql:/docker-entrypoint-initdb.d/projects.sql
     ports:

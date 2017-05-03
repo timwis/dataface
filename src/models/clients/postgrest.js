@@ -41,5 +41,11 @@ module.exports = {
   deleteRow (table, conditions) {
     return db.delete(`/${table}`)
       .match(conditions)
+  },
+
+  renameField (table, oldValue, value) {
+    return db.post('/rpc/rename_column')
+      .send({ table_name: table, old_name: oldValue, new_name: value })
+      .set('Accept', '*/*') // https://github.com/begriffs/postgrest/issues/860
   }
 }

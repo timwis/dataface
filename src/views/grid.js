@@ -28,10 +28,9 @@ module.exports = function grid (state, emit) {
 
   const tableRowState = { fields, rows, selectedCell, rowMenu: state.ui.rowMenu }
   const tbody = hyperList.render(tableRowState)
-  tbody.addEventListener('blur', onBlurCell, true)
   tbody.oncontextmenu = onMenu.bind(null, 'row')
 
-  return html`
+  const tree = html`
     <div class=${prefix} onload=${onLoad} onunload=${onUnload}>
       <table class="table is-bordered is-striped is-narrow"
         onclick=${onClickCell} ondblclick=${onDblClickCell}>
@@ -44,6 +43,11 @@ module.exports = function grid (state, emit) {
       ${rowMenu(state.ui.rowMenu)}
     </div>
   `
+
+  const table = tree.querySelector('table')
+  table.addEventListener('blur', onBlurCell, true)
+
+  return tree
 
   function headerMenu (headerMenuState) {
     const items = [
@@ -66,7 +70,6 @@ module.exports = function grid (state, emit) {
   }
 
   function onDeleteRow (rowIndex, evt) {
-    console.log('deleting', rowIndex)
     emit('store:deleteRow', {rowIndex})
   }
 
@@ -110,7 +113,11 @@ module.exports = function grid (state, emit) {
   function onBlurCell (evt) {
     const { rowIndex, columnIndex, editing } = state.ui.selectedCell
     const value = evt.target.innerText
-    save(rowIndex, columnIndex, value)
+    if (rowIndex === -1) {
+      saveHeader(columnIndex, value)
+    } else {
+      saveRow(rowIndex, columnIndex, value)
+    }
     if (editing) { // will be false if user hit enter b/c of enter listener
       emit('ui:selectCell', {editing: false})
     }
@@ -180,12 +187,19 @@ module.exports = function grid (state, emit) {
     evt.preventDefault()
   }
 
-  function save (rowIndex, columnIndex, value) {
+  function saveRow (rowIndex, columnIndex, value) {
     const field = state.store.activeSheet.fields[columnIndex].name
     const oldValue = rows[rowIndex][field]
     if (value !== oldValue) {
       const updates = { [field]: value }
       emit('store:update', { rowIndex, updates })
+    }
+  }
+
+  function saveHeader (columnIndex, value) {
+    const oldValue = state.store.activeSheet.fields[columnIndex].name
+    if (value !== oldValue) {
+      emit('store:renameField', { columnIndex, oldValue, value })
     }
   }
 
