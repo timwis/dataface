@@ -1,4 +1,5 @@
 const db = require('./clients/postgrest')
+const pick = require('lodash/pick')
 
 module.exports = function store (state, emitter) {
   state.store = {
@@ -44,8 +45,9 @@ module.exports = function store (state, emitter) {
       const { rowIndex, updates } = data
       const activeSheet = state.store.activeSheet
       const table = activeSheet.name
-      const id = activeSheet.rows[rowIndex].id
-      const conditions = { id }
+      const row = activeSheet.rows[rowIndex]
+      const primaryKeys = getPrimaryKeys(activeSheet.fields)
+      const conditions = pick(row, primaryKeys)
       const newRow = await db.update(table, updates, conditions)
       state.store.activeSheet.rows[rowIndex] = newRow
       emitter.emit('render')
@@ -96,4 +98,9 @@ module.exports = function store (state, emitter) {
       return ''
     }
   }
+}
+
+function getPrimaryKeys (fields) {
+  return fields.filter((field) => field.constraint === 'PRIMARY KEY')
+    .map((field) => field.name)
 }
