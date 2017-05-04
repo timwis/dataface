@@ -20,7 +20,7 @@ module.exports = {
     const to = offset + limit
     return db.get(`/${table}`)
       .range(from, to)
-      .order('id', true) // ascending
+      .order('`1`', true) // first column ascending
       .set('Accept', '*/*') // https://github.com/begriffs/postgrest/issues/860
   },
 
