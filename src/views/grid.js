@@ -12,7 +12,7 @@ const opts = {
   height: 500,
   itemHeight: 34,
   eachItem: tableRow,
-  getTotal: (state) => state.rows.length
+  getTotal: (state) => state.rows.length + 1
 }
 const hyperList = new HyperList('tbody', opts)
 
@@ -159,7 +159,7 @@ module.exports = function grid (state, emit) {
         break
       case 'down':
         const nextRowIndex = rowIndex + 1
-        const lastRowIndex = rows.length - 1
+        const lastRowIndex = rows.length // plus one for empty row
         payload.rowIndex = Math.min(nextRowIndex, lastRowIndex)
         break
       case 'left':
@@ -189,9 +189,13 @@ module.exports = function grid (state, emit) {
 
   function saveRow (rowIndex, columnIndex, value) {
     const field = state.store.activeSheet.fields[columnIndex].name
-    const oldValue = rows[rowIndex][field]
-    if (value !== oldValue) {
-      const updates = { [field]: value }
+    const row = rows[rowIndex]
+    const oldValue = row && row[field]
+    const updates = { [field]: value }
+
+    if (!row && value) {
+      emit('store:insert', { rowIndex, updates })
+    } else if (row && value !== oldValue) {
       emit('store:update', { rowIndex, updates })
     }
   }
@@ -220,7 +224,7 @@ module.exports = function grid (state, emit) {
 
 function tableRow (tableRowState, rowIndex) {
   const { fields, rows, selectedCell, rowMenu } = tableRowState
-  const row = rows[rowIndex]
+  const row = rows[rowIndex] || {}
   const classList = rowMenu.rowIndex === rowIndex ? 'row-selected' : ''
 
   return html`

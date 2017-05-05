@@ -39,6 +39,13 @@ module.exports = {
       .send(updates)
   },
 
+  insert (table, updates) {
+    return db.post(`/${table}`)
+      .set('Prefer', 'return=representation') // include row in response
+      .set('Accept', 'application/vnd.pgrst.object+json') // return obj not array
+      .send(updates)
+  },
+
   deleteRow (table, conditions) {
     return db.delete(`/${table}`)
       .query({ limit: 1 })

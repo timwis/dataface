@@ -56,6 +56,19 @@ module.exports = function store (state, emitter) {
     }
   })
 
+  emitter.on('store:insert', async function (data) {
+    try {
+      const { rowIndex, updates } = data
+      const activeSheet = state.store.activeSheet
+      const table = activeSheet.name
+      const newRow = await db.insert(table, updates)
+      state.store.activeSheet.rows[rowIndex] = newRow
+      emitter.emit('render')
+    } catch (err) {
+      console.error(err)
+    }
+  })
+
   emitter.on('store:deleteRow', async function (data) {
     try {
       const { rowIndex } = data

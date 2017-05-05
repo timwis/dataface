@@ -10,6 +10,9 @@ thead, tbody tr {
   display: table;
   table-layout: fixed;
 }
+tr {
+  min-height: 33px;
+}
 th:not(.editing),
 td:not(.editing) {
   cursor: cell;
