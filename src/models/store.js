@@ -47,7 +47,7 @@ module.exports = function store (state, emitter) {
       const table = activeSheet.name
       const row = activeSheet.rows[rowIndex]
       const primaryKeys = getPrimaryKeys(activeSheet.fields)
-      const conditions = pick(row, primaryKeys)
+      const conditions = primaryKeys.length ? pick(row, primaryKeys) : row
       const newRow = await db.update(table, updates, conditions)
       state.store.activeSheet.rows[rowIndex] = newRow
       emitter.emit('render')
@@ -61,8 +61,9 @@ module.exports = function store (state, emitter) {
       const { rowIndex } = data
       const activeSheet = state.store.activeSheet
       const table = activeSheet.name
-      const id = activeSheet.rows[rowIndex].id
-      const conditions = { id }
+      const row = activeSheet.rows[rowIndex]
+      const primaryKeys = getPrimaryKeys(activeSheet.fields)
+      const conditions = primaryKeys.length ? pick(row, primaryKeys) : row
       await db.deleteRow(table, conditions)
       state.store.activeSheet.rows.splice(rowIndex, 1)
       emitter.emit('render')

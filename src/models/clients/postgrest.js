@@ -32,6 +32,7 @@ module.exports = {
 
   update (table, updates, conditions) {
     return db.patch(`/${table}`)
+      .query({ limit: 1 })
       .set('Prefer', 'return=representation') // include row in response
       .set('Accept', 'application/vnd.pgrst.object+json') // return obj not array
       .match(conditions)
@@ -40,6 +41,7 @@ module.exports = {
 
   deleteRow (table, conditions) {
     return db.delete(`/${table}`)
+      .query({ limit: 1 })
       .match(conditions)
   },
 
