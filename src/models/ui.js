@@ -8,6 +8,7 @@ module.exports = function ui (state, emitter) {
     headerMenu: {
       x: 0,
       y: 0,
+      columnIndex: null,
       visible: false
     },
     rowMenu: {
@@ -23,8 +24,8 @@ module.exports = function ui (state, emitter) {
     emitter.emit('render')
   })
 
-  emitter.on('ui:headerMenu', ({ x, y, visible }) => {
-    state.ui.headerMenu = { x, y, visible }
+  emitter.on('ui:headerMenu', ({ x, y, columnIndex, visible }) => {
+    state.ui.headerMenu = { x, y, columnIndex, visible }
     emitter.emit('render')
   })
 

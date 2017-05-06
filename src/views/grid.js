@@ -53,9 +53,9 @@ module.exports = function grid (state, emit) {
   return tree
 
   function headerMenu (headerMenuState) {
+    const columnIndex = headerMenuState.columnIndex
     const items = [
-      { label: 'Set type', onclick: () => console.log('Clicked "set type"') },
-      { label: 'Remove column', onclick: () => console.log('Clicked "remove column"') }
+      { label: 'Remove column', onclick: onDeleteField.bind(null, columnIndex) }
     ]
     return headerMenuState.visible
       ? contextMenu(items, headerMenuState, hideMenus)
@@ -81,7 +81,8 @@ module.exports = function grid (state, emit) {
     const x = evt.pageX || evt.clientX
     const y = evt.pageY || evt.clientY
     const rowIndex = +evt.target.dataset.rowIndex
-    emit(eventName, { x, y, rowIndex, visible: true })
+    const columnIndex = +evt.target.dataset.columnIndex
+    emit(eventName, { x, y, rowIndex, columnIndex, visible: true })
     evt.preventDefault()
   }
 
@@ -110,6 +111,10 @@ module.exports = function grid (state, emit) {
     const payload = { rowIndex: -1, columnIndex: lastColumnIndex, editing: true }
     emit('ui:selectCell', payload)
     evt.stopPropagation()
+  }
+
+  function onDeleteField (columnIndex, evt) {
+    emit('store:deleteField', { columnIndex })
   }
 
   function onDblClickCell (evt) {

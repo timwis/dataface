@@ -115,6 +115,19 @@ module.exports = function store (state, emitter) {
     }
   })
 
+  emitter.on('store:deleteField', async function (data) {
+    try {
+      const columnIndex = data.columnIndex
+      const table = state.store.activeSheet.name
+      const fieldName = state.store.activeSheet.fields[columnIndex].name
+      await db.deleteField(table, fieldName)
+      state.store.activeSheet.fields.splice(columnIndex, 1)
+      emitter.emit('render')
+    } catch (err) {
+      console.error(err)
+    }
+  })
+
   function getActiveSheet () {
     // Use param if exists, otherwise use first table in list
     if (state.params.sheet) {

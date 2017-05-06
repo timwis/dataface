@@ -6,6 +6,7 @@ services:
       - ./db/get-schema.sql:/docker-entrypoint-initdb.d/get-schema.sql
       - ./db/rename-column.sql:/docker-entrypoint-initdb.d/rename-column.sql
       - ./db/insert-column.sql:/docker-entrypoint-initdb.d/insert-column.sql
+      - ./db/drop-column.sql:/docker-entrypoint-initdb.d/drop-column.sql
       - ./db/contacts.sql:/docker-entrypoint-initdb.d/contacts.sql
       - ./db/projects.sql:/docker-entrypoint-initdb.d/projects.sql
     ports:
