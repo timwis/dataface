@@ -30,7 +30,6 @@ LEFT JOIN
 	information_schema.table_constraints constr
 	ON constr.constraint_name = keys.constraint_name
 WHERE
-	cols.table_catalog = 'postgres' AND
 	cols.table_schema = 'public' AND
 	cols.table_name = table_name_param AND
 	cols.table_name = cls.relname;
