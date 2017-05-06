@@ -5,7 +5,7 @@ const mapValues = require('lodash/mapValues')
 
 const postgrestHost = process.env.POSTGREST_HOST
 
-module.exports = {
+const db = {
   async getTables () {
     const url = constructUrl()
     const response = await axios.get(url)
@@ -24,6 +24,12 @@ module.exports = {
     const url = constructUrl('rpc/get_schema')
     const response = await axios.post(url, { table_name_param: table })
     return response.data
+  },
+
+  async getField (table, field) {
+    const url = constructUrl('rpc/get_schema')
+    const response = await axios.post(url, { table_name_param: table })
+    return response.data.find((row) => row.name === field)
   },
 
   async update (table, updates, conditions) {
@@ -54,6 +60,13 @@ module.exports = {
     return response.data
   },
 
+  async insertField (table, name) {
+    const url = constructUrl('rpc/insert_column')
+    const payload = { table_name: table, column_name: name }
+    await axios.post(url, payload)
+    return await db.getField(table, name)
+  },
+
   async renameField (table, oldValue, value) {
     const url = constructUrl('rpc/rename_column')
     const payload = { table_name: table, old_name: oldValue, new_name: value }
@@ -72,3 +85,5 @@ function parameterizeConditions (conditions) {
     return `${operator}.${value}`
   })
 }
+
+module.exports = db
