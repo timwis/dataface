@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "arrow-key-codes": "^1.0.0",
+    "axios": "^0.16.1",
     "bulma": "^0.4.0",
     "choo": "^5.1.4",
     "hyperlist": "^1.0.0-alpha-5",
@@ -17,8 +18,8 @@
     "microcomponent": "^3.1.0",
     "nanocomponent": "^4.0.0",
     "on-load": "^3.2.0",
-    "postgrest-client": "^1.1.2",
-    "sheetify": "^6.0.1"
+    "sheetify": "^6.0.1",
+    "url-join": "^2.0.1"
   },
   "devDependencies": {
     "ava": "^0.18.2",

@@ -1,60 +1,74 @@
-const PostgREST = require('postgrest-client')
+const axios = require('axios')
+const urlJoin = require('url-join')
 const keys = require('lodash/keys')
+const mapValues = require('lodash/mapValues')
 
 const postgrestHost = process.env.POSTGREST_HOST
-const db = new PostgREST(postgrestHost)
 
 module.exports = {
-  getTables () {
-    return db.get('/')
-      .set('Accept', '*/*') // https://github.com/begriffs/postgrest/issues/860
-      .then((data) => {
-        return keys(data.definitions)
-          .filter((table) => !table.startsWith('(rpc)'))
-          .map((table) => ({name: table}))
-      })
+  async getTables () {
+    const url = constructUrl()
+    const response = await axios.get(url)
+    const tables = keys(response.data.definitions)
+    return tables.filter((table) => !table.startsWith('(rpc)'))
+      .map((table) => ({ name: table }))
   },
 
-  getRows (table, limit = 0, offset = 0) {
-    const from = offset
-    const to = offset + limit
-    return db.get(`/${table}`)
-      .range(from, to)
-      .order('`1`', true) // first column ascending
-      .set('Accept', '*/*') // https://github.com/begriffs/postgrest/issues/860
+  async getRows (table) {
+    const url = constructUrl(table)
+    const response = await axios.get(url)
+    return response.data
   },
 
-  getSchema (table) {
-    return db.post('/rpc/get_schema')
-      .send({ table_name_param: table })
-      .set('Accept', '*/*') // https://github.com/begriffs/postgrest/issues/860
+  async getSchema (table) {
+    const url = constructUrl('rpc/get_schema')
+    const response = await axios.post(url, { table_name_param: table })
+    return response.data
   },
 
-  update (table, updates, conditions) {
-    return db.patch(`/${table}`)
-      .query({ limit: 1 })
-      .set('Prefer', 'return=representation') // include row in response
-      .set('Accept', 'application/vnd.pgrst.object+json') // return obj not array
-      .match(conditions)
-      .send(updates)
+  async update (table, updates, conditions) {
+    const url = constructUrl(table)
+    const params = parameterizeConditions(conditions)
+    const headers = {
+      'Prefer': 'return=representation', // include row in response
+      'Accept': 'application/vnd.pgrst.object+json' // return obj not array
+    }
+    const response = await axios.patch(url, updates, { params, headers })
+    return response.data
   },
 
-  insert (table, updates) {
-    return db.post(`/${table}`)
-      .set('Prefer', 'return=representation') // include row in response
-      .set('Accept', 'application/vnd.pgrst.object+json') // return obj not array
-      .send(updates)
+  async insert (table, updates) {
+    const url = constructUrl(table)
+    const headers = {
+      'Prefer': 'return=representation', // include row in response
+      'Accept': 'application/vnd.pgrst.object+json' // return obj not array
+    }
+    const response = await axios.post(url, updates, { headers })
+    return response.data
   },
 
-  deleteRow (table, conditions) {
-    return db.delete(`/${table}`)
-      .query({ limit: 1 })
-      .match(conditions)
+  async deleteRow (table, conditions) {
+    const url = constructUrl(table)
+    const params = parameterizeConditions(conditions)
+    const response = axios.delete(url, { params })
+    return response.data
   },
 
-  renameField (table, oldValue, value) {
-    return db.post('/rpc/rename_column')
-      .send({ table_name: table, old_name: oldValue, new_name: value })
-      .set('Accept', '*/*') // https://github.com/begriffs/postgrest/issues/860
+  async renameField (table, oldValue, value) {
+    const url = constructUrl('rpc/rename_column')
+    const payload = { table_name: table, old_name: oldValue, new_name: value }
+    const response = await axios.post(url, payload)
+    return response.data
   }
+}
+
+function constructUrl (path) {
+  return urlJoin(postgrestHost, path)
+}
+
+function parameterizeConditions (conditions) {
+  return mapValues(conditions, (value) => {
+    const operator = (typeof value === 'boolean' || value === null) ? 'is' : 'eq'
+    return `${operator}.${value}`
+  })
 }
