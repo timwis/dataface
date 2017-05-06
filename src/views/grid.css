@@ -13,12 +13,20 @@ thead, tbody tr {
 tr {
   min-height: 33px;
 }
-th:not(.editing),
-td:not(.editing) {
+th:not(.editing):not(.extra),
+td:not(.editing):not(.extra) {
   cursor: cell;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+th.extra {
+  cursor: pointer;
+  text-align: center;
+}
+th.extra,
+td.extra {
+  width: 35px;
 }
 th.selected,
 td.selected {

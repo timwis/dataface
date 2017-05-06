@@ -35,7 +35,10 @@ module.exports = function grid (state, emit) {
       <table class="table is-bordered is-striped is-narrow"
         onclick=${onClickCell} ondblclick=${onDblClickCell}>
         <thead oncontextmenu=${onMenu.bind(null, 'header')}>
-          <tr>${fields.map(tableHeader)}</tr>
+          <tr>
+            ${fields.map(tableHeader)}
+            <th class="extra" onclick=${onClickExtraColumn}>+</th>
+          </tr>
         </thead>
         ${tbody}
       </table>
@@ -97,6 +100,16 @@ module.exports = function grid (state, emit) {
       const payload = { rowIndex, columnIndex, editing: false }
       emit('ui:selectCell', payload)
     }
+  }
+
+  function onClickExtraColumn (evt) {
+    emit('store:insertField')
+
+    // Start editing the new column
+    const lastColumnIndex = state.store.activeSheet.fields.length
+    const payload = { rowIndex: -1, columnIndex: lastColumnIndex, editing: true }
+    emit('ui:selectCell', payload)
+    evt.stopPropagation()
   }
 
   function onDblClickCell (evt) {
@@ -194,9 +207,9 @@ module.exports = function grid (state, emit) {
     const updates = { [field]: value }
 
     if (!row && value) {
-      emit('store:insert', { rowIndex, updates })
+      emit('store:insertRow', { rowIndex, updates })
     } else if (row && value !== oldValue) {
-      emit('store:update', { rowIndex, updates })
+      emit('store:updateRow', { rowIndex, updates })
     }
   }
 
@@ -241,6 +254,7 @@ function tableRow (tableRowState, rowIndex) {
         }
         return tableCell(tableCellOpts)
       })}
+      <td class="extra"></td>
     </tr>
   `
 }

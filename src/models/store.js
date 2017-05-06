@@ -40,7 +40,7 @@ module.exports = function store (state, emitter) {
     }
   })
 
-  emitter.on('store:update', async function (data) {
+  emitter.on('store:updateRow', async function (data) {
     try {
       const { rowIndex, updates } = data
       const activeSheet = state.store.activeSheet
@@ -56,7 +56,7 @@ module.exports = function store (state, emitter) {
     }
   })
 
-  emitter.on('store:insert', async function (data) {
+  emitter.on('store:insertRow', async function (data) {
     try {
       const { rowIndex, updates } = data
       const activeSheet = state.store.activeSheet
@@ -79,6 +79,19 @@ module.exports = function store (state, emitter) {
       const conditions = pick(row, primaryKeys)
       await db.deleteRow(table, conditions)
       state.store.activeSheet.rows.splice(rowIndex, 1)
+      emitter.emit('render')
+    } catch (err) {
+      console.error(err)
+    }
+  })
+
+  emitter.on('store:insertField', async function (data) {
+    try {
+      const table = state.store.activeSheet.name
+      const currentFieldCount = state.store.activeSheet.fields.length
+      const newFieldName = `field_${currentFieldCount + 1}`
+      const newField = await db.insertField(table, newFieldName)
+      state.store.activeSheet.fields.push(newField)
       emitter.emit('render')
     } catch (err) {
       console.error(err)
