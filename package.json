@@ -8,7 +8,7 @@
     "arrow-key-codes": "^1.0.0",
     "axios": "^0.16.1",
     "bulma": "^0.4.0",
-    "choo": "^5.1.4",
+    "choo": "^5.4.0",
     "hyperlist": "^1.0.0-alpha-5",
     "hyperlist-component": "^0.1.0",
     "insert-css": "^2.0.0",

@@ -1055,13 +1055,15 @@ choo-log@^6.0.0:
   dependencies:
     nanologger "^1.0.1"
 
-choo@^5.1.4:
-  version "5.1.4"
-  resolved "https://registry.yarnpkg.com/choo/-/choo-5.1.4.tgz#244e0fde777b4dd07f70117992ba8edeb37fa262"
+choo@^5.4.0:
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/choo/-/choo-5.4.0.tgz#4951b3ff98467ba3dee1f8756ea8677e647f793b"
   dependencies:
     bel "^4.5.1"
     document-ready "^2.0.1"
-    nanobus "^3.0.0"
+    nanobus "^3.1.0"
+    nanohistory "^1.0.0"
+    nanohref "^1.0.0"
     nanomorph "^4.0.0"
     nanomount "^1.0.0"
     nanoraf "^3.0.0"
@@ -3093,15 +3095,25 @@ nan@^2.3.0:
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.6.2.tgz#e4ff34e6c95fdfb5aecc08de6596f43605a7db45"
 
-nanobus@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/nanobus/-/nanobus-3.0.0.tgz#1436257ab89dbe50bbcf95cfa9a411965453c80c"
+nanobus@^3.1.0:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/nanobus/-/nanobus-3.2.1.tgz#3aaf07222449ae8b5bbcf1601e2ec66c9a3378ea"
+  dependencies:
+    nanotiming "^1.0.1"
 
 nanocomponent@4.0.0, nanocomponent@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/nanocomponent/-/nanocomponent-4.0.0.tgz#31d0fe4690b70d6608d43ef00c276c4851c0fc51"
   dependencies:
     on-load "^3.2.0"
+
+nanohistory@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/nanohistory/-/nanohistory-1.0.0.tgz#65a3d29bc5f40f6305ec67d120b8be38e95719e8"
+
+nanohref@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/nanohref/-/nanohref-1.0.0.tgz#12ed5ee990d98111344a04d81650d167ad264421"
 
 nanologger@^1.0.1, nanologger@^1.0.2:
   version "1.0.3"
@@ -3127,7 +3139,7 @@ nanorouter@^2.0.0:
   dependencies:
     wayfarer "^6.5.0"
 
-nanotiming@^1.0.0:
+nanotiming@^1.0.0, nanotiming@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/nanotiming/-/nanotiming-1.0.1.tgz#13e7a2e2767967974fedfff071edd39327f44ec3"
 
