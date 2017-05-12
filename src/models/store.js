@@ -30,12 +30,14 @@ module.exports = function store (state, emitter) {
 
   emitter.on('store:selectSheet', async function (table) {
     try {
-      const rows = await db.getRows(table)
+      const fields = await db.getSchema(table)
+      const firstFieldName = fields.length ? fields[0].name : ''
+      const rows = await db.getRows(table, firstFieldName)
       const structuredRows = rows.map(structureRow)
 
       state.store.activeSheet = {
         rows: structuredRows,
-        fields: await db.getSchema(table),
+        fields,
         name: table
       }
       emitter.emit('render')

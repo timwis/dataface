@@ -14,9 +14,10 @@ const db = {
       .map((table) => ({ name: table }))
   },
 
-  async getRows (table) {
+  async getRows (table, order) {
     const url = constructUrl(table)
-    const response = await axios.get(url)
+    const params = { order }
+    const response = await axios.get(url, { params })
     return response.data
   },
 
