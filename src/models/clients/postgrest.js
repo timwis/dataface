@@ -94,6 +94,13 @@ const db = {
     const payload = { old_name: oldName, new_name: name }
     const response = await axios.post(url, payload)
     return response.data
+  },
+
+  async deleteTable (name) {
+    const url = constructUrl('rpc/drop_table')
+    const payload = { table_name: name }
+    const response = await axios.post(url, payload)
+    return response.data
   }
 }
 

@@ -1,8 +1,19 @@
 const html = require('choo/html')
+const css = require('sheetify')
 
-module.exports = function menu (sheets, activeSheet) {
+const prefix = css`
+  .delete {
+    float: right;
+    display: none;
+  }
+  .menu-list li:hover .delete {
+    display: inline-block;
+  }
+`
+
+module.exports = function menu (sheets, activeSheet, onDelete) {
   return html`
-    <aside class="menu">
+    <aside class="menu ${prefix}">
       <p class="menu-label">Sheets</p>
       <ul class="menu-list">
       ${sheets.map(menuItem)}
@@ -17,10 +28,13 @@ module.exports = function menu (sheets, activeSheet) {
       <li>
         <a class=${classes} href="/${item.name}">
           ${item.name}
+          <button class="delete" onclick=${onClickDelete}></button>
         </a>
       </li>
     `
+
+    function onClickDelete (evt) {
+      if (onDelete) onDelete(item.name)
+    }
   }
 }
-
-

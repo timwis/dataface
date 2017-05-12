@@ -185,6 +185,24 @@ module.exports = function store (state, emitter) {
     }
   })
 
+  emitter.on('store:deleteSheet', async function (name) {
+    try {
+      await db.deleteTable(name)
+      const sheetIndex = state.store.sheets.findIndex((item) => item.name === name)
+      state.store.sheets.splice(sheetIndex, 1)
+
+      const newMaxIndex = state.store.sheets.length - 1
+      const newActiveSheetIndex = Math.min(sheetIndex, newMaxIndex)
+      const newActiveSheet = state.store.sheets[newActiveSheetIndex]
+      state.store.activeSheet.name = newActiveSheet.name
+      emitter.emit('pushState', `/${newActiveSheet.name}`)
+      // TODO: what if you delete the last sheet?
+    } catch (err) {
+      console.error(err)
+      emitter.emit('ui:notify', { msg: 'Error removing sheet' })
+    }
+  })
+
   function getActiveSheet () {
     // Use param if exists, otherwise use first table in list
     if (state.params.sheet) {

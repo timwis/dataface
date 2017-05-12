@@ -40,8 +40,8 @@ module.exports = (view) => (state, emit) => {
       <div class="container" onload=${onload}>
         <div class="columns">
           <div class="column is-one-quarter">
-            ${menu(sheets, state.store.activeSheet.name)}
-            <a class="button add-sheet-btn" onclick=${onClickAddSheet}>
+            ${menu(sheets, state.store.activeSheet.name, onClickDelete)}
+            <a class="button add-sheet-btn" onclick=${onClickAdd}>
               Add sheet
             </a>
           </div>
@@ -65,7 +65,11 @@ module.exports = (view) => (state, emit) => {
     return notification(item.msg, item.type, onDismiss)
   }
 
-  function onClickAddSheet (evt) {
+  function onClickDelete (sheetName) {
+    emit('store:deleteSheet', sheetName)
+  }
+
+  function onClickAdd (evt) {
     emit('store:insertSheet')
   }
 
