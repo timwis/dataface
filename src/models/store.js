@@ -110,7 +110,7 @@ module.exports = function store (state, emitter) {
     }
   })
 
-  emitter.on('store:insertField', async function (data) {
+  emitter.on('store:insertField', async function () {
     try {
       const table = state.store.activeSheet.name
       const currentFieldCount = state.store.activeSheet.fields.length
@@ -153,6 +153,21 @@ module.exports = function store (state, emitter) {
     } catch (err) {
       console.error(err)
       emitter.emit('ui:notify', { msg: 'Error removing column' })
+    }
+  })
+
+  emitter.on('store:insertSheet', async function () {
+    try {
+      const currentSheetCount = state.store.sheets.length
+      const name = `sheet_${currentSheetCount + 1}`
+      await db.insertTable(name)
+      state.store.sheets.push({ name })
+      state.store.activeSheet.name = name
+      emitter.emit('pushState', `/${name}`)
+      emitter.emit('store:insertField') // add a sample field
+    } catch (err) {
+      console.error(err)
+      emitter.emit('ui:notify', { msg: 'Error adding sheet' })
     }
   })
 

@@ -8,6 +8,7 @@ services:
       - ./db/insert-column.sql:/docker-entrypoint-initdb.d/insert-column.sql
       - ./db/drop-column.sql:/docker-entrypoint-initdb.d/drop-column.sql
       - ./db/rename-table.sql:/docker-entrypoint-initdb.d/rename-table.sql
+      - ./db/insert-table.sql:/docker-entrypoint-initdb.d/insert-table.sql
       - ./db/contacts.sql:/docker-entrypoint-initdb.d/contacts.sql
       - ./db/projects.sql:/docker-entrypoint-initdb.d/projects.sql
     ports:

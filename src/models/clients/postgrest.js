@@ -82,6 +82,13 @@ const db = {
     return response.data
   },
 
+  async insertTable (name) {
+    const url = constructUrl('rpc/insert_table')
+    const payload = { table_name: name }
+    const response = await axios.post(url, payload)
+    return response.data
+  },
+
   async renameTable (oldName, name) {
     const url = constructUrl('rpc/rename_table')
     const payload = { old_name: oldName, new_name: name }

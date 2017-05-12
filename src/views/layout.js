@@ -41,6 +41,9 @@ module.exports = (view) => (state, emit) => {
         <div class="columns">
           <div class="column is-one-quarter">
             ${menu(sheets, state.store.activeSheet.name)}
+            <a class="button add-sheet-btn" onclick=${onClickAddSheet}>
+              Add sheet
+            </a>
           </div>
           <div class="column table-container">
             ${sheetTitle(activeSheet.name, onChangeTitle)}
@@ -60,6 +63,10 @@ module.exports = (view) => (state, emit) => {
   function createNotification (item) {
     const onDismiss = () => emit('ui:dismissNotification', item.id)
     return notification(item.msg, item.type, onDismiss)
+  }
+
+  function onClickAddSheet (evt) {
+    emit('store:insertSheet')
   }
 
   function onChangeTitle (payload) {

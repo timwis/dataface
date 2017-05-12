@@ -1,0 +1,8 @@
+CREATE OR REPLACE FUNCTION insert_table(
+  table_name VARCHAR(70)
+) RETURNS VOID AS $$
+BEGIN
+EXECUTE format('CREATE TABLE %I (id SERIAL PRIMARY KEY)',
+  table_name);
+END
+$$ LANGUAGE plpgsql;
