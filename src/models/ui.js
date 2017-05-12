@@ -49,8 +49,6 @@ module.exports = function ui (state, emitter) {
     if (index !== -1) {
       state.ui.notifications.splice(index, 1)
       emitter.emit('render')
-    } else {
-      console.log('no notification found', state.ui.notifications)
     }
   })
 }

@@ -23,9 +23,11 @@ module.exports = (view) => (state, emit) => {
   return html`
     <body>
       ${nav()}
-      ${state.ui.notifications.map(createNotification)}
-      <div class="container">
-        <div class="columns" onload=${onload}>
+      <div class="notifications">
+        ${state.ui.notifications.map(createNotification)}
+      </div>
+      <div class="container" onload=${onload}>
+        <div class="columns">
           <div class="column is-one-quarter">
             ${menu(sheets, activeSheet.name)}
           </div>
