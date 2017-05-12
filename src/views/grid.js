@@ -92,10 +92,11 @@ module.exports = function grid (state, emit) {
   function onTypeInHiddenInput (evt) {
     const { rowIndex, columnIndex } = selectedCell
     const isCellSelected = (rowIndex !== null && columnIndex !== null)
+    const isEditable = (rowIndex === -1 || state.store.activeSheet.fields[columnIndex].editable)
     const newValue = evt.target.value
     const payload = { rowIndex, columnIndex, newValue }
 
-    if (isCellSelected) {
+    if (isCellSelected && isEditable) {
       emit('store:setNewValue', payload)
       emit('ui:selectCell', {editing: true})
     }
@@ -177,7 +178,9 @@ module.exports = function grid (state, emit) {
     const rowIndex = numericAttribute(el.dataset.rowIndex)
     const columnIndex = numericAttribute(el.dataset.columnIndex)
     const isEditing = el.classList.contains('editing')
-    if (!isEditing) {
+    const isEditable = (rowIndex === -1 || state.store.activeSheet.fields[columnIndex].editable)
+
+    if (!isEditing && isEditable) {
       const payload = { rowIndex, columnIndex, editing: true }
       emit('ui:selectCell', payload)
     }
@@ -252,9 +255,10 @@ module.exports = function grid (state, emit) {
 
   function onPressEnter (evt) {
     const { rowIndex, columnIndex, editing } = state.ui.selectedCell
+    const isEditable = (rowIndex === -1 || state.store.activeSheet.fields[columnIndex].editable)
 
-    // Don't do anything if no cell is selected
-    if (rowIndex === null || columnIndex === null) return
+    // Don't do anything if no cell is selected or the column isn't editable
+    if (rowIndex === null || columnIndex === null || !isEditable) return
 
     // Set editing to opposite of current state
     emit('ui:selectCell', {editing: !editing})

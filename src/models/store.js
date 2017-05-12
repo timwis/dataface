@@ -31,13 +31,14 @@ module.exports = function store (state, emitter) {
   emitter.on('store:selectSheet', async function (table) {
     try {
       const fields = await db.getSchema(table)
+      const fieldsWithEditable = fields.map(addEditable)
       const firstFieldName = fields.length ? fields[0].name : ''
       const rows = await db.getRows(table, firstFieldName)
       const structuredRows = rows.map(structureRow)
 
       state.store.activeSheet = {
         rows: structuredRows,
-        fields,
+        fields: fieldsWithEditable,
         name: table
       }
       emitter.emit('render')
@@ -163,6 +164,11 @@ module.exports = function store (state, emitter) {
 function getPrimaryKeys (fields) {
   return fields.filter((field) => field.constraint === 'PRIMARY KEY')
     .map((field) => field.name)
+}
+
+function addEditable (field) {
+  field.editable = !(field.default && field.default.startsWith('nextval'))
+  return field
 }
 
 function structureRow (row) {
