@@ -61,8 +61,8 @@ module.exports = function grid (state, emit) {
   function onInputCell (evt) {
     if (selectedCell.editing) {
       const { rowIndex, columnIndex } = selectedCell
-      const value = evt.target.innerText
-      const payload = { rowIndex, columnIndex, value }
+      const newValue = evt.target.innerText
+      const payload = { rowIndex, columnIndex, newValue }
       emit('store:setNewValue', payload)
     }
   }
@@ -92,8 +92,8 @@ module.exports = function grid (state, emit) {
   function onTypeInHiddenInput (evt) {
     const { rowIndex, columnIndex } = selectedCell
     const isCellSelected = (rowIndex !== null && columnIndex !== null)
-    const value = evt.target.value
-    const payload = { rowIndex, columnIndex, value }
+    const newValue = evt.target.value
+    const payload = { rowIndex, columnIndex, newValue }
 
     if (isCellSelected) {
       emit('store:setNewValue', payload)
@@ -185,11 +185,10 @@ module.exports = function grid (state, emit) {
 
   function onBlurCell (evt) {
     const { rowIndex, columnIndex, editing } = state.ui.selectedCell
-    const value = evt.target.innerText
     if (rowIndex === -1) {
-      saveHeader(columnIndex, value)
+      saveHeader(columnIndex)
     } else {
-      saveRow(rowIndex, columnIndex, value)
+      saveRow(rowIndex, columnIndex)
     }
     if (editing) { // will be false if user hit enter b/c of enter listener
       emit('ui:selectCell', {editing: false})
@@ -204,7 +203,8 @@ module.exports = function grid (state, emit) {
     keyboard.bind('tab', moveCellRight)
     keyboard.bind('shift + tab', moveCellLeft)
     keyboard.bind('shift + enter', noop) // differentiate from just enter
-    keyboard.bind('enter', enter)
+    keyboard.bind('enter', onPressEnter)
+    keyboard.bind('escape', onPressEscape)
   }
 
   function onUnload (el) {
@@ -215,7 +215,8 @@ module.exports = function grid (state, emit) {
     keyboard.unbind('tab', moveCellRight)
     keyboard.unbind('shift + tab', moveCellLeft)
     keyboard.unbind('shift + enter', noop)
-    keyboard.unbind('enter', enter)
+    keyboard.unbind('enter', onPressEnter)
+    keyboard.unbind('escape', onPressEscape)
   }
 
   function moveCell (direction, evt) {
@@ -249,33 +250,48 @@ module.exports = function grid (state, emit) {
     evt.preventDefault()
   }
 
-  function enter (evt) {
-    const { rowIndex, editing } = state.ui.selectedCell
+  function onPressEnter (evt) {
+    const { rowIndex, columnIndex, editing } = state.ui.selectedCell
 
     // Don't do anything if no cell is selected
-    if (rowIndex === null) return
+    if (rowIndex === null || columnIndex === null) return
 
     // Set editing to opposite of current state
     emit('ui:selectCell', {editing: !editing})
     evt.preventDefault()
   }
 
-  function saveRow (rowIndex, columnIndex, value) {
+  function onPressEscape (evt) {
+    const { rowIndex, columnIndex } = state.ui.selectedCell
+
+    // Don't do anything if no cell is selected
+    if (rowIndex === null || columnIndex === null) return
+
+    emit('store:setNewValue', { rowIndex, columnIndex, newValue: undefined })
+    emit('ui:selectCell', { editing: false })
+    evt.preventDefault()
+  }
+
+  function saveRow (rowIndex, columnIndex) {
     const field = state.store.activeSheet.fields[columnIndex].name
-    const row = rows[rowIndex]
+    const row = state.store.activeSheet.rows[rowIndex]
+    const value = row && row[field].newValue
     const oldValue = row && row[field].value
     const updates = { [field]: value }
 
     if (!row && value) {
       emit('store:insertRow', { rowIndex, updates })
-    } else if (row && value !== oldValue) {
+    } else if (row && value !== undefined && value !== oldValue) {
       emit('store:updateRow', { rowIndex, updates })
+    } else {
+      console.log('not updating', value, oldValue)
     }
   }
 
-  function saveHeader (columnIndex, value) {
+  function saveHeader (columnIndex) {
+    const value = state.store.activeSheet.fields[columnIndex].newName
     const oldValue = state.store.activeSheet.fields[columnIndex].name
-    if (value !== oldValue) {
+    if (value !== undefined && value !== oldValue) {
       emit('store:renameField', { columnIndex, oldValue, value })
     }
   }

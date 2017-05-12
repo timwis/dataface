@@ -45,16 +45,16 @@ module.exports = function store (state, emitter) {
   })
 
   emitter.on('store:setNewValue', function (data) {
-    const { rowIndex, columnIndex, value } = data
+    const { rowIndex, columnIndex, newValue } = data
     const isHeader = (rowIndex === -1)
     const { rows, fields } = state.store.activeSheet
 
     if (isHeader) {
-      state.store.activeSheet.fields[columnIndex].newName = value
+      state.store.activeSheet.fields[columnIndex].newName = newValue
     } else {
       const fieldName = fields[columnIndex].name
       rows[rowIndex][fieldName] = rows[rowIndex][fieldName] || {}
-      rows[rowIndex][fieldName].newValue = value
+      rows[rowIndex][fieldName].newValue = newValue
     }
   })
 
