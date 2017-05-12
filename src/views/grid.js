@@ -12,7 +12,7 @@ const opts = {
   height: 500,
   itemHeight: 34,
   eachItem: tableRow,
-  getTotal: (state) => state.rows.length + 1
+  getTotal: (state) => state.rows.length
 }
 const hyperList = new HyperList('tbody', opts)
 
@@ -34,7 +34,7 @@ module.exports = function grid (state, emit) {
   const tree = html`
     <div class=${prefix} onload=${onLoad} onunload=${onUnload}>
       <table class="table is-bordered is-striped is-narrow"
-        onclick=${onClickCell} ondblclick=${onDblClickCell}>
+        onclick=${onClickCell} ondblclick=${onDblClickCell} oninput=${onInputCell}>
         <thead oncontextmenu=${onMenu.bind(null, 'header')}>
           <tr>
             ${fields.map(tableHeader)}
@@ -58,17 +58,26 @@ module.exports = function grid (state, emit) {
 
   return tree
 
+  function onInputCell (evt) {
+    if (selectedCell.editing) {
+      const { rowIndex, columnIndex } = selectedCell
+      const value = evt.target.innerText
+      const payload = { rowIndex, columnIndex, value }
+      emit('store:setNewValue', payload)
+    }
+  }
+
   function getSelectedCellValue (fields, rows, selectedCell) {
     const { rowIndex, columnIndex } = selectedCell
     const isCellSelected = (rowIndex !== null && columnIndex !== null)
     const isHeaderSelected = isCellSelected && rowIndex === -1
+    const field = fields[columnIndex]
+    const row = rows[rowIndex]
 
-    if (isHeaderSelected) {
-      return fields[columnIndex].name
-    } else if (isCellSelected) {
-      const row = rows[selectedCell.rowIndex]
-      const fieldName = fields[selectedCell.columnIndex].name
-      return row[fieldName] || ''
+    if (isHeaderSelected && field) {
+      return field.name
+    } else if (isCellSelected && row && field && row[field.name]) {
+      return row[field.name].value
     } else {
       return ''
     }
@@ -81,7 +90,15 @@ module.exports = function grid (state, emit) {
   }
 
   function onTypeInHiddenInput (evt) {
-    emit('ui:selectCell', {editing: true, replaceValue: evt.target.value})
+    const { rowIndex, columnIndex } = selectedCell
+    const isCellSelected = (rowIndex !== null && columnIndex !== null)
+    const value = evt.target.value
+    const payload = { rowIndex, columnIndex, value }
+
+    if (isCellSelected) {
+      emit('store:setNewValue', payload)
+      emit('ui:selectCell', {editing: true})
+    }
   }
 
   function headerMenu (headerMenuState) {
@@ -106,6 +123,9 @@ module.exports = function grid (state, emit) {
 
   function onDeleteRow (rowIndex, evt) {
     emit('store:deleteRow', {rowIndex})
+    if (selectedCell.rowIndex === rowIndex) {
+      emit('ui:selectCell', { rowIndex: null })
+    }
   }
 
   function onMenu (menu, evt) {
@@ -147,6 +167,9 @@ module.exports = function grid (state, emit) {
 
   function onDeleteField (columnIndex, evt) {
     emit('store:deleteField', { columnIndex })
+    if (selectedCell.columnIndex === columnIndex) {
+      emit('ui:selectCell', { columnIndex: null })
+    }
   }
 
   function onDblClickCell (evt) {
@@ -169,7 +192,7 @@ module.exports = function grid (state, emit) {
       saveRow(rowIndex, columnIndex, value)
     }
     if (editing) { // will be false if user hit enter b/c of enter listener
-      emit('ui:selectCell', {editing: false, replaceValue: null})
+      emit('ui:selectCell', {editing: false})
     }
   }
 
@@ -233,14 +256,14 @@ module.exports = function grid (state, emit) {
     if (rowIndex === null) return
 
     // Set editing to opposite of current state
-    emit('ui:selectCell', {editing: !editing, replaceValue: null})
+    emit('ui:selectCell', {editing: !editing})
     evt.preventDefault()
   }
 
   function saveRow (rowIndex, columnIndex, value) {
     const field = state.store.activeSheet.fields[columnIndex].name
     const row = rows[rowIndex]
-    const oldValue = row && row[field]
+    const oldValue = row && row[field].value
     const updates = { [field]: value }
 
     if (!row && value) {
@@ -260,6 +283,7 @@ module.exports = function grid (state, emit) {
   function tableHeader (field, columnIndex) {
     const selectedCell = state.ui.selectedCell
     const opts = {
+      value: field.newName || field.name,
       rowIndex: -1,
       columnIndex,
       isHeader: true,
@@ -267,26 +291,21 @@ module.exports = function grid (state, emit) {
                   (selectedCell.columnIndex === columnIndex),
       isEditing: selectedCell.editing
     }
-
-    const replaceValue = selectedCell.replaceValue
-    const currentValue = field.name
-    opts.value = (opts.isSelected && opts.isEditing && replaceValue)
-      ? replaceValue
-      : currentValue
-
     return tableCell(opts)
   }
 }
 
 function tableRow (tableRowState, rowIndex) {
   const { fields, rows, selectedCell, rowMenu } = tableRowState
-  const row = rows[rowIndex] || {}
+  const row = rows[rowIndex]
   const classList = rowMenu.rowIndex === rowIndex ? 'row-selected' : ''
 
   return html`
     <tr class=${classList}>
       ${fields.map((field, columnIndex) => {
+        const rowField = row[field.name]
         const opts = {
+          value: rowField ? (rowField.newValue || rowField.value) : '',
           rowIndex,
           columnIndex,
           isHeader: false,
@@ -294,13 +313,6 @@ function tableRow (tableRowState, rowIndex) {
                       (columnIndex === selectedCell.columnIndex),
           isEditing: selectedCell.editing
         }
-
-        const replaceValue = selectedCell.replaceValue
-        const currentValue = row[field.name] || ''
-        opts.value = (opts.isSelected && opts.isEditing && replaceValue)
-          ? replaceValue
-          : currentValue
-
         return tableCell(opts)
       })}
       <td class="extra"></td>
