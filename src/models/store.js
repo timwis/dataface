@@ -156,6 +156,20 @@ module.exports = function store (state, emitter) {
     }
   })
 
+  emitter.on('store:renameSheet', async function (data) {
+    try {
+      const { oldName, name } = data
+      await db.renameTable(oldName, name)
+      state.store.activeSheet.name = name
+      const sheet = state.store.sheets.find((item) => item.name === oldName)
+      sheet.name = name
+      emitter.emit('pushState', `/${name}`)
+    } catch (err) {
+      console.error(err)
+      emitter.emit('ui:notify', { msg: 'Error renaming sheet' })
+    }
+  })
+
   function getActiveSheet () {
     // Use param if exists, otherwise use first table in list
     if (state.params.sheet) {

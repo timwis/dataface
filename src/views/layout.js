@@ -3,6 +3,7 @@ const html = require('choo/html')
 const nav = require('../components/nav')
 const menu = require('../components/menu')
 const notification = require('../components/notification')
+const sheetTitle = require('../components/sheet-title')
 
 require('insert-css')(`
   html, body, .container, .columns, .table-container {
@@ -14,6 +15,16 @@ require('insert-css')(`
   }
   .table-container {
     overflow-x: auto;
+  }
+  .add-sheet-btn {
+    width: 100%;
+  }
+  .sheet-name {
+    cursor: text;
+    outline: none;
+  }
+  .sheet-name:hover {
+    background-color: #ffdd57;
   }
 `)
 
@@ -29,9 +40,10 @@ module.exports = (view) => (state, emit) => {
       <div class="container" onload=${onload}>
         <div class="columns">
           <div class="column is-one-quarter">
-            ${menu(sheets, activeSheet.name)}
+            ${menu(sheets, state.store.activeSheet.name)}
           </div>
           <div class="column table-container">
+            ${sheetTitle(activeSheet.name, onChangeTitle)}
             ${activeSheet.fields !== null
               ? view(state, emit)
               : ''}
@@ -48,5 +60,9 @@ module.exports = (view) => (state, emit) => {
   function createNotification (item) {
     const onDismiss = () => emit('ui:dismissNotification', item.id)
     return notification(item.msg, item.type, onDismiss)
+  }
+
+  function onChangeTitle (payload) {
+    emit('store:renameSheet', payload)
   }
 }

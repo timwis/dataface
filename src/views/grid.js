@@ -255,10 +255,13 @@ module.exports = function grid (state, emit) {
 
   function onPressEnter (evt) {
     const { rowIndex, columnIndex, editing } = state.ui.selectedCell
-    const isEditable = (rowIndex === -1 || state.store.activeSheet.fields[columnIndex].editable)
 
-    // Don't do anything if no cell is selected or the column isn't editable
-    if (rowIndex === null || columnIndex === null || !isEditable) return
+    // Don't do anything if no cell is selected
+    if (rowIndex === null || columnIndex === null) return
+
+    // Don't do anything if the column isn't editable
+    const isEditable = (rowIndex === -1 || state.store.activeSheet.fields[columnIndex].editable)
+    if (!isEditable) return
 
     // Set editing to opposite of current state
     emit('ui:selectCell', {editing: !editing})
