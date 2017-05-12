@@ -21,7 +21,7 @@ module.exports = function store (state, emitter) {
     try {
       state.store.sheets = await db.getTables()
       const activeSheetName = getActiveSheet()
-      emitter.emit('store:selectSheet', activeSheetName)
+      if (activeSheetName) emitter.emit('store:selectSheet', activeSheetName)
     } catch (err) {
       console.error(err)
       emitter.emit('ui:notify', { msg: 'Error fetching list of sheets' })
