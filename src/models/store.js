@@ -1,5 +1,6 @@
 const db = require('./clients/postgrest')
 const pick = require('lodash/pick')
+const mapValues = require('lodash/mapValues')
 
 module.exports = function store (state, emitter) {
   state.store = {
@@ -29,14 +30,31 @@ module.exports = function store (state, emitter) {
 
   emitter.on('store:selectSheet', async function (table) {
     try {
+      const rows = await db.getRows(table)
+      const structuredRows = rows.map(structureRow)
+
       state.store.activeSheet = {
-        rows: await db.getRows(table),
+        rows: structuredRows,
         fields: await db.getSchema(table),
         name: table
       }
       emitter.emit('render')
     } catch (err) {
       console.error(err)
+    }
+  })
+
+  emitter.on('store:setNewValue', function (data) {
+    const { rowIndex, columnIndex, value } = data
+    const isHeader = (rowIndex === -1)
+    const { rows, fields } = state.store.activeSheet
+
+    if (isHeader) {
+      state.store.activeSheet.fields[columnIndex].newName = value
+    } else {
+      const fieldName = fields[columnIndex].name
+      rows[rowIndex][fieldName] = rows[rowIndex][fieldName] || {}
+      rows[rowIndex][fieldName].newValue = value
     }
   })
 
@@ -47,9 +65,9 @@ module.exports = function store (state, emitter) {
       const table = activeSheet.name
       const row = activeSheet.rows[rowIndex]
       const primaryKeys = getPrimaryKeys(activeSheet.fields)
-      const conditions = pick(row, primaryKeys)
+      const conditions = destructureRow(pick(row, primaryKeys))
       const newRow = await db.update(table, updates, conditions)
-      state.store.activeSheet.rows[rowIndex] = newRow
+      state.store.activeSheet.rows[rowIndex] = structureRow(newRow)
       emitter.emit('render')
     } catch (err) {
       console.error(err)
@@ -62,7 +80,7 @@ module.exports = function store (state, emitter) {
       const activeSheet = state.store.activeSheet
       const table = activeSheet.name
       const newRow = await db.insert(table, updates)
-      state.store.activeSheet.rows[rowIndex] = newRow
+      state.store.activeSheet.rows[rowIndex] = structureRow(newRow)
       emitter.emit('render')
     } catch (err) {
       console.error(err)
@@ -76,7 +94,7 @@ module.exports = function store (state, emitter) {
       const table = activeSheet.name
       const row = activeSheet.rows[rowIndex]
       const primaryKeys = getPrimaryKeys(activeSheet.fields)
-      const conditions = pick(row, primaryKeys)
+      const conditions = destructureRow(pick(row, primaryKeys))
       await db.deleteRow(table, conditions)
       state.store.activeSheet.rows.splice(rowIndex, 1)
       emitter.emit('render')
@@ -143,4 +161,12 @@ module.exports = function store (state, emitter) {
 function getPrimaryKeys (fields) {
   return fields.filter((field) => field.constraint === 'PRIMARY KEY')
     .map((field) => field.name)
+}
+
+function structureRow (row) {
+  return mapValues(row, (value) => ({ value }))
+}
+
+function destructureRow (row) {
+  return mapValues(row, 'value')
 }
