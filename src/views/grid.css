@@ -54,3 +54,7 @@ td.editing {
 tr.row-selected {
   background-color: #a2bfbb !important;
 }
+input.hidden-input {
+  position: absolute;
+  top: -100px;
+}
