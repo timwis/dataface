@@ -19,6 +19,7 @@ const hyperList = new HyperList('tbody', opts)
 module.exports = function grid (state, emit) {
   const { fields, rows } = state.store.activeSheet
   const selectedCell = Object.assign({}, state.ui.selectedCell)
+  const selectedCellValue = getSelectedCellValue(fields, rows, selectedCell)
 
   const moveCellUp = moveCell.bind(this, 'up')
   const moveCellDown = moveCell.bind(this, 'down')
@@ -44,13 +45,44 @@ module.exports = function grid (state, emit) {
       </table>
       ${headerMenu(state.ui.headerMenu)}
       ${rowMenu(state.ui.rowMenu)}
+      ${hiddenInput(selectedCellValue)}
     </div>
   `
 
   const table = tree.querySelector('table')
   table.addEventListener('blur', onBlurCell, true)
 
+  if (!selectedCell.editing) {
+    window.setTimeout(() => setCursorInHiddenInput(), 100)
+  }
+
   return tree
+
+  function getSelectedCellValue (fields, rows, selectedCell) {
+    const { rowIndex, columnIndex } = selectedCell
+    const isCellSelected = (rowIndex !== null && columnIndex !== null)
+    const isHeaderSelected = isCellSelected && rowIndex === -1
+
+    if (isHeaderSelected) {
+      return fields[columnIndex].name
+    } else if (isCellSelected) {
+      const row = rows[selectedCell.rowIndex]
+      const fieldName = fields[selectedCell.columnIndex].name
+      return row[fieldName] || ''
+    } else {
+      return ''
+    }
+  }
+
+  function hiddenInput (value) {
+    return html`
+      <input class="hidden-input" value=${value} oninput=${onTypeInHiddenInput}>
+    `
+  }
+
+  function onTypeInHiddenInput (evt) {
+    emit('ui:selectCell', {editing: true, replaceValue: evt.target.value})
+  }
 
   function headerMenu (headerMenuState) {
     const columnIndex = headerMenuState.columnIndex
@@ -80,8 +112,8 @@ module.exports = function grid (state, emit) {
     const eventName = menu === 'header' ? 'ui:headerMenu' : 'ui:rowMenu'
     const x = evt.pageX || evt.clientX
     const y = evt.pageY || evt.clientY
-    const rowIndex = +evt.target.dataset.rowIndex
-    const columnIndex = +evt.target.dataset.columnIndex
+    const rowIndex = numericAttribute(evt.target.dataset.rowIndex)
+    const columnIndex = numericAttribute(evt.target.dataset.columnIndex)
     emit(eventName, { x, y, rowIndex, columnIndex, visible: true })
     evt.preventDefault()
   }
@@ -93,8 +125,8 @@ module.exports = function grid (state, emit) {
 
   function onClickCell (evt) {
     const el = evt.target
-    const rowIndex = +el.dataset.rowIndex
-    const columnIndex = +el.dataset.columnIndex
+    const rowIndex = numericAttribute(el.dataset.rowIndex)
+    const columnIndex = numericAttribute(el.dataset.columnIndex)
     const isSelected = el.classList.contains('selected')
 
     if (!isSelected) {
@@ -119,8 +151,8 @@ module.exports = function grid (state, emit) {
 
   function onDblClickCell (evt) {
     const el = evt.target
-    const rowIndex = +el.dataset.rowIndex
-    const columnIndex = +el.dataset.columnIndex
+    const rowIndex = numericAttribute(el.dataset.rowIndex)
+    const columnIndex = numericAttribute(el.dataset.columnIndex)
     const isEditing = el.classList.contains('editing')
     if (!isEditing) {
       const payload = { rowIndex, columnIndex, editing: true }
@@ -137,7 +169,7 @@ module.exports = function grid (state, emit) {
       saveRow(rowIndex, columnIndex, value)
     }
     if (editing) { // will be false if user hit enter b/c of enter listener
-      emit('ui:selectCell', {editing: false})
+      emit('ui:selectCell', {editing: false, replaceValue: null})
     }
   }
 
@@ -201,7 +233,7 @@ module.exports = function grid (state, emit) {
     if (rowIndex === null) return
 
     // Set editing to opposite of current state
-    emit('ui:selectCell', {editing: !editing})
+    emit('ui:selectCell', {editing: !editing, replaceValue: null})
     evt.preventDefault()
   }
 
@@ -228,7 +260,6 @@ module.exports = function grid (state, emit) {
   function tableHeader (field, columnIndex) {
     const selectedCell = state.ui.selectedCell
     const opts = {
-      value: field.name,
       rowIndex: -1,
       columnIndex,
       isHeader: true,
@@ -236,6 +267,13 @@ module.exports = function grid (state, emit) {
                   (selectedCell.columnIndex === columnIndex),
       isEditing: selectedCell.editing
     }
+
+    const replaceValue = selectedCell.replaceValue
+    const currentValue = field.name
+    opts.value = (opts.isSelected && opts.isEditing && replaceValue)
+      ? replaceValue
+      : currentValue
+
     return tableCell(opts)
   }
 }
@@ -248,8 +286,7 @@ function tableRow (tableRowState, rowIndex) {
   return html`
     <tr class=${classList}>
       ${fields.map((field, columnIndex) => {
-        const tableCellOpts = {
-          value: row[field.name] || '',
+        const opts = {
           rowIndex,
           columnIndex,
           isHeader: false,
@@ -257,7 +294,14 @@ function tableRow (tableRowState, rowIndex) {
                       (columnIndex === selectedCell.columnIndex),
           isEditing: selectedCell.editing
         }
-        return tableCell(tableCellOpts)
+
+        const replaceValue = selectedCell.replaceValue
+        const currentValue = row[field.name] || ''
+        opts.value = (opts.isSelected && opts.isEditing && replaceValue)
+          ? replaceValue
+          : currentValue
+
+        return tableCell(opts)
       })}
       <td class="extra"></td>
     </tr>
@@ -290,4 +334,14 @@ function setCursorInSelectedCell () {
   // It's probably a bug with nanomorph, technically
   const el = document.querySelector('.selected')
   setCursor(el)
+}
+
+function setCursorInHiddenInput () {
+  const el = document.querySelector('.hidden-input')
+  el.focus()
+  el.select()
+}
+
+function numericAttribute (val) {
+  return (val === '' || val === undefined) ? null : +val
 }

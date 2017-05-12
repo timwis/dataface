@@ -3,7 +3,8 @@ module.exports = function ui (state, emitter) {
     selectedCell: {
       rowIndex: null,
       columnIndex: null,
-      editing: false
+      editing: false,
+      replaceValue: null // for when entering edit mode by typing
     },
     headerMenu: {
       x: 0,
