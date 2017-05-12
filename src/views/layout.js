@@ -46,7 +46,7 @@ module.exports = (view) => (state, emit) => {
             </a>
           </div>
           <div class="column table-container">
-            ${sheetTitle(activeSheet.name, onChangeTitle)}
+            ${activeSheet.name ? sheetTitle(activeSheet.name, onChangeTitle) : ''}
             ${activeSheet.fields !== null
               ? view(state, emit)
               : ''}
