@@ -25,6 +25,7 @@ module.exports = function store (state, emitter) {
       emitter.emit('render')
     } catch (err) {
       console.error(err)
+      emitter.emit('ui:notify', { msg: 'Error fetching list of sheets' })
     }
   })
 
@@ -44,6 +45,7 @@ module.exports = function store (state, emitter) {
       emitter.emit('render')
     } catch (err) {
       console.error(err)
+      // emitter.emit('ui:notify', { msg: `Error selecting sheet ${table}` })
     }
   })
 
@@ -74,6 +76,7 @@ module.exports = function store (state, emitter) {
       emitter.emit('render')
     } catch (err) {
       console.error(err)
+      emitter.emit('ui:notify', { msg: 'Error saving row' })
     }
   })
 
@@ -87,6 +90,7 @@ module.exports = function store (state, emitter) {
       emitter.emit('render')
     } catch (err) {
       console.error(err)
+      emitter.emit('ui:notify', { msg: 'Error adding row' })
     }
   })
 
@@ -103,6 +107,7 @@ module.exports = function store (state, emitter) {
       emitter.emit('render')
     } catch (err) {
       console.error(err)
+      emitter.emit('ui:notify', { msg: 'Error removing row' })
     }
   })
 
@@ -116,6 +121,7 @@ module.exports = function store (state, emitter) {
       emitter.emit('render')
     } catch (err) {
       console.error(err)
+      emitter.emit('ui:notify', { msg: 'Error adding column' })
     }
   })
 
@@ -133,6 +139,7 @@ module.exports = function store (state, emitter) {
       emitter.emit('render')
     } catch (err) {
       console.error(err)
+      emitter.emit('ui:notify', { msg: 'Error renaming column' })
     }
   })
 
@@ -146,6 +153,7 @@ module.exports = function store (state, emitter) {
       emitter.emit('render')
     } catch (err) {
       console.error(err)
+      emitter.emit('ui:notify', { msg: 'Error removing column' })
     }
   })
 

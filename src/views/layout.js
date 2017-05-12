@@ -2,6 +2,7 @@ const html = require('choo/html')
 
 const nav = require('../components/nav')
 const menu = require('../components/menu')
+const notification = require('../components/notification')
 
 require('insert-css')(`
   html, body, .container, .columns, .table-container {
@@ -22,6 +23,7 @@ module.exports = (view) => (state, emit) => {
   return html`
     <body>
       ${nav()}
+      ${state.ui.notifications.map(createNotification)}
       <div class="container">
         <div class="columns" onload=${onload}>
           <div class="column is-one-quarter">
@@ -39,5 +41,10 @@ module.exports = (view) => (state, emit) => {
 
   function onload (el) {
     emit('store:getList')
+  }
+
+  function createNotification (item) {
+    const onDismiss = () => emit('ui:dismissNotification', item.id)
+    return notification(item.msg, item.type, onDismiss)
   }
 }
