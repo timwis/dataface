@@ -14,7 +14,7 @@ module.exports = function store (state, emitter) {
 
   emitter.on('pushState', function (location) {
     const sheet = location.split('/').pop()
-    emitter.emit('store:selectSheet', sheet)
+    if (sheet) emitter.emit('store:selectSheet', sheet)
   })
 
   emitter.on('store:getList', async function () {
@@ -163,6 +163,8 @@ module.exports = function store (state, emitter) {
       await db.insertTable(name)
       state.store.sheets.push({ name })
       state.store.activeSheet.name = name
+      state.store.activeSheet.rows = []
+      state.store.activeSheet.fields = await db.getSchema(name)
       emitter.emit('pushState', `/${name}`)
       emitter.emit('store:insertField') // add a sample field
     } catch (err) {
@@ -194,9 +196,13 @@ module.exports = function store (state, emitter) {
       const newMaxIndex = state.store.sheets.length - 1
       const newActiveSheetIndex = Math.min(sheetIndex, newMaxIndex)
       const newActiveSheet = state.store.sheets[newActiveSheetIndex]
-      state.store.activeSheet.name = newActiveSheet.name
-      emitter.emit('pushState', `/${newActiveSheet.name}`)
-      // TODO: what if you delete the last sheet?
+      const newActiveSheetName = newActiveSheet ? newActiveSheet.name : ''
+      state.store.activeSheet = {
+        name: null,
+        fields: null,
+        rows: null
+      }
+      emitter.emit('pushState', `/${newActiveSheetName}`)
     } catch (err) {
       console.error(err)
       emitter.emit('ui:notify', { msg: 'Error removing sheet' })
