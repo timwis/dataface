@@ -19,7 +19,8 @@ module.exports = function sheetTitle (title, onChange) {
   }
 
   function onBlur (evt) {
-    const payload = { oldName: title, name: evt.target.innerText }
-    if (onChange) onChange(payload)
+    const oldName = title
+    const name = evt.target.innerText
+    if (oldName !== name && onChange) onChange({ oldName, name })
   }
 }
