@@ -117,8 +117,9 @@ module.exports = function store (state, emitter) {
   emitter.on('store:insertField', async function () {
     try {
       const table = state.store.activeSheet.name
-      const currentFieldCount = state.store.activeSheet.fields.length
-      const newFieldName = `field_${currentFieldCount + 1}`
+      const fieldNames = state.store.activeSheet.fields.map((field) => field.name)
+      const nextInSeq = getNextInSequence(fieldNames)
+      const newFieldName = `field_${nextInSeq}`
       const newField = await db.insertField(table, newFieldName)
       const newFieldWithEditable = addEditable(newField)
       state.store.activeSheet.fields.push(newFieldWithEditable)
@@ -163,8 +164,9 @@ module.exports = function store (state, emitter) {
 
   emitter.on('store:insertSheet', async function () {
     try {
-      const currentSheetCount = state.store.sheets.length
-      const name = `sheet_${currentSheetCount + 1}`
+      const sheetNames = state.store.sheets.map((sheet) => sheet.name)
+      const nextInSeq = getNextInSequence(sheetNames)
+      const name = `sheet_${nextInSeq}`
       await db.insertTable(name)
       state.store.sheets.push({ name })
       state.store.activeSheet.name = name
@@ -242,4 +244,25 @@ function structureRow (row) {
 
 function destructureRow (row) {
   return mapValues(row, 'value')
+}
+
+function getNextInSequence (names) {
+  const numbers = names
+    .map(getTrailingNumber)
+    .filter(isSequenceMember)
+    .sort()
+  return numbers.length > 0 ? last(numbers) + 1 : names.length + 1
+}
+
+function getTrailingNumber (name) {
+  const parts = name.split('_')
+  return +last(parts)
+}
+
+function isSequenceMember (input) {
+  return input > 0
+}
+
+function last (arr) {
+  return arr[arr.length - 1]
 }

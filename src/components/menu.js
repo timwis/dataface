@@ -35,6 +35,8 @@ module.exports = function menu (sheets, activeSheet, onDelete) {
 
     function onClickDelete (evt) {
       if (onDelete) onDelete(item.name)
+      evt.preventDefault()
+      evt.stopPropagation()
     }
   }
 }
