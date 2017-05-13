@@ -12,7 +12,7 @@ const opts = {
   height: 500,
   itemHeight: 34,
   eachItem: tableRow,
-  getTotal: (state) => state.rows.length
+  getTotal: (state) => state.rows.length + 1 // empty row at end
 }
 const hyperList = new HyperList('tbody', opts)
 
@@ -280,19 +280,7 @@ module.exports = function grid (state, emit) {
   }
 
   function saveRow (rowIndex, columnIndex) {
-    const field = state.store.activeSheet.fields[columnIndex].name
-    const row = state.store.activeSheet.rows[rowIndex]
-    const value = row && row[field].newValue
-    const oldValue = row && row[field].value
-    const updates = { [field]: value }
-
-    if (!row && value) {
-      emit('store:insertRow', { rowIndex, updates })
-    } else if (row && value !== undefined && value !== oldValue) {
-      emit('store:updateRow', { rowIndex, updates })
-    } else {
-      console.log('not updating', value, oldValue)
-    }
+    emit('store:saveRow', { rowIndex, columnIndex })
   }
 
   function saveHeader (columnIndex) {
@@ -320,7 +308,7 @@ module.exports = function grid (state, emit) {
 
 function tableRow (tableRowState, rowIndex) {
   const { fields, rows, selectedCell, rowMenu } = tableRowState
-  const row = rows[rowIndex]
+  const row = rows[rowIndex] || {} // allow empty row at end
   const classList = rowMenu.rowIndex === rowIndex ? 'row-selected' : ''
 
   return html`

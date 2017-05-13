@@ -57,39 +57,43 @@ module.exports = function store (state, emitter) {
       state.store.activeSheet.fields[columnIndex].newName = newValue
     } else {
       const fieldName = fields[columnIndex].name
+      rows[rowIndex] = rows[rowIndex] || {}
       rows[rowIndex][fieldName] = rows[rowIndex][fieldName] || {}
       rows[rowIndex][fieldName].newValue = newValue
     }
   })
 
-  emitter.on('store:updateRow', async function (data) {
+  emitter.on('store:saveRow', async function (data) {
     try {
-      const { rowIndex, updates } = data
+      const { rowIndex, columnIndex } = data
       const activeSheet = state.store.activeSheet
-      const table = activeSheet.name
+      const field = activeSheet.fields[columnIndex].name
       const row = activeSheet.rows[rowIndex]
+      const oldValue = row[field].value
+      const newValue = row[field].newValue
+      const updates = { [field]: newValue }
       const primaryKeys = getPrimaryKeys(activeSheet.fields)
       const conditions = destructureRow(pick(row, primaryKeys))
-      const newRow = await db.update(table, updates, conditions)
-      state.store.activeSheet.rows[rowIndex] = structureRow(newRow)
-      emitter.emit('render')
+      const isNewRow = (Object.keys(conditions).length === 0)
+      const table = activeSheet.name
+
+      let newRow
+
+      if (isNewRow && newValue) {
+        newRow = await db.insert(table, updates)
+      } else if (!isNewRow && newValue !== oldValue && newValue !== undefined) {
+        newRow = await db.update(table, updates, conditions)
+      } else {
+        console.log('not saving', isNewRow, oldValue, newValue)
+      }
+
+      if (newRow) {
+        state.store.activeSheet.rows[rowIndex] = structureRow(newRow)
+        emitter.emit('render')
+      }
     } catch (err) {
       console.error(err)
       emitter.emit('ui:notify', { msg: 'Error saving row' })
-    }
-  })
-
-  emitter.on('store:insertRow', async function (data) {
-    try {
-      const { rowIndex, updates } = data
-      const activeSheet = state.store.activeSheet
-      const table = activeSheet.name
-      const newRow = await db.insert(table, updates)
-      state.store.activeSheet.rows[rowIndex] = structureRow(newRow)
-      emitter.emit('render')
-    } catch (err) {
-      console.error(err)
-      emitter.emit('ui:notify', { msg: 'Error adding row' })
     }
   })
 
@@ -116,7 +120,8 @@ module.exports = function store (state, emitter) {
       const currentFieldCount = state.store.activeSheet.fields.length
       const newFieldName = `field_${currentFieldCount + 1}`
       const newField = await db.insertField(table, newFieldName)
-      state.store.activeSheet.fields.push(newField)
+      const newFieldWithEditable = addEditable(newField)
+      state.store.activeSheet.fields.push(newFieldWithEditable)
       emitter.emit('render')
     } catch (err) {
       console.error(err)
