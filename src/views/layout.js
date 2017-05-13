@@ -6,7 +6,7 @@ const notification = require('../components/notification')
 const sheetTitle = require('../components/sheet-title')
 
 require('insert-css')(`
-  html, body, .container, .columns, .table-container {
+  html, body, .container {
     height: 100%
   }
   body {
