@@ -3,7 +3,6 @@ const html = require('choo/html')
 const nav = require('../components/nav')
 const menu = require('../components/menu')
 const notification = require('../components/notification')
-const sheetTitle = require('../components/sheet-title')
 
 require('insert-css')(`
   html, body, .container {
@@ -29,7 +28,7 @@ require('insert-css')(`
 `)
 
 module.exports = (view) => (state, emit) => {
-  const { sheets, activeSheet } = state.store
+  const sheets = state.store.sheets
 
   return html`
     <body>
@@ -46,10 +45,7 @@ module.exports = (view) => (state, emit) => {
             </a>
           </div>
           <div class="column table-container">
-            ${activeSheet.name ? sheetTitle(activeSheet.name, onChangeTitle) : ''}
-            ${activeSheet.fields !== null
-              ? view(state, emit)
-              : ''}
+            ${view(state, emit)}
           </div>
         </div>
       </div>
@@ -71,9 +67,5 @@ module.exports = (view) => (state, emit) => {
 
   function onClickAdd (evt) {
     emit('store:insertSheet')
-  }
-
-  function onChangeTitle (payload) {
-    emit('store:renameSheet', payload)
   }
 }

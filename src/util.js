@@ -15,3 +15,7 @@ module.exports.setCursor = function setCursor (el) {
     textRange.select()
   }
 }
+
+module.exports.numericAttribute = function numericAttribute (val) {
+  return (val === '' || val === undefined) ? null : +val
+}
