@@ -36,7 +36,7 @@ module.exports = (view) => (state, emit) => {
       <div class="notifications">
         ${state.ui.notifications.map(createNotification)}
       </div>
-      <div class="container" onload=${onload}>
+      <div class="container" onload=${onLoad}>
         <div class="columns">
           <div class="column is-one-quarter">
             ${menu(sheets, state.store.activeSheet.name, onClickDelete)}
@@ -52,7 +52,7 @@ module.exports = (view) => (state, emit) => {
     </body>
   `
 
-  function onload (el) {
+  function onLoad (el) {
     emit('store:getList')
   }
 

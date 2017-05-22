@@ -6,8 +6,8 @@ module.exports = function store (state, emitter) {
   state.store = {
     sheets: [],
     activeSheet: {
-      fields: null,
-      rows: null,
+      columns: [],
+      rows: [],
       name: null
     }
   }
@@ -38,7 +38,7 @@ module.exports = function store (state, emitter) {
 
       state.store.activeSheet = {
         rows: structuredRows,
-        fields: fieldsWithEditable,
+        columns: fieldsWithEditable,
         name: table
       }
       emitter.emit('render')

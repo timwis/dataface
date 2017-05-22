@@ -34,7 +34,7 @@ module.exports = function ui (state, emitter) {
         break
       case 'down':
         const nextRowIndex = currentRowIndex + 1
-        const lastRowIndex = columnCount // includes one for empty row
+        const lastRowIndex = rowCount // includes one for empty row
         payload.rowIndex = Math.min(nextRowIndex, lastRowIndex)
         break
       case 'left':

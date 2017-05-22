@@ -1,18 +1,20 @@
 const html = require('choo/html')
 
 const sheetName = require('../components/sheet-name')
-const grid = require('../components/grid')
+const Grid = require('../components/grid')
+
+const grid = new Grid()
 
 module.exports = function sheet (state, emit) {
   const activeSheet = state.store.activeSheet
   const selectedCell = state.ui.selectedCell
   const isNameVisible = (activeSheet.name !== null)
-  const isGridVisible = (activeSheet.fields !== null)
+  const isGridVisible = (activeSheet.columns.length > 0)
 
   return html`
     <div>
       ${isNameVisible ? sheetName(activeSheet.name, onChangeName) : ''}
-      ${isGridVisible ? grid({ activeSheet, selectedCell }) : ''}
+      ${isGridVisible ? grid.render({ activeSheet, selectedCell, emit }) : ''}
     </div>
   `
 
