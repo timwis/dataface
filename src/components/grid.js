@@ -3,6 +3,7 @@ const css = require('sheetify')
 const HyperList = require('hyperlist-component')
 const partial = require('lodash/partial')
 const bindAll = require('lodash/bindAll')
+const pick = require('lodash/pick')
 const keyboard = require('keyboardjs')
 
 const gridRow = require('./grid-row')
@@ -10,10 +11,13 @@ const gridCellHeader = require('./grid-cell-header')
 const prefix = css('./grid.css')
 const { numericAttribute } = require('../util')
 
+const HEADER_INDEX = -1
+
 module.exports = class Grid {
   constructor () {
     this.hyperList = initHyperList()
-    bindAll(this, ['onLoad', 'onClickCell', 'onDblClickCell', 'onClickAddColumn', 'navigate'])
+    bindAll(this, ['onLoad', 'onClickCell', 'onDblClickCell', 'onClickAddColumn',
+      'navigate', 'onPressEnter', 'onPressEscape', 'onBlurCell', 'onInputCell'])
   }
 
   render (props) {
@@ -24,13 +28,13 @@ module.exports = class Grid {
 
     const rowMenu = {}
     const gridRowState = { columns, rows, selectedCell, rowMenu }
-    console.log(gridRowState)
     const tbody = this.hyperList.render(gridRowState)
 
-    return html`
+    const tree = html`
       <div class=${prefix} onload=${this.onLoad}>
         <table class="table is-bordered is-striped is-narrow"
-          onclick=${this.onClickCell} ondblclick=${this.onDblClickCell}>
+          onclick=${this.onClickCell} ondblclick=${this.onDblClickCell}
+          oninput=${this.onInputCell}>
           <thead>
             <tr>
               ${columns.map(gridCellHeaderWithState)}
@@ -41,6 +45,11 @@ module.exports = class Grid {
         </table>
       </div>
     `
+
+    const table = tree.querySelector('table')
+    table.addEventListener('blur', this.onBlurCell, true) // useCapture=true
+
+    return tree
   }
 
   onLoad (el) {
@@ -57,13 +66,11 @@ module.exports = class Grid {
   }
 
   navigate (direction, evt) {
-    const { selectedCell, activeSheet } = this.props
-    const isCellSelected = (selectedCell.rowIndex !== null)
-    const isEditing = (selectedCell.editing === true)
+    const activeSheet = this.props.activeSheet
     const rowCount = activeSheet.rows.length
     const columnCount = activeSheet.columns.length
 
-    if (isCellSelected && !isEditing) {
+    if (this.isAnyCellSelected() && !this.isEditing()) {
       this.props.emit('ui:navigate', { direction, rowCount, columnCount })
       evt.preventDefault()
     }
@@ -75,7 +82,7 @@ module.exports = class Grid {
     const isSelected = el.classList.contains('selected')
 
     if (!isSelected) {
-      const payload = { rowIndex, columnIndex, editing: false }
+      const payload = { rowIndex, columnIndex }
       this.props.emit('ui:selectCell', payload)
     }
   }
@@ -86,9 +93,37 @@ module.exports = class Grid {
     const isEditing = el.classList.contains('editing')
 
     if (!isEditing && this.isCellEditable(rowIndex, columnIndex)) {
-      const payload = { rowIndex, columnIndex, editing: true }
+      const payload = { rowIndex, columnIndex }
       this.props.emit('ui:selectCell', payload)
+      this.props.emit('ui:setCellEditing')
     }
+  }
+
+  onInputCell (evt) {
+    if (this.isEditing()) {
+      const value = evt.target.innerText
+      this.props.emit('ui:setPendingValue', value)
+    }
+  }
+
+  onBlurCell (evt) {
+    if (this.isHeaderSelected()) {
+      this.saveSelectedHeaderCell()
+    } else {
+      this.saveSelectedCell()
+    }
+
+    // if (this.isEditing() { // will be false if user hit enter
+    //   this.props.emit('ui:selectCell', { editing: false })
+    // }
+  }
+
+  saveSelectedCell () {
+    const payload = pick(this.props.selectedCell, ['rowIndex', 'columnIndex', 'pendingValue'])
+    this.props.emit('store:saveCell', payload)
+  }
+
+  saveSelectedHeaderCell () {
   }
 
   onClickAddColumn (evt) {
@@ -97,19 +132,55 @@ module.exports = class Grid {
     const columns = this.props.activeSheet.columns
     const lastColumnIndex = columns.length
     const payload = {
-      rowIndex: -1,
-      columnIndex: lastColumnIndex,
-      editing: true
+      rowIndex: HEADER_INDEX,
+      columnIndex: lastColumnIndex
     }
     this.props.emit('ui:selectCell', payload)
+    this.props.emit('ui:setCellEditing')
     evt.stopPropagation()
+  }
+
+  onPressEnter (evt) {
+    if (this.isAnyCellSelected() && this.isSelectedCellEditable()) {
+      if (this.isEditing()) {
+        this.props.emit('ui:setCellNotEditing')
+      } else {
+        this.props.emit('ui:setCellEditing')
+      }
+      evt.preventDefault()
+    }
+  }
+
+  onPressEscape (evt) {
+    if (this.isAnyCellSelected() && this.isEditing()) {
+      // TODO: erase saved value
+      this.props.emit('ui:setCellNotEditing')
+      evt.preventDefault()
+    }
+  }
+
+  isAnyCellSelected () {
+    const { rowIndex, columnIndex } = this.props.selectedCell
+    return (rowIndex !== null && columnIndex !== null)
+  }
+
+  isEditing () {
+    return this.props.selectedCell.editing
+  }
+
+  isSelectedCellEditable () {
+    const { rowIndex, columnIndex } = this.props.selectedCell
+    return this.isCellEditable(rowIndex, columnIndex)
   }
 
   isCellEditable (rowIndex, columnIndex) {
     const columns = this.props.activeSheet.columns
-    const isHeaderSelected = (rowIndex === -1)
     const isColumnEditable = columns[columnIndex].editable
-    return isHeaderSelected || isColumnEditable
+    return this.isHeaderSelected() || isColumnEditable
+  }
+
+  isHeaderSelected () {
+    return this.props.selectedCell.rowIndex === HEADER_INDEX
   }
 }
 

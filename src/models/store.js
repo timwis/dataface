@@ -20,203 +20,196 @@ module.exports = function store (state, emitter) {
   emitter.on('store:getList', async function () {
     try {
       state.store.sheets = await db.getTables()
-      const activeSheetName = getActiveSheet()
-      if (activeSheetName) emitter.emit('store:selectSheet', activeSheetName)
     } catch (err) {
       console.error(err)
       emitter.emit('ui:notify', { msg: 'Error fetching list of sheets' })
     }
+
+    const activeSheetName = determineActiveSheet()
+    if (activeSheetName) {
+      emitter.emit('store:selectSheet', activeSheetName)
+    }
   })
 
-  emitter.on('store:selectSheet', async function (table) {
+  emitter.on('store:selectSheet', async function (sheetName) {
+    let rows, columns
     try {
-      const fields = await db.getSchema(table)
-      const fieldsWithEditable = fields.map(addEditable)
-      const firstFieldName = fields.length ? fields[0].name : ''
-      const rows = await db.getRows(table, firstFieldName)
-      const structuredRows = rows.map(structureRow)
-
-      state.store.activeSheet = {
-        rows: structuredRows,
-        columns: fieldsWithEditable,
-        name: table
-      }
-      emitter.emit('render')
+      columns = await db.getSchema(sheetName)
+      const firstColumnName = (columns.length) ? columns[0].name : ''
+      rows = await getRows(sheetName, firstColumnName)
     } catch (err) {
       console.error(err)
-      emitter.emit('ui:notify', { msg: `Error selecting sheet ${table}` })
+      emitter.emit('ui:notify', { msg: `Error selecting sheet ${sheetName}` })
     }
+
+    state.store.activeSheet = {
+      rows,
+      columns,
+      name: sheetName
+    }
+    emitter.emit('render')
   })
 
-  emitter.on('store:setNewValue', function (data) {
-    const { rowIndex, columnIndex, newValue } = data
-    const isHeader = (rowIndex === -1)
-    const { rows, fields } = state.store.activeSheet
+  emitter.on('store:saveCell', async function ({ rowIndex, columnIndex, pendingValue }) {
+    const activeSheet = state.store.activeSheet
+    const sheetName = activeSheet.name
+    const columnName = activeSheet.columns[columnIndex].name
+    const currentValue = activeSheet.rows[rowIndex][columnName].value
+    const updates = { [columnName]: pendingValue }
+    const conditions = getConditions(rowIndex)
+    const isNewRow = (Object.keys(conditions).length === 0)
 
-    if (isHeader) {
-      state.store.activeSheet.fields[columnIndex].newName = newValue
-    } else {
-      const fieldName = fields[columnIndex].name
-      rows[rowIndex] = rows[rowIndex] || {}
-      rows[rowIndex][fieldName] = rows[rowIndex][fieldName] || {}
-      rows[rowIndex][fieldName].newValue = newValue
-    }
-  })
-
-  emitter.on('store:saveRow', async function (data) {
+    let newRow
     try {
-      const { rowIndex, columnIndex } = data
-      const activeSheet = state.store.activeSheet
-      const field = activeSheet.fields[columnIndex].name
-      const row = activeSheet.rows[rowIndex]
-      const oldValue = row[field].value
-      const newValue = row[field].newValue
-      const updates = { [field]: newValue }
-      const primaryKeys = getPrimaryKeys(activeSheet.fields)
-      const conditions = destructureRow(pick(row, primaryKeys))
-      const isNewRow = (Object.keys(conditions).length === 0)
-      const table = activeSheet.name
-
-      let newRow
-
-      if (isNewRow && newValue) {
-        newRow = await db.insert(table, updates)
-      } else if (!isNewRow && newValue !== oldValue && newValue !== undefined) {
-        newRow = await db.update(table, updates, conditions)
-      } else {
-        console.log('not saving', isNewRow, oldValue, newValue)
-      }
-
-      if (newRow) {
-        state.store.activeSheet.rows[rowIndex] = structureRow(newRow)
-        emitter.emit('render')
+      if (isNewRow && pendingValue) {
+        newRow = await db.insert(sheetName, updates)
+      } else if (!isNewRow && pendingValue !== currentValue && pendingValue !== null) {
+        newRow = await db.update(sheetName, updates, conditions)
       }
     } catch (err) {
       console.error(err)
-      emitter.emit('ui:notify', { msg: 'Error saving row' })
+      emitter.emit('ui:notify', { msg: `Error saving cell` })
+    }
+
+    if (newRow) {
+      state.store.activeSheet.rows[rowIndex] = structureRow(newRow)
+      emitter.emit('render')
     }
   })
 
-  emitter.on('store:deleteRow', async function (data) {
+  emitter.on('store:deleteRow', async function ({ rowIndex }) {
+    const sheetName = state.store.activeSheet.activeSheet.name
+    const conditions = getConditions(rowIndex)
+
     try {
-      const { rowIndex } = data
-      const activeSheet = state.store.activeSheet
-      const table = activeSheet.name
-      const row = activeSheet.rows[rowIndex]
-      const primaryKeys = getPrimaryKeys(activeSheet.fields)
-      const conditions = destructureRow(pick(row, primaryKeys))
-      await db.deleteRow(table, conditions)
-      state.store.activeSheet.rows.splice(rowIndex, 1)
-      emitter.emit('render')
+      await db.deleteRow(sheetName, conditions)
     } catch (err) {
       console.error(err)
       emitter.emit('ui:notify', { msg: 'Error removing row' })
+      return
     }
+
+    state.store.activeSheet.rows.splice(rowIndex, 1)
+    emitter.emit('render')
   })
 
-  emitter.on('store:insertField', async function () {
+  emitter.on('store:insertColumn', async function () {
+    const activeSheet = state.store.activeSheet
+    const sheetName = activeSheet.name
+    const columnNames = activeSheet.columns.map((column) => column.name)
+    const nextInSeq = getNextInSequence(columnNames)
+    const newColumnName = `column_${nextInSeq}`
+
+    let newColumn
     try {
-      const table = state.store.activeSheet.name
-      const fieldNames = state.store.activeSheet.fields.map((field) => field.name)
-      const nextInSeq = getNextInSequence(fieldNames)
-      const newFieldName = `field_${nextInSeq}`
-      const newField = await db.insertField(table, newFieldName)
-      const newFieldWithEditable = addEditable(newField)
-      state.store.activeSheet.fields.push(newFieldWithEditable)
-      emitter.emit('render')
+      newColumn = await db.insertColumn(sheetName, newColumnName)
     } catch (err) {
       console.error(err)
       emitter.emit('ui:notify', { msg: 'Error adding column' })
+      return
     }
+
+    state.store.activeSheet.columns.push(newColumn)
+    emitter.emit('render')
   })
 
-  emitter.on('store:renameField', async function (data) {
+  emitter.on('store:renameColumn', async function ({ columnIndex, oldName, newName }) {
+    const sheetName = state.store.activeSheet.name
+    const rows = state.store.activeSheet.rows
+
     try {
-      const { columnIndex, oldValue, value } = data
-      const table = state.store.activeSheet.name
-      await db.renameField(table, oldValue, value)
-      state.store.activeSheet.fields[columnIndex].name = value
-      state.store.activeSheet.rows.map((row) => {
-        row[value] = row[oldValue]
-        delete row[oldValue]
-        return row
-      })
-      emitter.emit('render')
+      await db.renameColumn(sheetName, oldName, newName)
     } catch (err) {
       console.error(err)
-      emitter.emit('ui:notify', { msg: 'Error renaming column' })
+      emitter.emit('ui:notify', { msg: `Error renaming column ${oldName} to ${newName}` })
+      return
     }
+
+    state.store.activeSheet.fields[columnIndex].name = newName
+    state.store.activeSheet.rows = renameProperty(rows, oldName, newName)
+    emitter.emit('render')
   })
 
-  emitter.on('store:deleteField', async function (data) {
+  emitter.on('store:deleteColumn', async function ({ columnIndex }) {
+    const sheetName = state.store.activeSheet.name
+    const columnName = state.store.activeSheet.columns[columnIndex].name
+
     try {
-      const columnIndex = data.columnIndex
-      const table = state.store.activeSheet.name
-      const fieldName = state.store.activeSheet.fields[columnIndex].name
-      await db.deleteField(table, fieldName)
-      state.store.activeSheet.fields.splice(columnIndex, 1)
-      emitter.emit('render')
+      await db.deleteColumn(sheetName, columnName)
     } catch (err) {
       console.error(err)
       emitter.emit('ui:notify', { msg: 'Error removing column' })
+      return
     }
+
+    state.store.activeSheet.columns.splice(columnIndex, 1)
+    emitter.emit('render')
   })
 
   emitter.on('store:insertSheet', async function () {
+    const sheetNames = state.store.sheets.map((sheet) => sheet.name)
+    const nextInSeq = getNextInSequence(sheetNames)
+    const name = `sheet_${nextInSeq}`
+
+    let newColumns
     try {
-      const sheetNames = state.store.sheets.map((sheet) => sheet.name)
-      const nextInSeq = getNextInSequence(sheetNames)
-      const name = `sheet_${nextInSeq}`
       await db.insertTable(name)
-      state.store.sheets.push({ name })
-      state.store.activeSheet.name = name
-      state.store.activeSheet.rows = []
-      state.store.activeSheet.fields = await db.getSchema(name)
-      emitter.emit('pushState', `/${name}`)
-      emitter.emit('store:insertField') // add a sample field
+      newColumns = await db.getSchema(name)
     } catch (err) {
       console.error(err)
       emitter.emit('ui:notify', { msg: 'Error adding sheet' })
+      return
     }
+
+    state.store.sheets.push({ name })
+    state.store.activeSheet.name = name
+    state.store.activeSheet.rows = []
+    state.store.activeSheet.columns = newColumns
+    emitter.emit('pushState', `/${name}`)
+    emitter.emit('store:insertColumn') // add a sample column
   })
 
-  emitter.on('store:renameSheet', async function (data) {
+  emitter.on('store:renameSheet', async function ({ oldName, newName }) {
     try {
-      const { oldName, newName } = data
       await db.renameTable(oldName, newName)
-      state.store.activeSheet.name = newName
-      const sheet = state.store.sheets.find((item) => item.name === oldName)
-      sheet.name = newName
-      emitter.emit('pushState', `/${newName}`)
     } catch (err) {
       console.error(err)
       emitter.emit('ui:notify', { msg: 'Error renaming sheet' })
+      return
     }
+
+    state.store.activeSheet.name = newName
+    const sheet = state.store.sheets.find((item) => item.name === oldName)
+    sheet.name = newName
+    emitter.emit('pushState', `/${newName}`)
   })
 
   emitter.on('store:deleteSheet', async function (name) {
     try {
       await db.deleteTable(name)
-      const sheetIndex = state.store.sheets.findIndex((item) => item.name === name)
-      state.store.sheets.splice(sheetIndex, 1)
-
-      const newMaxIndex = state.store.sheets.length - 1
-      const newActiveSheetIndex = Math.min(sheetIndex, newMaxIndex)
-      const newActiveSheet = state.store.sheets[newActiveSheetIndex]
-      const newActiveSheetName = newActiveSheet ? newActiveSheet.name : ''
-      state.store.activeSheet = {
-        name: null,
-        fields: null,
-        rows: null
-      }
-      emitter.emit('pushState', `/${newActiveSheetName}`)
     } catch (err) {
       console.error(err)
       emitter.emit('ui:notify', { msg: 'Error removing sheet' })
+      return
     }
+
+    const sheetIndex = state.store.sheets.findIndex((item) => item.name === name)
+    state.store.sheets.splice(sheetIndex, 1)
+
+    const newActiveSheetName = determineNextActiveSheet()
+    state.store.activeSheet = {
+      name: null,
+      fields: null,
+      rows: null
+    }
+    emitter.emit('pushState', `/${newActiveSheetName}`)
   })
 
-  function getActiveSheet () {
+  function getRows (sheetName, orderBy) {
+    return db.getRows(sheetName, orderBy).then((rows) => rows.map(structureRow))
+  }
+
+  function determineActiveSheet () {
     // Use param if exists, otherwise use first table in list
     if (state.params.sheet) {
       return state.params.sheet
@@ -226,16 +219,26 @@ module.exports = function store (state, emitter) {
       return ''
     }
   }
+
+  function determineNextActiveSheet (sheetIndex) {
+    const newMaxIndex = state.store.sheets.length - 1
+    const newActiveSheetIndex = Math.min(sheetIndex, newMaxIndex)
+    const newActiveSheet = state.store.sheets[newActiveSheetIndex]
+    return newActiveSheet ? newActiveSheet.name : ''
+  }
+
+  function getConditions (rowIndex) {
+    const activeSheet = state.store.activeSheet
+    const row = activeSheet.rows[rowIndex]
+    const primaryKeys = getPrimaryKeys(activeSheet.columns)
+    const conditions = destructureRow(pick(row, primaryKeys))
+    return conditions
+  }
 }
 
 function getPrimaryKeys (fields) {
   return fields.filter((field) => field.constraint === 'PRIMARY KEY')
     .map((field) => field.name)
-}
-
-function addEditable (field) {
-  field.editable = !(field.default && field.default.startsWith('nextval'))
-  return field
 }
 
 function structureRow (row) {
@@ -244,6 +247,14 @@ function structureRow (row) {
 
 function destructureRow (row) {
   return mapValues(row, 'value')
+}
+
+function renameProperty (items, oldProp, newProp) {
+  return items.map((item) => {
+    item[newProp] = item[oldProp]
+    delete item[oldProp]
+    return item
+  })
 }
 
 function getNextInSequence (names) {

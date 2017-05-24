@@ -24,13 +24,14 @@ const db = {
   async getSchema (table) {
     const url = constructUrl('rpc/get_schema')
     const response = await axios.post(url, { table_name_param: table })
-    return response.data
+    const columnsWithEditable = response.data.map(addEditable)
+    return columnsWithEditable
   },
 
-  async getField (table, field) {
+  async getColumn (table, column) {
     const url = constructUrl('rpc/get_schema')
     const response = await axios.post(url, { table_name_param: table })
-    return response.data.find((row) => row.name === field)
+    return response.data.find((row) => row.name === column)
   },
 
   async update (table, updates, conditions) {
@@ -61,21 +62,21 @@ const db = {
     return response.data
   },
 
-  async insertField (table, name) {
+  async insertColumn (table, name) {
     const url = constructUrl('rpc/insert_column')
     const payload = { table_name: table, column_name: name }
     await axios.post(url, payload)
-    return await db.getField(table, name)
+    return await db.getColumn(table, name)
   },
 
-  async renameField (table, oldValue, value) {
+  async renameColumn (table, oldName, newName) {
     const url = constructUrl('rpc/rename_column')
-    const payload = { table_name: table, old_name: oldValue, new_name: value }
+    const payload = { table_name: table, old_name: oldName, new_name: newName }
     const response = await axios.post(url, payload)
     return response.data
   },
 
-  async deleteField (table, name) {
+  async deleteColumn (table, name) {
     const url = constructUrl('rpc/drop_column')
     const payload = { table_name: table, column_name: name }
     const response = await axios.post(url, payload)
@@ -113,6 +114,11 @@ function parameterizeConditions (conditions) {
     const operator = (typeof value === 'boolean' || value === null) ? 'is' : 'eq'
     return `${operator}.${value}`
   })
+}
+
+function addEditable (column) {
+  column.editable = !(column.default && column.default.startsWith('nextval'))
+  return column
 }
 
 module.exports = db

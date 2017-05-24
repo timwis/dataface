@@ -1,11 +1,14 @@
 const shortid = require('shortid')
 
+const HEADER_INDEX = -1
+
 module.exports = function ui (state, emitter) {
   state.ui = {
     selectedCell: {
       rowIndex: null,
       columnIndex: null,
-      editing: false
+      editing: false,
+      pendingValue: null
     },
     headerMenu: {
       x: 0,
@@ -30,7 +33,7 @@ module.exports = function ui (state, emitter) {
     switch (direction) {
       case 'up':
         const prevRowIndex = currentRowIndex - 1
-        payload.rowIndex = Math.max(prevRowIndex, -1) // -1 is header
+        payload.rowIndex = Math.max(prevRowIndex, HEADER_INDEX)
         break
       case 'down':
         const nextRowIndex = currentRowIndex + 1
@@ -50,9 +53,25 @@ module.exports = function ui (state, emitter) {
     emitter.emit('ui:selectCell', payload)
   })
 
-  emitter.on('ui:selectCell', (data) => {
-    Object.assign(state.ui.selectedCell, data)
+  emitter.on('ui:selectCell', ({ rowIndex, columnIndex }) => {
+    Object.assign(state.ui.selectedCell, { rowIndex, columnIndex })
+    state.ui.selectedCell.editing = false
+    state.ui.selectedCell.pendingValue = null
     emitter.emit('render')
+  })
+
+  emitter.on('ui:setCellEditing', () => {
+    state.ui.selectedCell.editing = true
+    emitter.emit('render')
+  })
+
+  emitter.on('ui:setCellNotEditing', () => {
+    state.ui.selectedCell.editing = false
+    emitter.emit('render')
+  })
+
+  emitter.on('ui:setPendingValue', (value) => {
+    state.ui.selectedCell.pendingValue = value
   })
 
   emitter.on('ui:headerMenu', ({ x, y, columnIndex, visible }) => {

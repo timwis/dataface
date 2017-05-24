@@ -17,13 +17,16 @@ module.exports = function gridRow (state, rowIndex) {
 
   function createCell (column, columnIndex) {
     const cell = row[column.name]
+    const currentValue = cell ? cell.value : ''
+    const pendingValue = selectedCell.pendingValue
+    const isSelected = (rowIndex === selectedCell.rowIndex) &&
+                       (columnIndex === selectedCell.columnIndex)
     const opts = {
-      value: cell ? (cell.newValue || cell.value) : '',
+      value: isSelected && pendingValue !== null ? pendingValue : currentValue,
       rowIndex,
       columnIndex,
       isHeader: false,
-      isSelected: (rowIndex === selectedCell.rowIndex) &&
-                  (columnIndex === selectedCell.columnIndex),
+      isSelected,
       isEditing: selectedCell.editing
     }
     return gridCell(opts)
