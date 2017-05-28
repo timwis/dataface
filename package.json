@@ -1,34 +1,25 @@
 {
-  "main": "src/index.js",
+  "name": "dataface",
+  "description": "Build and manage data with a spreadsheet-like interface",
+  "author": "timwis <tim@timwis.com>",
+  "private": true,
   "scripts": {
-    "start": "budo . --live --pushstate --title Dataface -- -t [ sheetify/transform -u sheetify-cssnext ] -t [ localenvify ] -g yo-yoify",
-    "test": "ava"
+    "start": "budo src/main.js:dist/build.js --live -- -t localenvify",
+    "build": "NODE_ENV=production browserify -t localenvify src/main.js | uglifyjs -c warnings=false -m > dist/build.js"
   },
   "dependencies": {
-    "arrow-key-codes": "^1.0.0",
-    "axios": "^0.16.1",
-    "bulma": "^0.4.0",
-    "choo": "^5.4.0",
-    "hyperlist": "^1.0.0-alpha-5",
-    "hyperlist-component": "^0.1.0",
-    "insert-css": "^2.0.0",
-    "keyboardjs": "^2.3.3",
-    "localenvify": "^1.0.1",
-    "lodash": "^4.17.4",
-    "microcomponent": "^3.1.0",
-    "nanocomponent": "^4.0.0",
-    "on-load": "^3.2.0",
-    "sheetify": "^6.0.1",
-    "shortid": "^2.2.8",
-    "url-join": "^2.0.1"
+    "vue": "^2.0.1"
   },
   "devDependencies": {
-    "ava": "^0.18.2",
-    "budo": "mattdesl/budo#feature/livereload-rework",
-    "choo-log": "^6.0.0",
-    "jsdom": "^9.12.0",
-    "jsdom-global": "^2.1.1",
-    "sheetify-cssnext": "^1.0.7",
-    "yo-yoify": "^3.7.0"
+    "browserify": "^13.0.1",
+    "budo": "^10.0.3",
+    "localenvify": "^1.0.1",
+    "uglify-js": "^2.5.0",
+    "vueify": "^9.1.0"
+  },
+  "browserify": {
+    "transform": [
+      "vueify"
+    ]
   }
 }
