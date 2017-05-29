@@ -4,13 +4,23 @@
   "author": "timwis <tim@timwis.com>",
   "private": true,
   "scripts": {
-    "start": "budo src/main.js:dist/build.js --live -- -t localenvify",
+    "start": "budo src/main.js:dist/build.js --live --pushstate -- -t localenvify",
     "build": "NODE_ENV=production browserify -t localenvify src/main.js | uglifyjs -c warnings=false -m > dist/build.js"
   },
   "dependencies": {
-    "vue": "^2.0.1"
+    "axios": "^0.16.1",
+    "bulma": "^0.4.2",
+    "lodash": "^4.17.4",
+    "url-join": "^2.0.2",
+    "vue": "^2.0.1",
+    "vue-router": "^2.5.3",
+    "vue-virtual-scroller": "^0.6.1",
+    "vuex": "^2.3.1"
   },
   "devDependencies": {
+    "babel-core": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babelify": "^7.3.0",
     "browserify": "^13.0.1",
     "budo": "^10.0.3",
     "localenvify": "^1.0.1",
@@ -19,7 +29,8 @@
   },
   "browserify": {
     "transform": [
-      "vueify"
+      "vueify",
+      "babelify"
     ]
   }
 }

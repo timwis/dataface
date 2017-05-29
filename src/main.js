@@ -1,8 +1,12 @@
 const Vue = require('vue')
 
-const App = require('./App.vue')
+const layout = require('./pages/layout.vue')
+const store = require('./store')
+const router = require('./router')
 
-new Vue({
+new Vue({ // eslint-disable-line
   el: '#app',
-  render: h => h(App)
+  store,
+  router,
+  render: h => h(layout)
 })
