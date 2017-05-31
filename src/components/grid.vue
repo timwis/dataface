@@ -8,10 +8,10 @@
       @blur.capture="onBlur"
       @input="onInput"
       @keydown.enter.prevent="onPressEnter"
-      @keydown.up="navigate('up', $event)"
-      @keydown.down="navigate('down', $event)"
-      @keydown.left="navigate('left', $event)"
-      @keydown.right="navigate('right', $event)">
+      @keydown.up="onPressArrowKeys('up', $event)"
+      @keydown.down="onPressArrowKeys('down', $event)"
+      @keydown.left="onPressArrowKeys('left', $event)"
+      @keydown.right="onPressArrowKeys('right', $event)">
       <thead>
         <tr>
           <th
@@ -40,7 +40,7 @@
 </template>
 
 <script>
-const { mapState, mapMutations } = require('vuex')
+const { mapState, mapMutations, mapActions } = require('vuex')
 const HEADER_ROW = -1
 
 module.exports = {
@@ -62,7 +62,18 @@ module.exports = {
       setCursor(evt.target)
     },
     onBlur (evt) {
-      if (this.editing) this.setNotEditing()
+      if (!this.editing) return
+      this.setNotEditing()
+
+      const el = evt.target
+      const { rowIndex, columnIndex } = getElIndexes(el)
+      if (rowIndex === HEADER_ROW) return // todo
+
+      const currentValue = this.getCurrentValue(rowIndex, columnIndex)
+      const newValue = el.innerText
+      if (currentValue !== newValue) {
+        this.saveCell({ rowIndex, columnIndex, newValue })
+      }
     },
     onInput (evt) {
       if (!this.editing) this.setEditing()
@@ -70,8 +81,8 @@ module.exports = {
     onPressEnter (evt) {
       const el = evt.target
       if (this.editing) {
-        this.setNotEditing()
-        this.navigate('down', evt)
+        // navigating down triggers blur, which triggers setNotEditing
+        this.navigate('down', evt.target)
       } else {
         this.setEditing()
         setCursor(el, 'end')
@@ -83,16 +94,19 @@ module.exports = {
       setCursor(el)
     },
     onDblClickCell (evt) {
-      console.log('dblclick')
       const el = evt.target
       this.setEditing()
       el.focus()
       setCursor(el, 'end')
     },
-    navigate (direction, evt) {
+    onPressArrowKeys (direction, evt) {
       if (this.editing) return
 
-      const currentEl = evt.target
+      const el = evt.target
+      this.navigate(direction, el)
+      evt.preventDefault()
+    },
+    navigate (direction, currentEl) {
       const { rowIndex, columnIndex } = getElIndexes(currentEl)
       let newEl
 
@@ -129,11 +143,18 @@ module.exports = {
           break
       }
       if (newEl) newEl.focus()
-      evt.preventDefault()
+    },
+    getCurrentValue (rowIndex, columnIndex) {
+      const row = this.rows[rowIndex]
+      const column = this.columns[columnIndex]
+      return (row && column) ? row[column.name] : null
     },
     ...mapMutations([
       'setEditing',
       'setNotEditing'
+    ]),
+    ...mapActions([
+      'saveCell'
     ])
   }
 }
