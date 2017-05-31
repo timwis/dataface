@@ -16,7 +16,9 @@
         <tr>
           <th
             v-for="(column, columnIndex) in columns"
-            data-row-index="-1"
+            tabindex="0"
+            contenteditable
+            :data-row-index="HEADER_ROW"
             :data-column-index="columnIndex">
             {{ column.name }}
           </th>
@@ -39,8 +41,12 @@
 
 <script>
 const { mapState, mapMutations } = require('vuex')
+const HEADER_ROW = -1
 
 module.exports = {
+  data () {
+    return { HEADER_ROW }
+  },
   computed: {
     classObject () {
       return { editing: this.editing }
@@ -66,7 +72,6 @@ module.exports = {
       if (this.editing) {
         this.setNotEditing()
         this.navigate('down', evt)
-        //setCursor(el)
       } else {
         this.setEditing()
         setCursor(el, 'end')
@@ -93,13 +98,25 @@ module.exports = {
 
       switch (direction) {
         case 'up':
-          const previousRow = currentEl.parentNode.previousSibling
+          let previousRow
+          if (rowIndex === 0) {
+            const thead = this.$el.querySelector('thead')
+            previousRow = thead.children[0]
+          } else {
+            previousRow = currentEl.parentNode.previousSibling
+          }
           if (previousRow) {
             newEl = previousRow.children[columnIndex]
           }
           break
         case 'down':
-          const nextRow = currentEl.parentNode.nextSibling
+          let nextRow
+          if (rowIndex === HEADER_ROW) {
+            const tbody = this.$el.querySelector('tbody')
+            nextRow = tbody.children[0]
+          } else {
+            nextRow = currentEl.parentNode.nextSibling
+          }
           if (nextRow) {
             newEl = nextRow.children[columnIndex]
           }
