@@ -35,6 +35,15 @@
             {{ row[column.name] }}
           </td>
         </tr>
+        <tr :key="rows.length">
+          <td
+            v-for="(column, columnIndex) in columns"
+            tabindex="0"
+            contenteditable
+            :data-row-index="rows.length"
+            :data-column-index="columnIndex">
+          </td>
+        </tr>
       </tbody>
     </table>
 </template>
@@ -58,6 +67,14 @@ module.exports = {
     })
   },
   methods: {
+    ...mapMutations([
+      'setEditing',
+      'setNotEditing'
+    ]),
+    ...mapActions([
+      'saveCell',
+      'renameColumn'
+    ]),
     onFocus (evt) {
       setCursor(evt.target)
     },
@@ -67,12 +84,19 @@ module.exports = {
 
       const el = evt.target
       const { rowIndex, columnIndex } = getElIndexes(el)
-      if (rowIndex === HEADER_ROW) return // todo
 
-      const currentValue = this.getCurrentValue(rowIndex, columnIndex)
-      const newValue = el.innerText
-      if (currentValue !== newValue) {
-        this.saveCell({ rowIndex, columnIndex, newValue })
+      if (rowIndex === HEADER_ROW) {
+        const oldValue = this.getCurrentHeaderValue(columnIndex)
+        const newValue = el.innerText
+        if (oldValue !== newValue) {
+          this.renameColumn({ columnIndex, oldValue, newValue })
+        }
+      } else {
+        const oldValue = this.getCurrentCellValue(rowIndex, columnIndex)
+        const newValue = el.innerText
+        if (oldValue !== newValue) {
+          this.saveCell({ rowIndex, columnIndex, newValue })
+        }
       }
     },
     onInput (evt) {
@@ -114,10 +138,11 @@ module.exports = {
         case 'up':
           let previousRow
           if (rowIndex === 0) {
-            const thead = this.$el.querySelector('thead')
+            const tbody = currentEl.parentNode.parentNode
+            const thead = tbody.previousElementSibling
             previousRow = thead.children[0]
           } else {
-            previousRow = currentEl.parentNode.previousSibling
+            previousRow = currentEl.parentNode.previousElementSibling
           }
           if (previousRow) {
             newEl = previousRow.children[columnIndex]
@@ -126,10 +151,11 @@ module.exports = {
         case 'down':
           let nextRow
           if (rowIndex === HEADER_ROW) {
-            const tbody = this.$el.querySelector('tbody')
+            const thead = currentEl.parentNode.parentNode
+            const tbody = thead.nextElementSibling
             nextRow = tbody.children[0]
           } else {
-            nextRow = currentEl.parentNode.nextSibling
+            nextRow = currentEl.parentNode.nextElementSibling
           }
           if (nextRow) {
             newEl = nextRow.children[columnIndex]
@@ -144,18 +170,14 @@ module.exports = {
       }
       if (newEl) newEl.focus()
     },
-    getCurrentValue (rowIndex, columnIndex) {
+    getCurrentHeaderValue (columnIndex) {
+      return this.columns[columnIndex].name
+    },
+    getCurrentCellValue (rowIndex, columnIndex) {
       const row = this.rows[rowIndex]
       const column = this.columns[columnIndex]
       return (row && column) ? row[column.name] : null
-    },
-    ...mapMutations([
-      'setEditing',
-      'setNotEditing'
-    ]),
-    ...mapActions([
-      'saveCell'
-    ])
+    }
   }
 }
 function getElIndexes (el) {

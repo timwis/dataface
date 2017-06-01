@@ -1,5 +1,7 @@
-const api = require('../../api/postgrest')
+const Vue = require('vue')
 const pick = require('lodash/pick')
+
+const api = require('../../api/postgrest')
 
 module.exports = {
   state: {
@@ -23,7 +25,12 @@ module.exports = {
       state.activeSheet.name = name
     },
     receiveRow (state, { rowIndex, newRow }) {
-      state.activeSheet.rows[rowIndex] = newRow
+      Vue.set(state.activeSheet.rows, rowIndex, newRow)
+    },
+    receiveColumnRename (state, { columnIndex, oldValue, newValue }) {
+      state.activeSheet.columns[columnIndex].name = newValue
+      const rename = createRename(oldValue, newValue)
+      state.activeSheet.rows = state.activeSheet.rows.map(rename)
     }
   },
   actions: {
@@ -74,6 +81,17 @@ module.exports = {
       if (newRow) {
         commit('receiveRow', { rowIndex, newRow })
       }
+    },
+    async renameColumn ({ state, commit }, { columnIndex, oldValue, newValue }) {
+      const sheetName = state.activeSheet.name
+      try {
+        await api.renameColumn(sheetName, oldValue, newValue)
+      } catch (err) {
+        console.error(err)
+        return
+      }
+
+      commit('receiveColumnRename', { columnIndex, oldValue, newValue })
     }
   }
 }
@@ -81,4 +99,12 @@ module.exports = {
 function getPrimaryKeys (fields) {
   return fields.filter((field) => field.constraint === 'PRIMARY KEY')
     .map((field) => field.name)
+}
+
+function createRename (oldValue, newValue) {
+  return function (item) {
+    item[newValue] = item[oldValue]
+    delete item[oldValue]
+    return item
+  }
 }
