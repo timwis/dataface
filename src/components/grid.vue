@@ -8,6 +8,7 @@
       @blur.capture="onBlur"
       @input="onInput"
       @keydown.enter.prevent="onPressEnter"
+      @keydown.esc.prevent="onPressEscape"
       @keydown.up="onPressArrowKeys('up', $event)"
       @keydown.down="onPressArrowKeys('down', $event)"
       @keydown.left="onPressArrowKeys('left', $event)"
@@ -111,6 +112,14 @@ module.exports = {
         this.setEditing()
         setCursor(el, 'end')
       }
+    },
+    onPressEscape (evt) {
+      const el = evt.target
+      const { rowIndex, columnIndex } = getElIndexes(el)
+      const oldValue = this.getCurrentCellValue(rowIndex, columnIndex)
+      el.innerText = oldValue
+      this.setNotEditing()
+      setCursor(el)
     },
     onClickCell (evt) {
       const el = evt.target
