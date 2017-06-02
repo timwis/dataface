@@ -23,6 +23,7 @@
             :data-column-index="columnIndex">
             {{ column.name }}
           </th>
+          <th class="extra-column" @click.stop="onClickAddColumn">+</th>
         </tr>
       </thead>
       <tbody>
@@ -35,6 +36,7 @@
             :data-column-index="columnIndex">
             {{ row[column.name] }}
           </td>
+          <td class="extra-column"></td>
         </tr>
         <tr :key="rows.length">
           <td
@@ -74,6 +76,7 @@ module.exports = {
     ]),
     ...mapActions([
       'saveCell',
+      'insertColumn',
       'renameColumn'
     ]),
     onFocus (evt) {
@@ -138,6 +141,11 @@ module.exports = {
       const el = evt.target
       this.navigate(direction, el)
       evt.preventDefault()
+    },
+    async onClickAddColumn (evt) {
+      await this.insertColumn()
+      const lastColumnEl = this.$el.querySelector('th:nth-last-child(2)')
+      lastColumnEl.focus()
     },
     navigate (direction, currentEl) {
       const { rowIndex, columnIndex } = getElIndexes(currentEl)
@@ -228,12 +236,20 @@ tbody {
   display: block;
   overflow: auto;
 }
-th,
-td {
+th:not(.extra-column),
+td:not(.extra-column) {
   cursor: cell;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+th.extra-column {
+  cursor: pointer;
+  text-align: center;
+}
+th.extra-column,
+td.extra-column {
+  width: 35px;
 }
 table.editing th:focus,
 table.editing td:focus {

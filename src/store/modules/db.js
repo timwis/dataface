@@ -27,6 +27,9 @@ module.exports = {
     receiveRow (state, { rowIndex, newRow }) {
       Vue.set(state.activeSheet.rows, rowIndex, newRow)
     },
+    receiveColumn (state, column) {
+      state.activeSheet.columns.push(column)
+    },
     receiveColumnRename (state, { columnIndex, oldValue, newValue }) {
       state.activeSheet.columns[columnIndex].name = newValue
       const rename = createRename(oldValue, newValue)
@@ -88,6 +91,24 @@ module.exports = {
         commit('receiveRow', { rowIndex, newRow })
       }
     },
+    async insertColumn ({ state, commit, dispatch }) {
+      const sheetName = state.activeSheet.name
+      const columnNames = state.activeSheet.columns.map((col) => col.name)
+      const nextInSeq = getNextInSequence(columnNames)
+      const newColumnName = `column_${nextInSeq}`
+
+      let newColumn
+      try {
+        newColumn = await api.insertColumn(sheetName, newColumnName)
+      } catch (err) {
+        console.error(err)
+        dispatch('notify', { msg: `Error adding column` })
+        return
+      }
+
+      commit('receiveColumn', newColumn)
+      return Promise.resolve()
+    },
     async renameColumn ({ state, commit, dispatch }, { columnIndex, oldValue, newValue }) {
       const sheetName = state.activeSheet.name
       try {
@@ -114,4 +135,25 @@ function createRename (oldValue, newValue) {
     delete item[oldValue]
     return item
   }
+}
+
+function getNextInSequence (names) {
+  const numbers = names
+    .map(getTrailingNumber)
+    .filter(isSequenceMember)
+    .sort()
+  return numbers.length > 0 ? last(numbers) + 1 : names.length + 1
+}
+
+function getTrailingNumber (name) {
+  const parts = name.split('_')
+  return +last(parts)
+}
+
+function isSequenceMember (input) {
+  return input > 0
+}
+
+function last (arr) {
+  return arr[arr.length - 1]
 }
