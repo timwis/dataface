@@ -40,12 +40,14 @@ module.exports = {
         sheets = await api.getTables()
       } catch (err) {
         console.error(err)
+        dispatch('notify', { msg: `Failed to get sheets` })
+        return
       }
 
       commit('receiveSheetList', { sheets })
       return Promise.resolve()
     },
-    async getSheet ({ commit }, { name }) {
+    async getSheet ({ commit, dispatch }, { name }) {
       console.log('getting sheet', name)
       let rows, columns
       try {
@@ -54,11 +56,13 @@ module.exports = {
         rows = await api.getRows(name, firstColumnName) // order by
       } catch (err) {
         console.error(err)
+        dispatch('notify', { msg: `Failed to get sheet ${name}` })
+        return
       }
 
       commit('receiveSheet', { rows, columns, name })
     },
-    async saveCell ({ state, commit }, { rowIndex, columnIndex, newValue }) {
+    async saveCell ({ state, commit, dispatch }, { rowIndex, columnIndex, newValue }) {
       const sheetName = state.activeSheet.name
       const columnName = state.activeSheet.columns[columnIndex].name
       const updates = { [columnName]: newValue }
@@ -76,18 +80,21 @@ module.exports = {
         }
       } catch (err) {
         console.error(err)
+        dispatch('notify', { msg: `Failed to save cell` })
+        return
       }
 
       if (newRow) {
         commit('receiveRow', { rowIndex, newRow })
       }
     },
-    async renameColumn ({ state, commit }, { columnIndex, oldValue, newValue }) {
+    async renameColumn ({ state, commit, dispatch }, { columnIndex, oldValue, newValue }) {
       const sheetName = state.activeSheet.name
       try {
         await api.renameColumn(sheetName, oldValue, newValue)
       } catch (err) {
         console.error(err)
+        dispatch('notify', { msg: `Failed to rename column ${oldValue} to ${newValue}` })
         return
       }
 
