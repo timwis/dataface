@@ -1,5 +1,6 @@
 <template>
     <table
+      v-if="isDataLoaded"
       class="table is-bordered is-striped is-narrow"
       :class="{ editing: editing }"
       @click="onClickCell"
@@ -60,6 +61,9 @@ module.exports = {
   computed: {
     classObject () {
       return { editing: this.editing }
+    },
+    isDataLoaded () {
+      return this.columns.length > 0
     },
     ...mapState({
       columns: (state) => state.db.activeSheet.columns,
