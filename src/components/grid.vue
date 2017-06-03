@@ -20,9 +20,8 @@
             tabindex="0"
             contenteditable
             :data-row-index="HEADER_ROW"
-            :data-column-index="columnIndex">
-            {{ column.name }}
-          </th>
+            :data-column-index="columnIndex"
+            v-text="column.name"></th>
           <th class="extra-column" @click.stop="onClickAddColumn">+</th>
         </tr>
       </thead>
@@ -33,9 +32,8 @@
             tabindex="0"
             contenteditable
             :data-row-index="rowIndex"
-            :data-column-index="columnIndex">
-            {{ row[column.name] }}
-          </td>
+            :data-column-index="columnIndex"
+            v-text="row[column.name]"></td>
           <td class="extra-column"></td>
         </tr>
         <tr :key="rows.length">
