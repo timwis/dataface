@@ -25,6 +25,9 @@ module.exports = {
     receiveSheetInsertion (state, { name }) {
       Vue.set(state.sheets, state.sheets.length, { name })
     },
+    receiveSheetRemoval (state, { index }) {
+      Vue.delete(state.sheets, index)
+    },
     receiveRow (state, { rowIndex, newRow }) {
       Vue.set(state.activeSheet.rows, rowIndex, newRow)
     },
@@ -175,8 +178,33 @@ module.exports = {
       await dispatch('getSheet', { name })
       await dispatch('insertColumn')
       router.push(`/${name}`)
+    },
+    async removeSheet ({ state, commit, dispatch }, name) {
+      try {
+        await api.deleteTable(name)
+      } catch (err) {
+        console.error(err)
+        dispatch('notify', { msg: `Failed to remove sheet ${name}` })
+        return
+      }
+
+      const index = state.sheets.findIndex((sheet) => sheet.name === name)
+      commit('receiveSheetRemoval', { index })
+
+      const emptyPayload = { rows: [], columns: [], name: null }
+      commit('receiveActiveSheet', emptyPayload)
+
+      const newActiveSheetName = determineNextActiveSheet(state, index)
+      router.push(`/${newActiveSheetName}`)
     }
   }
+}
+
+function determineNextActiveSheet (state, sheetIndex) {
+  const newMaxIndex = state.sheets.length - 1
+  const newActiveSheetIndex = Math.min(sheetIndex, newMaxIndex)
+  const newActiveSheet = state.sheets[newActiveSheetIndex]
+  return newActiveSheet ? newActiveSheet.name : ''
 }
 
 function getPrimaryKeys (fields) {

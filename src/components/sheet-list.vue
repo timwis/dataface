@@ -8,7 +8,7 @@
         <router-link :to="'/' + sheet.name"
            :class="{ 'is-active': sheet.name === activeSheetName }">
           {{ sheet.name }}
-          <button class="delete" @click.prevent="onClickDelete"></button>
+          <button class="delete" @click.prevent.stop="removeSheet(sheet.name)"></button>
         </router-link>
       </li>
     </ul>
@@ -16,18 +16,16 @@
 </template>
 
 <script>
-const { mapState } = require('vuex')
+const { mapState, mapActions } = require('vuex')
 
 module.exports = {
   computed: mapState({
     sheets: (state) => state.db.sheets,
     activeSheetName: (state) => state.db.activeSheet.name
   }),
-  methods: {
-    onClickDelete (evt) {
-      console.log('Clicked delete sheet')
-    }
-  }
+  methods: mapActions([
+    'removeSheet'
+  ])
 }
 </script>
 
