@@ -27,6 +27,9 @@ module.exports = {
     receiveRow (state, { rowIndex, newRow }) {
       Vue.set(state.activeSheet.rows, rowIndex, newRow)
     },
+    receiveRowRemoval (state, rowIndex) {
+      Vue.delete(state.activeSheet.rows, rowIndex)
+    },
     receiveColumn (state, column) {
       state.activeSheet.columns.push(column)
     },
@@ -34,6 +37,9 @@ module.exports = {
       state.activeSheet.columns[columnIndex].name = newValue
       const rename = createRename(oldValue, newValue)
       state.activeSheet.rows = state.activeSheet.rows.map(rename)
+    },
+    receiveColumnRemoval (state, columnIndex) {
+      Vue.delete(state.activeSheet.columns, columnIndex)
     }
   },
   actions: {
@@ -91,6 +97,22 @@ module.exports = {
         commit('receiveRow', { rowIndex, newRow })
       }
     },
+    async removeRow ({ state, commit, dispatch }, rowIndex) {
+      const sheetName = state.activeSheet.name
+      const row = state.activeSheet.rows[rowIndex]
+      const primaryKeys = getPrimaryKeys(state.activeSheet.columns)
+      const conditions = pick(row, primaryKeys)
+
+      try {
+        await api.deleteRow(sheetName, conditions)
+      } catch (err) {
+        console.error(err)
+        dispatch('notify', { msg: `Failed to remove row` })
+        return
+      }
+
+      commit('receiveRowRemoval', rowIndex)
+    },
     async insertColumn ({ state, commit, dispatch }) {
       const sheetName = state.activeSheet.name
       const columnNames = state.activeSheet.columns.map((col) => col.name)
@@ -120,6 +142,20 @@ module.exports = {
       }
 
       commit('receiveColumnRename', { columnIndex, oldValue, newValue })
+    },
+    async removeColumn ({ state, commit, dispatch }, columnIndex) {
+      const sheetName = state.activeSheet.name
+      const columnName = state.activeSheet.columns[columnIndex].name
+
+      try {
+        await api.deleteColumn(sheetName, columnName)
+      } catch (err) {
+        console.error(err)
+        dispatch('notify', { msg: `Failed to remove column ${columnName}` })
+        return
+      }
+
+      commit('receiveColumnRemoval', columnIndex)
     }
   }
 }

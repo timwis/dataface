@@ -1,4 +1,5 @@
 <template>
+  <div>
     <table
       v-if="isDataLoaded"
       class="table is-bordered is-striped is-narrow"
@@ -14,7 +15,7 @@
       @keydown.down="onPressArrowKeys('down', $event)"
       @keydown.left="onPressArrowKeys('left', $event)"
       @keydown.right="onPressArrowKeys('right', $event)">
-      <thead>
+      <thead @contextmenu.prevent="onColumnContextMenu">
         <tr>
           <th
             v-for="(column, columnIndex) in columns"
@@ -26,7 +27,7 @@
           <th class="extra-column" @click.stop="onClickAddColumn">+</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody @contextmenu.prevent="onRowContextMenu">
         <tr v-for="(row, rowIndex) in rows" :key="index">
           <td
             v-for="(column, columnIndex) in columns"
@@ -48,15 +49,39 @@
         </tr>
       </tbody>
     </table>
+
+    <context-menu ref="rowMenu">
+      <template scope="child">
+        <div class="panel">
+          <a class="panel-block" @click="removeRow(child.userData)">
+            Remove row
+          </a>
+        </div>
+      </template>
+    </context-menu>
+
+    <context-menu ref="columnMenu">
+      <template scope="child">
+        <div class="panel">
+          <a class="panel-block" @click="removeColumn(child.userData)">
+            Remove column
+          </a>
+        </div>
+      </template>
+    </context-menu>
+  </div>
 </template>
 
 <script>
 const { mapState, mapMutations, mapActions } = require('vuex')
-const HEADER_ROW = -1
+const contextMenu = require('vue-lil-context-menu')
 
 module.exports = {
+  components: {
+    'context-menu': contextMenu
+  },
   data () {
-    return { HEADER_ROW }
+    return { HEADER_ROW: -1 }
   },
   computed: {
     classObject () {
@@ -78,8 +103,10 @@ module.exports = {
     ]),
     ...mapActions([
       'saveCell',
+      'removeRow',
       'insertColumn',
-      'renameColumn'
+      'renameColumn',
+      'removeColumn'
     ]),
     onFocus (evt) {
       setCursor(evt.target)
@@ -91,7 +118,7 @@ module.exports = {
       const el = evt.target
       const { rowIndex, columnIndex } = getElIndexes(el)
 
-      if (rowIndex === HEADER_ROW) {
+      if (rowIndex === this.HEADER_ROW) {
         const oldValue = this.getCurrentHeaderValue(columnIndex)
         const newValue = el.innerText
         if (oldValue !== newValue) {
@@ -149,6 +176,16 @@ module.exports = {
       const lastColumnEl = this.$el.querySelector('th:nth-last-child(2)')
       lastColumnEl.focus()
     },
+    onRowContextMenu (evt) {
+      const el = evt.target
+      const { rowIndex } = getElIndexes(el)
+      this.$refs.rowMenu.open(evt, rowIndex)
+    },
+    onColumnContextMenu (evt) {
+      const el = evt.target
+      const { columnIndex } = getElIndexes(el)
+      this.$refs.columnMenu.open(evt, columnIndex)
+    },
     navigate (direction, currentEl) {
       const { rowIndex, columnIndex } = getElIndexes(currentEl)
       let newEl
@@ -169,7 +206,7 @@ module.exports = {
           break
         case 'down':
           let nextRow
-          if (rowIndex === HEADER_ROW) {
+          if (rowIndex === this.HEADER_ROW) {
             const thead = currentEl.parentNode.parentNode
             const tbody = thead.nextElementSibling
             nextRow = tbody.children[0]
@@ -287,5 +324,10 @@ table.editing td:focus {
   background-color: #fff;
   box-shadow: 0 0 5px 3px #ccc;
   z-index: 999;
+}
+.lil-context-menu {
+  width: 250px;
+  background-color: #fff;
+  box-shadow: 0 2px 6px 0 #ccc;
 }
 </style>
