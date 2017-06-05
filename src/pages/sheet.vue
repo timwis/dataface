@@ -3,6 +3,9 @@
     <div class="columns">
       <div class="column is-one-quarter">
         <sheet-list></sheet-list>
+        <a class="button add-sheet-btn" @click="insertSheet">
+          Add sheet
+        </a>
       </div>
       <div class="column grid-container">
         <grid></grid>
@@ -12,6 +15,8 @@
 </template>
 
 <script>
+const { mapActions } = require('vuex')
+
 const SiteNav = require('../components/site-nav.vue')
 const SheetList = require('../components/sheet-list.vue')
 const Grid = require('../components/grid.vue')
@@ -22,7 +27,10 @@ module.exports = {
     'site-nav': SiteNav,
     'sheet-list': SheetList,
     'grid': Grid
-  }
+  },
+  methods: mapActions([
+    'insertSheet'
+  ])
 }
 </script>
 
@@ -33,5 +41,9 @@ module.exports = {
 }
 .grid-container {
   position: relative;
+}
+.add-sheet-btn {
+  width: 100%;
+  margin-top: 10px;
 }
 </style>

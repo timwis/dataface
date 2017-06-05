@@ -46,6 +46,7 @@
             :data-row-index="rows.length"
             :data-column-index="columnIndex">
           </td>
+          <td class="extra-column"></td>
         </tr>
       </tbody>
     </table>

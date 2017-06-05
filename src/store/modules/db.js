@@ -1,14 +1,12 @@
 const Vue = require('vue')
 const pick = require('lodash/pick')
 
+const router = require('../../router')
 const api = require('../../api/postgrest')
 
 module.exports = {
   state: {
-    sheets: [
-      { name: 'Foo' },
-      { name: 'Bar' }
-    ],
+    sheets: [],
     activeSheet: {
       columns: [],
       rows: [],
@@ -19,10 +17,13 @@ module.exports = {
     receiveSheetList (state, { sheets }) {
       state.sheets = sheets
     },
-    receiveSheet (state, { rows, columns, name }) {
+    receiveActiveSheet (state, { rows, columns, name }) {
       state.activeSheet.rows = rows
       state.activeSheet.columns = columns
       state.activeSheet.name = name
+    },
+    receiveSheetInsertion (state, { name }) {
+      Vue.set(state.sheets, state.sheets.length, { name })
     },
     receiveRow (state, { rowIndex, newRow }) {
       Vue.set(state.activeSheet.rows, rowIndex, newRow)
@@ -69,7 +70,7 @@ module.exports = {
         return
       }
 
-      commit('receiveSheet', { rows, columns, name })
+      commit('receiveActiveSheet', { rows, columns, name })
     },
     async saveCell ({ state, commit, dispatch }, { rowIndex, columnIndex, newValue }) {
       const sheetName = state.activeSheet.name
@@ -156,6 +157,24 @@ module.exports = {
       }
 
       commit('receiveColumnRemoval', columnIndex)
+    },
+    async insertSheet ({ state, commit, dispatch }) {
+      const sheetNames = state.sheets.map((sheet) => sheet.name)
+      const nextInSeq = getNextInSequence(sheetNames)
+      const name = `sheet_${nextInSeq}`
+
+      try {
+        await api.insertTable(name)
+      } catch (err) {
+        console.error(err)
+        dispatch('notify', { msg: `Failed to add sheet` })
+        return
+      }
+
+      commit('receiveSheetInsertion', { name })
+      await dispatch('getSheet', { name })
+      await dispatch('insertColumn')
+      router.push(`/${name}`)
     }
   }
 }
