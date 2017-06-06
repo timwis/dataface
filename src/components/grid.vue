@@ -32,7 +32,7 @@
           <td
             v-for="(column, columnIndex) in columns"
             tabindex="0"
-            contenteditable
+            :contenteditable="column.editable ? true : false"
             :data-row-index="rowIndex"
             :data-column-index="columnIndex"
             v-text="row[column.name]"></td>
@@ -42,7 +42,7 @@
           <td
             v-for="(column, columnIndex) in columns"
             tabindex="0"
-            contenteditable
+            :contenteditable="column.editable ? true : false"
             :data-row-index="rows.length"
             :data-column-index="columnIndex">
           </td>
@@ -138,10 +138,11 @@ module.exports = {
     },
     onPressEnter (evt) {
       const el = evt.target
+      const isEditable = el.isContentEditable
       if (this.editing) {
         // navigating down triggers blur, which triggers setNotEditing
         this.navigate('down', evt.target)
-      } else {
+      } else if (isEditable) {
         this.setEditing()
         setCursor(el, 'end')
       }
@@ -161,9 +162,12 @@ module.exports = {
     },
     onDblClickCell (evt) {
       const el = evt.target
-      this.setEditing()
-      el.focus()
-      setCursor(el, 'end')
+      const isEditable = el.isContentEditable
+      if (isEditable) {
+        this.setEditing()
+        el.focus()
+        setCursor(el, 'end')
+      }
     },
     onPressArrowKeys (direction, evt) {
       if (this.editing) return
