@@ -208,11 +208,13 @@ module.exports = {
       const index = state.sheets.findIndex((sheet) => sheet.name === name)
       commit('receiveSheetRemoval', { index })
 
-      const emptyPayload = { rows: [], columns: [], name: null }
-      commit('receiveActiveSheet', emptyPayload)
-
       const newActiveSheetName = determineNextActiveSheet(state, index)
-      router.push(`/${newActiveSheetName}`)
+      if (newActiveSheetName) {
+        router.push(`/${newActiveSheetName}`)
+      } else {
+        const emptyPayload = { rows: [], columns: [], name: null }
+        commit('receiveActiveSheet', emptyPayload)
+      }
     }
   }
 }
