@@ -31,7 +31,8 @@ const db = {
   async getColumn (table, column) {
     const url = constructUrl('rpc/get_schema')
     const response = await axios.post(url, { table_name_param: table })
-    return response.data.find((row) => row.name === column)
+    const responseItem = response.data.find((row) => row.name === column)
+    return addEditable(responseItem)
   },
 
   async update (table, updates, conditions) {
