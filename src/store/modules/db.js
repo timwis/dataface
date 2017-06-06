@@ -107,6 +107,7 @@ module.exports = {
       }
     },
     async removeRow ({ state, commit, dispatch }, rowIndex) {
+      if (rowIndex === null) return
       const sheetName = state.activeSheet.name
       const row = state.activeSheet.rows[rowIndex]
       const primaryKeys = getPrimaryKeys(state.activeSheet.columns)
@@ -153,6 +154,7 @@ module.exports = {
       commit('receiveColumnRename', { columnIndex, oldValue, newValue })
     },
     async removeColumn ({ state, commit, dispatch }, columnIndex) {
+      if (columnIndex === null) return
       const sheetName = state.activeSheet.name
       const columnName = state.activeSheet.columns[columnIndex].name
 
