@@ -241,8 +241,10 @@ function getNextInSequence (names) {
   const numbers = names
     .map(getTrailingNumber)
     .filter(isSequenceMember)
-    .sort()
-  return numbers.length > 0 ? last(numbers) + 1 : names.length + 1
+    .sort(sortNumeric)
+  return numbers.length > 0
+    ? last(numbers) + 1
+    : names.length + 1
 }
 
 function getTrailingNumber (name) {
@@ -252,6 +254,10 @@ function getTrailingNumber (name) {
 
 function isSequenceMember (input) {
   return input > 0
+}
+
+function sortNumeric (a, b) {
+  return a - b
 }
 
 function last (arr) {
