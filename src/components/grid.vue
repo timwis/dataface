@@ -142,6 +142,7 @@ module.exports = {
       if (this.editing) {
         // navigating down triggers blur, which triggers setNotEditing
         this.navigate('down', evt.target)
+        this.onBlur(evt) // HACK: if pressing enter on final row, navigate does nothing
       } else if (isEditable) {
         this.setEditing()
         setCursor(el, 'end')
