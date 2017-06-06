@@ -1,3 +1,5 @@
-.env
-postgrest.conf
-node_modules
+.DS_Store
+node_modules/
+dist/build.js
+npm-debug.log
+yarn-error.log
