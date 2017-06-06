@@ -232,12 +232,18 @@ module.exports = {
       if (newEl) newEl.focus()
     },
     getCurrentHeaderValue (columnIndex) {
-      return this.columns[columnIndex].name
+      // always return string for comparison
+      return this.columns[columnIndex].name + ''
     },
     getCurrentCellValue (rowIndex, columnIndex) {
       const row = this.rows[rowIndex]
       const column = this.columns[columnIndex]
-      return (row && column) ? row[column.name] : null
+      if (row && column) {
+        // always return string for comparison
+        return row[column.name] + ''
+      } else {
+        return null
+      }
     }
   }
 }
