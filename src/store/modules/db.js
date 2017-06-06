@@ -25,6 +25,11 @@ module.exports = {
     receiveSheetInsertion (state, { name }) {
       Vue.set(state.sheets, state.sheets.length, { name })
     },
+    receiveSheetRename (state, { oldName, newName }) {
+      state.activeSheet.name = newName
+      const sheet = state.sheets.find((sheet) => sheet.name === oldName)
+      sheet.name = newName
+    },
     receiveSheetRemoval (state, { index }) {
       Vue.delete(state.sheets, index)
     },
@@ -178,6 +183,18 @@ module.exports = {
       await dispatch('getSheet', { name })
       await dispatch('insertColumn')
       router.push(`/${name}`)
+    },
+    async renameSheet ({ state, commit, dispatch }, { oldName, newName }) {
+      try {
+        await api.renameTable(oldName, newName)
+      } catch (err) {
+        console.error(err)
+        dispatch('notify', { msg: `Failed to rename sheet` })
+        return
+      }
+
+      commit('receiveSheetRename', { oldName, newName })
+      router.push(`/${newName}`)
     },
     async removeSheet ({ state, commit, dispatch }, name) {
       try {

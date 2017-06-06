@@ -8,6 +8,7 @@
         </a>
       </div>
       <div class="column grid-container">
+        <sheet-name></sheet-name>
         <grid></grid>
       </div>
     </div>
@@ -19,6 +20,7 @@ const { mapActions } = require('vuex')
 
 const SiteNav = require('../components/site-nav.vue')
 const SheetList = require('../components/sheet-list.vue')
+const SheetName = require('../components/sheet-name.vue')
 const Grid = require('../components/grid.vue')
 
 module.exports = {
@@ -26,6 +28,7 @@ module.exports = {
   components: {
     'site-nav': SiteNav,
     'sheet-list': SheetList,
+    'sheet-name': SheetName,
     'grid': Grid
   },
   methods: mapActions([
