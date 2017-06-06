@@ -10,7 +10,8 @@ module.exports = {
     activeSheet: {
       columns: [],
       rows: [],
-      name: null
+      name: null,
+      keys: []
     }
   },
   mutations: {
@@ -21,6 +22,7 @@ module.exports = {
       state.activeSheet.rows = rows
       state.activeSheet.columns = columns
       state.activeSheet.name = name
+      state.activeSheet.keys = getPrimaryKeys(columns)
     },
     receiveSheetInsertion (state, { name }) {
       Vue.set(state.sheets, state.sheets.length, { name })
@@ -66,7 +68,6 @@ module.exports = {
       return Promise.resolve()
     },
     async getSheet ({ commit, dispatch }, { name }) {
-      console.log('getting sheet', name)
       let rows, columns
       try {
         columns = await api.getSchema(name)

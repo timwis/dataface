@@ -32,13 +32,13 @@
           <td
             v-for="(column, columnIndex) in columns"
             tabindex="0"
-            :contenteditable="column.editable ? true : false"
+            :contenteditable="(hasKeys && column.editable) ? true : false"
             :data-row-index="rowIndex"
             :data-column-index="columnIndex"
             v-text="row[column.name]"></td>
           <td class="extra-column"></td>
         </tr>
-        <tr :key="rows.length">
+        <tr :key="rows.length" v-if="hasKeys">
           <td
             v-for="(column, columnIndex) in columns"
             tabindex="0"
@@ -94,6 +94,7 @@ module.exports = {
     ...mapState({
       columns: (state) => state.db.activeSheet.columns,
       rows: (state) => state.db.activeSheet.rows,
+      hasKeys: (state) => state.db.activeSheet.keys.length > 0,
       editing: (state) => state.ui.editing
     })
   },
