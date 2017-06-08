@@ -1,5 +1,8 @@
 # Dataface
-Build and manage data with a spreadsheet-like interface. **Work in progress**.
+Build and manage data in a Postgres database with a spreadsheet-like interface.
+[Demo](http://dataface.surge.sh).
+
+![screenshot of spreadsheet-like interface](http://i.imgur.com/3SX1UCo.png)
 
 ## Development
 The `docker-compose.yml` file provides a postgres container, a
