@@ -61,9 +61,8 @@ function determineActiveSheet (route, sheets) {
 }
 </script>
 
+<style src="../../node_modules/bulma/css/bulma.css"></style>
 <style>
-@import url('../node_modules/bulma/css/bulma.css');
-
 html,
 body,
 #app {

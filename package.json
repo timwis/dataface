@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "start": "budo src/main.js:dist/build.js --live --pushstate -- -t localenvify",
-    "build": "NODE_ENV=production browserify -t localenvify src/main.js | uglifyjs -c warnings=false -m > dist/build.js"
+    "build": "NODE_ENV=production browserify -g localenvify src/main.js > dist/build.js"
   },
   "dependencies": {
     "axios": "^0.16.1",
