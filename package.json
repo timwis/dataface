@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "start": "budo src/main.js:dist/build.js --live --pushstate -- -t localenvify",
-    "build": "NODE_ENV=production browserify -g localenvify src/main.js > dist/build.js"
+    "build": "NODE_ENV=production browserify -g localenvify src/main.js > dist/build.js",
+    "test": "ava test/**/*.spec.js"
   },
   "dependencies": {
     "axios": "^0.16.1",
@@ -19,19 +20,35 @@
     "vuex": "^2.3.1"
   },
   "devDependencies": {
+    "ava": "^0.19.1",
     "babel-core": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babelify": "^7.3.0",
+    "browser-env": "^2.0.31",
     "browserify": "^13.0.1",
     "budo": "^10.0.3",
     "localenvify": "^1.0.1",
+    "require-extension-hooks": "^0.2.0",
+    "require-extension-hooks-vue": "^0.3.1",
     "uglify-js": "^2.5.0",
-    "vueify": "^9.1.0"
+    "vueify": "^9.1.0",
+    "vuenit": "^0.4.2"
   },
   "browserify": {
     "transform": [
       "vueify",
       "babelify"
     ]
+  },
+  "ava": {
+    "require": [
+      "babel-register",
+      "./test/.setup.js"
+    ],
+    "source": [
+      "**/*.{js,vue}",
+      "!dist/**/*"
+    ],
+    "babel": "inherit"
   }
 }
