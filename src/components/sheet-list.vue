@@ -19,6 +19,7 @@
 const { mapState, mapActions } = require('vuex')
 
 module.exports = {
+  name: 'sheet-list',
   computed: mapState({
     sheets: (state) => state.db.sheets,
     activeSheetName: (state) => state.db.activeSheet.name

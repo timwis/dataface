@@ -10,13 +10,14 @@
 const { mapState, mapActions } = require('vuex')
 
 module.exports = {
+  name: 'sheet-name',
   computed: mapState({
     sheetName: (state) => state.db.activeSheet.name
   }),
   methods: {
     onSave (evt) {
       const oldName = this.sheetName
-      const newName = evt.target.innerText
+      const newName = evt.target.textContent
       if (oldName !== newName) {
         this.renameSheet({ oldName, newName })
       }
