@@ -1,0 +1,49 @@
+[{
+	"name": "id",
+	"type": "integer",
+	"length": null,
+	"default": "nextval('contacts_id_seq'::regclass)",
+	"null": false,
+	"constraint": "PRIMARY KEY",
+	"custom": null
+}, {
+	"name": "first_name",
+	"type": "character varying",
+	"length": 50,
+	"default": null,
+	"null": true,
+	"constraint": null,
+	"custom": null
+}, {
+	"name": "last_name",
+	"type": "character varying",
+	"length": 50,
+	"default": null,
+	"null": true,
+	"constraint": null,
+	"custom": null
+}, {
+	"name": "email",
+	"type": "character varying",
+	"length": 50,
+	"default": null,
+	"null": true,
+	"constraint": null,
+	"custom": null
+}, {
+	"name": "gender",
+	"type": "character varying",
+	"length": 50,
+	"default": null,
+	"null": true,
+	"constraint": null,
+	"custom": null
+}, {
+	"name": "ip_address",
+	"type": "character varying",
+	"length": 20,
+	"default": null,
+	"null": true,
+	"constraint": null,
+	"custom": null
+}]

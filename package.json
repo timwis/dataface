@@ -44,7 +44,7 @@
   "ava": {
     "require": [
       "babel-register",
-      "./test/.setup.js"
+      "./test/helpers/setup.js"
     ],
     "source": [
       "**/*.{js,vue}",

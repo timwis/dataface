@@ -1,0 +1,71 @@
+[{
+  "id": 1,
+  "first_name": "Staci",
+  "last_name": "Phythean",
+  "email": "sphythean0@bloglines.com",
+  "gender": "Female",
+  "ip_address": "53.98.200.83"
+}, {
+  "id": 2,
+  "first_name": "Amy",
+  "last_name": "Ramstead",
+  "email": "aramstead1@netscape.com",
+  "gender": "Female",
+  "ip_address": "9.27.75.177"
+}, {
+  "id": 3,
+  "first_name": "Vinny",
+  "last_name": "Terrelly",
+  "email": "vterrelly2@wiley.com",
+  "gender": "Male",
+  "ip_address": "97.87.167.80"
+}, {
+  "id": 4,
+  "first_name": "Whit",
+  "last_name": "Gemeau",
+  "email": "wgemeau3@indiegogo.com",
+  "gender": "Male",
+  "ip_address": "184.219.254.27"
+}, {
+  "id": 5,
+  "first_name": "Kora",
+  "last_name": "McDougall",
+  "email": "kmcdougall4@ihg.com",
+  "gender": "Female",
+  "ip_address": "113.236.0.133"
+}, {
+  "id": 6,
+  "first_name": "Brig",
+  "last_name": "Grimshaw",
+  "email": "bgrimshaw5@harvard.edu",
+  "gender": "Male",
+  "ip_address": "128.233.40.109"
+}, {
+  "id": 7,
+  "first_name": "Ruby",
+  "last_name": "Songist",
+  "email": "rsongist6@tamu.edu",
+  "gender": "Female",
+  "ip_address": "101.247.12.155"
+}, {
+  "id": 8,
+  "first_name": "Tori",
+  "last_name": "Arnold",
+  "email": "tarnold7@forbes.com",
+  "gender": "Female",
+  "ip_address": "22.7.26.117"
+}, {
+  "id": 9,
+  "first_name": "Marlo",
+  "last_name": "Fermin",
+  "email": "mfermin8@123-reg.co.uk",
+  "gender": "Male",
+  "ip_address": "189.49.177.132"
+}, {
+  "id": 10,
+  "first_name": "Simonne",
+  "last_name": "Vinden",
+  "email": "svinden9@liveinternet.ru",
+  "gender": "Female",
+  "ip_address": "0.108.116.203"
+}]

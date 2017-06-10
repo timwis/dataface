@@ -9,12 +9,12 @@
       @focus.capture="onFocus"
       @blur.capture="onBlur"
       @input="onInput"
-      @keydown.enter.prevent="onPressEnter"
-      @keydown.esc.prevent="onPressEscape"
-      @keydown.up="onPressArrowKeys('up', $event)"
-      @keydown.down="onPressArrowKeys('down', $event)"
-      @keydown.left="onPressArrowKeys('left', $event)"
-      @keydown.right="onPressArrowKeys('right', $event)">
+      @keydown.enter.capture.prevent="onPressEnter"
+      @keydown.esc.capture.prevent="onPressEscape"
+      @keydown.up.capture="onPressArrowKeys('up', $event)"
+      @keydown.down.capture="onPressArrowKeys('down', $event)"
+      @keydown.left.capture="onPressArrowKeys('left', $event)"
+      @keydown.right.capture="onPressArrowKeys('right', $event)">
       <thead @contextmenu.prevent="onColumnContextMenu">
         <tr>
           <th
@@ -28,7 +28,7 @@
         </tr>
       </thead>
       <tbody @contextmenu.prevent="onRowContextMenu">
-        <tr v-for="(row, rowIndex) in rows" :key="index">
+        <tr v-for="(row, rowIndex) in rows" :key="rowIndex">
           <td
             v-for="(column, columnIndex) in columns"
             tabindex="0"
@@ -78,6 +78,7 @@ const { mapState, mapMutations, mapActions } = require('vuex')
 const contextMenu = require('vue-lil-context-menu')
 
 module.exports = {
+  name: 'grid',
   components: {
     'context-menu': contextMenu
   },
@@ -228,7 +229,7 @@ module.exports = {
           newEl = currentEl.previousSibling
           break
         case 'right':
-          newEl = currentEl.nextSibling
+          newEl = currentEl.nextElementSibling
           break
       }
       if (newEl) newEl.focus()
@@ -250,8 +251,8 @@ module.exports = {
   }
 }
 function getElIndexes (el) {
-  const rowIndex = numericAttribute(el.dataset.rowIndex)
-  const columnIndex = numericAttribute(el.dataset.columnIndex)
+  const rowIndex = numericAttribute(el.getAttribute('data-row-index'))
+  const columnIndex = numericAttribute(el.getAttribute('data-column-index'))
   return { rowIndex, columnIndex }
 }
 function numericAttribute (val) {
