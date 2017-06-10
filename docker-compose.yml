@@ -25,7 +25,7 @@ services:
       - "3000:3000"
     environment:
       DB_URI: "postgres://postgres:pwd@postgres:5433/postgres"
-      DB_SCHEMA: public
+      PGSCHEMA: "public"
       DB_ANON_ROLE: postgres
   client:
     depends_on:
