@@ -35,6 +35,27 @@ test.cb('calls save on blur', (t) => {
   trigger(el, 'blur')
 })
 
+// Simulating enter works, but the blur event is not triggering
+// the blur event listener. This test *should* work.
+test.failing.cb('calls save on press enter', (t) => {
+  const $store = mockStore({
+    modules: {
+      db: {
+        activeSheet: { name: 'users' }
+      }
+    }
+  })
+  $store.when('renameSheet').call((context, payload) => {
+    t.pass()
+    t.end()
+  })
+  const vm = mount(SheetName, { inject: { $store } })
+  const el = vm.$el
+  trigger(el, 'focus')
+  el.textContent = 'changed'
+  trigger(el, 'keydown', { keyCode: 13 })
+})
+
 test.cb('does not save if name unchanged', (t) => {
   const $store = mockStore({
     modules: {
