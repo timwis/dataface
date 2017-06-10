@@ -64,23 +64,31 @@
     <context-menu ref="columnMenu">
       <template scope="child">
         <div class="panel">
+          <a class="panel-block" @click="onClickChangeType(child.userData)">
+            Change column type...
+          </a>
           <a class="panel-block" @click="removeColumn(child.userData)">
             Remove column
           </a>
         </div>
       </template>
     </context-menu>
+
+    <type-modal ref="typeModal"></type-modal>
   </div>
 </template>
 
 <script>
 const { mapState, mapMutations, mapActions } = require('vuex')
-const contextMenu = require('vue-lil-context-menu')
+const ContextMenu = require('vue-lil-context-menu')
+
+const TypeModal = require('./type-modal.vue')
 
 module.exports = {
   name: 'grid',
   components: {
-    'context-menu': contextMenu
+    'context-menu': ContextMenu,
+    'type-modal': TypeModal
   },
   data () {
     return { HEADER_ROW: -1 }
@@ -233,6 +241,10 @@ module.exports = {
           break
       }
       if (newEl) newEl.focus()
+    },
+    onClickChangeType (columnIndex) {
+      const column = this.columns[columnIndex]
+      this.$refs.typeModal.open(column)
     },
     getCurrentHeaderValue (columnIndex) {
       // always return string for comparison
