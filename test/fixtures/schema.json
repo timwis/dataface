@@ -5,6 +5,7 @@
 	"default": "nextval('contacts_id_seq'::regclass)",
 	"null": false,
 	"constraint": "PRIMARY KEY",
+    "editable": false,
 	"custom": null
 }, {
 	"name": "first_name",
@@ -13,6 +14,7 @@
 	"default": null,
 	"null": true,
 	"constraint": null,
+    "editable": true,
 	"custom": null
 }, {
 	"name": "last_name",
@@ -21,6 +23,7 @@
 	"default": null,
 	"null": true,
 	"constraint": null,
+    "editable": true,
 	"custom": null
 }, {
 	"name": "email",
@@ -29,6 +32,7 @@
 	"default": null,
 	"null": true,
 	"constraint": null,
+    "editable": true,
 	"custom": null
 }, {
 	"name": "gender",
@@ -37,6 +41,7 @@
 	"default": null,
 	"null": true,
 	"constraint": null,
+    "editable": true,
 	"custom": null
 }, {
 	"name": "ip_address",
@@ -45,5 +50,6 @@
 	"default": null,
 	"null": true,
 	"constraint": null,
+    "editable": true,
 	"custom": null
 }]

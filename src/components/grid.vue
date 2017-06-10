@@ -140,7 +140,7 @@ module.exports = {
     },
     onPressEnter (evt) {
       const el = evt.target
-      const isEditable = el.isContentEditable
+      const isEditable = (el.getAttribute('contenteditable') === 'true') // no jsdom support for isContentEditable
       if (this.editing) {
         // navigating down triggers blur, which triggers setNotEditing
         this.navigate('down', evt.target)

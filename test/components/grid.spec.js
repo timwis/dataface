@@ -96,6 +96,53 @@ test('navigates focus via arrow keys', (t) => {
   t.is(document.activeElement, firstCell)
 })
 
+test.cb('pressing enter calls setEditing', (t) => {
+  const $store = sampleStore()
+  const vm = mount(Grid, { inject: { $store } })
+
+  $store.when('setEditing').call((context, payload) => {
+    t.pass()
+    t.end()
+  })
+
+  const firstEditableCell = vm.$findOne('tbody td[contenteditable="true"]')
+  firstEditableCell.focus()
+
+  keydown('enter')
+})
+
+test.cb('pressing enter on non-editable cell does not call setEditing', (t) => {
+  const $store = sampleStore()
+  const vm = mount(Grid, { inject: { $store } })
+
+  $store.when('setEditing').call((context, payload) => {
+    t.fail()
+  })
+
+  const index = fixtures.columns.findIndex((column) => column.editable === false)
+  const firstRow = vm.$findOne('tbody tr')
+  const cell = firstRow.children[index]
+
+  cell.focus()
+  keydown('enter')
+  window.setTimeout(() => t.end())
+})
+
+test('pressing enter during edit mode navigates down', (t) => {
+  const $store = sampleStore()
+  const vm = mount(Grid, { inject: { $store } })
+
+  const firstEditableCell = vm.$findOne('tbody td[contenteditable="true"]')
+  const columnIndex = firstEditableCell.getAttribute('data-column-index')
+  firstEditableCell.focus()
+  $store.state.ui.editing = true
+  keydown('enter')
+
+  const nextRow = firstEditableCell.parentNode.nextElementSibling
+  const expectedCell = nextRow.children[columnIndex]
+  t.is(document.activeElement, expectedCell)
+})
+
 function keydown (key) {
   trigger(document.activeElement, 'keydown', { keyCode: keyCodes[key] })
 }
