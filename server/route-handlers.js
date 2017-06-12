@@ -1,4 +1,4 @@
-const queries = require('./queries')
+const actions = require('./actions')
 
 module.exports = {
   listSheets,
@@ -8,15 +8,14 @@ module.exports = {
 }
 
 async function listSheets (ctx) {
-  const sheets = await queries.listSheets(ctx.db)
+  const sheets = await actions.listSheets(ctx.db)
   ctx.body = sheets
 }
 
 async function createSheet (ctx) {
   try {
     const payload = ctx.request.body
-    await queries.createSheet(ctx.db, payload)
-    const sheet = await queries.getSheet(ctx.db, payload.name)
+    const sheet = await actions.createSheet(ctx.db, payload)
     ctx.body = sheet
   } catch (err) {
     if (err.code === '42P07') {
@@ -30,12 +29,27 @@ async function createSheet (ctx) {
 async function getSheet (ctx) {
   const sheetName = ctx.params.sheetName
   try {
-    const sheet = await queries.getSheet(ctx.db, sheetName)
+    const sheet = await actions.getSheet(ctx.db, sheetName)
     ctx.body = sheet
   } catch (err) {
-    Boom.notFound()
+    ctx.throw(404)
   }
 }
 
 async function updateSheet (ctx) {
+  const sheetName = ctx.params.sheetName
+  const payload = ctx.request.body
+  try {
+    const sheet = await actions.updateSheet(ctx.db, sheetName, payload)
+    ctx.body = sheet
+  } catch (err) {
+    if (err.code === '42P07') {
+      ctx.throw(409)
+    } else if (err.code === '42P01') {
+      ctx.throw(404)
+    } else {
+      console.error(err)
+      ctx.throw(500)
+    }
+  }
 }

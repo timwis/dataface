@@ -3,7 +3,8 @@ const assert = require('assert')
 module.exports = {
   listSheets,
   getSheet,
-  createSheet
+  createSheet,
+  renameSheet
 }
 
 function listSheets (db) {
@@ -26,4 +27,8 @@ function createSheet (db, { name }) {
   return db.schema.createTable(name, (table) => {
     table.increments('id')
   })
+}
+
+function renameSheet (db, oldName, newName) {
+  return db.schema.renameTable(oldName, newName)
 }
