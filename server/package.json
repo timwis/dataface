@@ -3,11 +3,11 @@
     "start": "nodemon index.js"
   },
   "dependencies": {
-    "ajv": "^5.1.5",
     "boom": "^5.1.0",
     "knex": "^0.13.0",
     "koa": "^2.2.0",
     "koa-body": "^2.1.0",
+    "koa-json-schema": "timwis/koa-json-schema#koa-v2",
     "koa-router": "^7.2.0",
     "pg": "^6.2.4"
   },

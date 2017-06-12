@@ -1,8 +1,8 @@
 const Koa = require('koa')
 const Router = require('koa-router')
 const KoaBody = require('koa-body')
-const Ajv = require('ajv')
 const knex = require('knex')
+const validate = require('koa-json-schema')
 
 const handlers = require('./route-handlers')
 const schemas = require('./schemas')
@@ -14,8 +14,10 @@ const router = new Router()
 const bodyParser = new KoaBody()
 app.context.db = knex({ client: 'pg', connection: DB_URI, ssl: true })
 
+// list sheets
 router.get('/sheets', handlers.listSheets)
 
+// create sheet
 router.post(
   '/sheets',
   bodyParser,
@@ -23,8 +25,10 @@ router.post(
   handlers.createSheet
 )
 
+// get sheet
 router.get('/sheets/:sheetName', handlers.getSheet)
 
+// update sheet
 router.patch(
   '/sheets/:sheetName',
   bodyParser,
@@ -32,6 +36,7 @@ router.patch(
   handlers.updateSheet
 )
 
+// global handler
 app.use(async (ctx, next) => {
   ctx.type = 'application/json'
   await next()
@@ -41,18 +46,3 @@ app.use(router.routes())
 app.use(router.allowedMethods())
 
 app.listen(PORT)
-
-function validate (schema) {
-  const ajv = new Ajv()
-  const compiled = ajv.compile(schema)
-
-  return async (ctx, next) => {
-    const isValid = compiled(ctx.request.body)
-    if (isValid) {
-      await next()
-    } else {
-      const errorMessages = compiled.errors.map((err) => err.message).join('\n')
-      ctx.throw(422, errorMessages)
-    }
-  }
-}
