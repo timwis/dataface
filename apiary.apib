@@ -1,0 +1,165 @@
+FORMAT: 1A
+
+# Dataface
+
+Build and manage data with a spreadsheet-like interface.
+
+# Group Sheets
+
+Resources related to sheets (which is what dataface calls database tables).
+
+## Sheet Collection [/sheets]
+
+### List All Sheets [GET]
+
++ Response 200 (application/json)
+  + Attributes (array[Sheet])
+
+### Create a New Sheet [POST]
+
++ Request (application/json)
+  + Attributes (Sheet)
+
++ Response 201 (application/json)
+  + Headers
+      Location: /sheets/{sheet_name}
+  + Attributes (Sheet)
+
+## Sheet [/sheets/{sheet_name}]
+
++ Parameters
+  + sheet_name (string) - Name of the sheet
+
+### Get basic information about a Sheet [GET]
+
++ Response 200 (application/json)
+  + Attributes (Sheet)
+
+### Update a Sheet [PATCH]
+To update a Sheet send a JSON payload with the updated value for one or more attributes.
+
++ Request (application/json)
+
+  {"name": "client_invoices"}
+
++ Response 200 (application/json)
+
+  {"name": "client_invoices", "description": "List of invoices"}
+
+### Delete a Sheet [DELETE]
+
++ Response 204
+
+## Sheet Column Collection [/sheets/{sheet_name}/columns]
+
++ Parameters
+  + sheet_name (string) - Name of the sheet
+
+### Get a Sheet's Columns [GET]
+
++ Response 200 (application/json)
+  + Attributes (array[Column])
+
+### Create a Column [POST]
+
++ Request (application/json)
+  + Attributes (Column)
+
++ Response 201 (application/json)
+  + Headers
+    Location: /sheets/{sheet_name}/columns/{column_name}
+  + Attributes (Column)
+
+## Sheet Column [/sheets/{sheet_name}/columns/{column_name}]
+
++ Parameters
+  + sheet_name (string) - Name of the sheet
+  + column_name (string) - Name of the column
+
+### Update a Column [PATCH]
+Use this method to rename a column, alter its type or metadata.
+
++ Request (application/json)
+  + Attributes (Column)
+
++ Response 200 (application/json)
+  + Attributes (Column)
+
+### Delete a Column [DELETE]
+
++ Response 204
+
+## Sheet Row Collection [/sheets/{sheet_name}/rows]
+Filter the rows by adding conditions on columns through the querystring parameters.
+For example:
+
++ `?first_name=eq.John&last_name=eq.Doe`
++ `?age=gt.10&email=like.*doe.com`
+
+See the full list of querystring operators in the [PostgREST docs](https://postgrest.com/en/v0.4/api.html#horizontal-filtering-rows).
+
++ Parameters
+  + sheet_name (string) - Name of the sheet
+
+### Get a Sheet's Rows [GET]
+
++ Request
+  + Headers
+    Range-Unit: items
+    Range: 0-29
+    X-Order: first_name DESC
+
++ Response 200 (application/json)
+  + Headers
+    Range-Unit: items
+    Content-Range: 0-29/*
+    X-Order: first_name DESC
+  + Attributes (array[Sample Row])
+
+### Add a Row to a Sheet [POST]
+
++ Request (application/json)
+  + Attributes (Sample Row)
+
++ Response 201 (application/json)
+  + Attributes (Sample Row)
+
+### Update a Row in a Sheet [PATCH]
+> Don't forget to include the `Range` header to ensure you're limiting your update to a single row!
+
++ Request (application/json)
+  + Headers
+    Range-Unit: items
+    Range: 0-0
+  + Body
+
+    {"first_name": "Jane", "email": "jane@doe.com"}
+
++ Response 200 (application/json)
+  + Body
+
+    {"first_name": "Jane", "last_name": "Doe", "age": 35, "email": "jane@doe.com"}
+
+### Delete a Row in a Sheet [DELETE]
+
++ Response 204
+
+# Data Structures
+
+## Sheet (object)
++ name: `invoices` (string) - Name of the sheet. Should be a valid database table name.
++ description: `List of invoices` (optional, string) - Description of the sheet.
+
+## Column (object)
++ name: `first_name` (string) - Name of the column. Should be a valid database column name.
++ type: `text` (enum[string]) - The type of data stored in the column
+  + Members
+    + `text`
+    + `number`
++ order: `1` (number) - The order of the column in the sheet (starts at `1`)
+
+## Sample Row (object)
++ first_name: `John` (string)
++ last_name: `Doe` (string)
++ age: `35` (number)
++ email: `john@doe.com` (string)
