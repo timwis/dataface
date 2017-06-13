@@ -4,7 +4,8 @@ module.exports = {
   listSheets,
   getSheet,
   createSheet,
-  renameSheet
+  renameSheet,
+  deleteSheet
 }
 
 function listSheets (db) {
@@ -31,4 +32,8 @@ function createSheet (db, { name }) {
 
 function renameSheet (db, oldName, newName) {
   return db.schema.renameTable(oldName, newName)
+}
+
+function deleteSheet (db, name) {
+  return db.schema.dropTable(name)
 }

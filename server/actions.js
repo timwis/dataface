@@ -4,7 +4,8 @@ module.exports = {
   listSheets: queries.listSheets,
   getSheet: queries.getSheet,
   createSheet,
-  updateSheet
+  updateSheet,
+  deleteSheet: queries.deleteSheet
 }
 
 async function createSheet (db, { name }) {

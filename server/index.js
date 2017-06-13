@@ -36,6 +36,9 @@ router.patch(
   handlers.updateSheet
 )
 
+// delete sheet
+router.delete('/sheets/:sheetName', handlers.deleteSheet)
+
 // global handler
 app.use(async (ctx, next) => {
   ctx.type = 'application/json'

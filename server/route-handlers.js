@@ -4,7 +4,8 @@ module.exports = {
   listSheets,
   createSheet,
   getSheet,
-  updateSheet
+  updateSheet,
+  deleteSheet
 }
 
 async function listSheets (ctx) {
@@ -46,6 +47,21 @@ async function updateSheet (ctx) {
     if (err.code === '42P07') {
       ctx.throw(409)
     } else if (err.code === '42P01') {
+      ctx.throw(404)
+    } else {
+      console.error(err)
+      ctx.throw(500)
+    }
+  }
+}
+
+async function deleteSheet (ctx) {
+  const sheetName = ctx.params.sheetName
+  try {
+    await actions.deleteSheet(ctx.db, sheetName)
+    ctx.status = 204
+  } catch (err) {
+    if (err.code === '42P01') {
       ctx.throw(404)
     } else {
       console.error(err)
