@@ -8,7 +8,8 @@ module.exports = {
   updateSheet,
   deleteSheet: queries.deleteSheet,
   getSheetColumns,
-  createColumn
+  createColumn,
+  updateColumn
 }
 
 async function createSheet (db, { name }) {
@@ -37,6 +38,19 @@ async function getSheetColumns (db, name) {
 async function createColumn (db, sheetName, { name, type = 'text' }) {
   const dbType = encodeType(type)
   return queries.createColumn(db, sheetName, { name, dbType })
+}
+
+async function getColumn (db, sheetName, columnName) {
+  const columns = await getSheetColumns(db, sheetName)
+  const column = columns.find((col) => col.name === columnName)
+  return column
+}
+
+async function updateColumn (db, sheetName, columnName, { name, type }) {
+  const dbType = type ? encodeType(type) : undefined
+  await queries.updateColumn(db, sheetName, columnName, { name, dbType })
+  const finalName = name || sheetName
+  return getColumn(db, sheetName, finalName)
 }
 
 function _mergeCustomProps (column) {

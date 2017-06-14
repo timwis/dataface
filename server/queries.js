@@ -7,7 +7,8 @@ module.exports = {
   renameSheet,
   deleteSheet,
   getSheetColumns,
-  createColumn
+  createColumn,
+  updateColumn
 }
 
 function listSheets (db) {
@@ -40,7 +41,7 @@ function deleteSheet (db, name) {
   return db.schema.dropTable(name)
 }
 
-function getSheetColumns (db, name) {
+function getSheetColumns (db, sheetName) {
   return db.raw(`
     SELECT
         cols.column_name AS name,
@@ -66,11 +67,18 @@ function getSheetColumns (db, name) {
         cols.table_schema = 'public' AND
         cols.table_name = ? AND
         cols.table_name = cls.relname;
-  `, name).then((response) => response.rows)
+  `, sheetName).then((response) => response.rows)
 }
 
 function createColumn (db, sheetName, { name, dbType }) {
   return db.schema.alterTable(sheetName, function (t) {
     t.specificType(name, dbType)
+  })
+}
+
+function updateColumn (db, sheetName, columnName, { name, dbType }) {
+  return db.schema.alterTable(sheetName, function (t) {
+    if (name) t.renameColumn(columnName, name)
+    if (dbType) t.specificType(columnName, dbType).alter()
   })
 }

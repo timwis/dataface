@@ -50,6 +50,14 @@ router.post(
   handlers.createColumn
 )
 
+// update column
+router.patch(
+  '/sheets/:sheetName/columns/:columnName',
+  bodyParser,
+  validate(schemas.column),
+  handlers.updateColumn
+)
+
 // global handler
 app.use(async (ctx, next) => {
   ctx.type = 'application/json'
@@ -74,6 +82,7 @@ function translateErrorCode (code) {
     case '42701':
       return 409
     case '42P01':
+    case '42703':
       return 404
     default:
       return 500
