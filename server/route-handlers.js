@@ -6,7 +6,8 @@ module.exports = {
   getSheet,
   updateSheet,
   deleteSheet,
-  getSheetColumns
+  getSheetColumns,
+  createColumn
 }
 
 async function listSheets (ctx) {
@@ -43,4 +44,11 @@ async function getSheetColumns (ctx) {
   const sheetName = ctx.params.sheetName
   const columns = await actions.getSheetColumns(ctx.db, sheetName)
   ctx.body = columns
+}
+
+async function createColumn (ctx) {
+  const sheetName = ctx.params.sheetName
+  const payload = ctx.request.body
+  const column = await actions.createColumn(ctx.db, sheetName, payload)
+  ctx.body = column
 }

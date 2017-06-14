@@ -42,6 +42,14 @@ router.delete('/sheets/:sheetName', handlers.deleteSheet)
 // get sheet columns
 router.get('/sheets/:sheetName/columns', handlers.getSheetColumns)
 
+// create column
+router.post(
+  '/sheets/:sheetName/columns',
+  bodyParser,
+  validate(schemas.column),
+  handlers.createColumn
+)
+
 // global handler
 app.use(async (ctx, next) => {
   ctx.type = 'application/json'
@@ -49,7 +57,7 @@ app.use(async (ctx, next) => {
     await next()
   } catch (err) {
     console.error(err)
-    const statusCode = translateErrorCode(err.code)
+    const statusCode = err.status || translateErrorCode(err.code)
     ctx.throw(statusCode)
   }
 })
@@ -62,8 +70,12 @@ app.listen(PORT)
 // Translate postgres error codes to http status codes
 function translateErrorCode (code) {
   switch (code) {
-    case '42P07': return 409
-    case '42P01': return 404
-    default: return 500
+    case '42P07':
+    case '42701':
+      return 409
+    case '42P01':
+      return 404
+    default:
+      return 500
   }
 }

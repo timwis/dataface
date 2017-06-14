@@ -1,8 +1,3 @@
-module.exports = {
-  encodeType,
-  decodeType
-}
-
 const typeMap = {
   text: {
     mapsTo: 'text',
@@ -29,6 +24,12 @@ const typeMap = {
     mapsTo: 'boolean',
     mapsFrom: ['boolean']
   }
+}
+
+module.exports = {
+  encodeType,
+  decodeType,
+  typeMap
 }
 
 const reverseTypeMap = createReverseTypeMap(typeMap)

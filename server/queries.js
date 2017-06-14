@@ -6,7 +6,8 @@ module.exports = {
   createSheet,
   renameSheet,
   deleteSheet,
-  getSheetColumns
+  getSheetColumns,
+  createColumn
 }
 
 function listSheets (db) {
@@ -43,7 +44,7 @@ function getSheetColumns (db, name) {
   return db.raw(`
     SELECT
         cols.column_name AS name,
-        cols.data_type AS type,
+        cols.data_type AS db_type,
         cols.character_maximum_length AS length,
         cols.column_default AS default,
         cols.is_nullable::boolean AS null,
@@ -66,4 +67,10 @@ function getSheetColumns (db, name) {
         cols.table_name = ? AND
         cols.table_name = cls.relname;
   `, name).then((response) => response.rows)
+}
+
+function createColumn (db, sheetName, { name, dbType }) {
+  return db.schema.alterTable(sheetName, function (t) {
+    t.specificType(name, dbType)
+  })
 }

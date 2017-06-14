@@ -1,5 +1,5 @@
 const queries = require('./queries')
-const { decodeType } = require('./type-map')
+const { encodeType, decodeType } = require('./type-map')
 
 module.exports = {
   listSheets: queries.listSheets,
@@ -7,7 +7,8 @@ module.exports = {
   createSheet,
   updateSheet,
   deleteSheet: queries.deleteSheet,
-  getSheetColumns
+  getSheetColumns,
+  createColumn
 }
 
 async function createSheet (db, { name }) {
@@ -33,6 +34,11 @@ async function getSheetColumns (db, name) {
   return columns
 }
 
+async function createColumn (db, sheetName, { name, type = 'text' }) {
+  const dbType = encodeType(type)
+  return queries.createColumn(db, sheetName, { name, dbType })
+}
+
 function _mergeCustomProps (column) {
   Object.assign(column, column.custom)
   delete column.custom
@@ -40,6 +46,6 @@ function _mergeCustomProps (column) {
 }
 
 function _addFriendlyType (column) {
-  column.friendlyType = decodeType(column.type)
+  column.type = decodeType(column.db_type)
   return column
 }
