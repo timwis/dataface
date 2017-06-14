@@ -15,45 +15,22 @@ async function listSheets (ctx) {
 }
 
 async function createSheet (ctx) {
-  try {
-    const payload = ctx.request.body
-    const sheet = await actions.createSheet(ctx.db, payload)
-    ctx.body = sheet
-  } catch (err) {
-    if (err.code === '42P07') {
-      ctx.throw(409)
-    } else {
-      ctx.throw(500)
-    }
-  }
+  const payload = ctx.request.body
+  const sheet = await actions.createSheet(ctx.db, payload)
+  ctx.body = sheet
 }
 
 async function getSheet (ctx) {
   const sheetName = ctx.params.sheetName
-  try {
-    const sheet = await actions.getSheet(ctx.db, sheetName)
-    ctx.body = sheet
-  } catch (err) {
-    ctx.throw(404)
-  }
+  const sheet = await actions.getSheet(ctx.db, sheetName)
+  ctx.body = sheet
 }
 
 async function updateSheet (ctx) {
   const sheetName = ctx.params.sheetName
   const payload = ctx.request.body
-  try {
-    const sheet = await actions.updateSheet(ctx.db, sheetName, payload)
-    ctx.body = sheet
-  } catch (err) {
-    if (err.code === '42P07') {
-      ctx.throw(409)
-    } else if (err.code === '42P01') {
-      ctx.throw(404)
-    } else {
-      console.error(err)
-      ctx.throw(500)
-    }
-  }
+  const sheet = await actions.updateSheet(ctx.db, sheetName, payload)
+  ctx.body = sheet
 }
 
 async function deleteSheet (ctx) {

@@ -39,13 +39,31 @@ router.patch(
 // delete sheet
 router.delete('/sheets/:sheetName', handlers.deleteSheet)
 
+// get sheet columns
+router.get('/sheets/:sheetName/columns', handlers.getSheetColumns)
+
 // global handler
 app.use(async (ctx, next) => {
   ctx.type = 'application/json'
-  await next()
+  try {
+    await next()
+  } catch (err) {
+    console.error(err)
+    const statusCode = translateErrorCode(err.code)
+    ctx.throw(statusCode)
+  }
 })
 
 app.use(router.routes())
 app.use(router.allowedMethods())
 
 app.listen(PORT)
+
+// Translate postgres error codes to http status codes
+function translateErrorCode (code) {
+  switch (code) {
+    case '42P07': return 409
+    case '42P01': return 404
+    default: return 500
+  }
+}
