@@ -5,7 +5,8 @@ module.exports = {
   createSheet,
   getSheet,
   updateSheet,
-  deleteSheet
+  deleteSheet,
+  getSheetColumns
 }
 
 async function listSheets (ctx) {
@@ -57,15 +58,12 @@ async function updateSheet (ctx) {
 
 async function deleteSheet (ctx) {
   const sheetName = ctx.params.sheetName
-  try {
-    await actions.deleteSheet(ctx.db, sheetName)
-    ctx.status = 204
-  } catch (err) {
-    if (err.code === '42P01') {
-      ctx.throw(404)
-    } else {
-      console.error(err)
-      ctx.throw(500)
-    }
-  }
+  await actions.deleteSheet(ctx.db, sheetName)
+  ctx.status = 204
+}
+
+async function getSheetColumns (ctx) {
+  const sheetName = ctx.params.sheetName
+  const columns = await actions.getSheetColumns(ctx.db, sheetName)
+  ctx.body = columns
 }

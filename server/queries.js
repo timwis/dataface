@@ -5,7 +5,8 @@ module.exports = {
   getSheet,
   createSheet,
   renameSheet,
-  deleteSheet
+  deleteSheet,
+  getSheetColumns
 }
 
 function listSheets (db) {
@@ -36,4 +37,33 @@ function renameSheet (db, oldName, newName) {
 
 function deleteSheet (db, name) {
   return db.schema.dropTable(name)
+}
+
+function getSheetColumns (db, name) {
+  return db.raw(`
+    SELECT
+        cols.column_name AS name,
+        cols.data_type AS type,
+        cols.character_maximum_length AS length,
+        cols.column_default AS default,
+        cols.is_nullable::boolean AS null,
+        constr.constraint_type AS constraint,
+        pg_catalog.col_description(cls.oid, cols.ordinal_position::int)::jsonb AS custom
+    FROM
+        pg_catalog.pg_class AS cls,
+        information_schema.columns AS cols
+    LEFT JOIN
+        information_schema.key_column_usage AS keys
+        ON keys.column_name = cols.column_name
+        AND keys.table_catalog = cols.table_catalog
+        AND keys.table_schema = cols.table_schema
+        AND keys.table_name = cols.table_name
+    LEFT JOIN
+        information_schema.table_constraints AS constr
+        ON constr.constraint_name = keys.constraint_name
+    WHERE
+        cols.table_schema = 'public' AND
+        cols.table_name = ? AND
+        cols.table_name = cls.relname;
+  `, name).then((response) => response.rows)
 }
