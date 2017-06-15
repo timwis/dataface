@@ -8,7 +8,8 @@ module.exports = {
   deleteSheet,
   getSheetColumns,
   createColumn,
-  updateColumn
+  updateColumn,
+  deleteColumn
 }
 
 function listSheets (db) {
@@ -80,5 +81,11 @@ function updateColumn (db, sheetName, columnName, { name, dbType }) {
   return db.schema.alterTable(sheetName, function (t) {
     if (name) t.renameColumn(columnName, name)
     if (dbType) t.specificType(columnName, dbType).alter()
+  })
+}
+
+function deleteColumn (db, sheetName, columnName) {
+  return db.schema.alterTable(sheetName, function (t) {
+    t.dropColumn(columnName)
   })
 }

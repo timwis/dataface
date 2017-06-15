@@ -58,6 +58,9 @@ router.patch(
   handlers.updateColumn
 )
 
+// delete column
+router.delete('/sheets/:sheetName/columns/:columnName', handlers.deleteColumn)
+
 // global handler
 app.use(async (ctx, next) => {
   ctx.type = 'application/json'
