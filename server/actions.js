@@ -10,7 +10,8 @@ module.exports = {
   getColumns,
   createColumn,
   updateColumn,
-  deleteColumn: queries.deleteColumn
+  deleteColumn: queries.deleteColumn,
+  getRows: queries.getRows
 }
 
 async function createSheet (db, { name }) {

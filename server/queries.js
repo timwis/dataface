@@ -9,7 +9,8 @@ module.exports = {
   getColumns,
   createColumn,
   updateColumn,
-  deleteColumn
+  deleteColumn,
+  getRows
 }
 
 function listSheets (db) {
@@ -88,4 +89,11 @@ function deleteColumn (db, sheetName, columnName) {
   return db.schema.alterTable(sheetName, function (t) {
     t.dropColumn(columnName)
   })
+}
+
+function getRows (db, sheetName) {
+  return db
+    .select()
+    .from(sheetName)
+    .orderByRaw(1) // first column
 }
