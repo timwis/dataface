@@ -39,8 +39,8 @@ router.patch(
 // delete sheet
 router.delete('/sheets/:sheetName', handlers.deleteSheet)
 
-// get sheet columns
-router.get('/sheets/:sheetName/columns', handlers.getSheetColumns)
+// get columns
+router.get('/sheets/:sheetName/columns', handlers.getColumns)
 
 // create column
 router.post(

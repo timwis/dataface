@@ -6,7 +6,7 @@ module.exports = {
   createSheet,
   renameSheet,
   deleteSheet,
-  getSheetColumns,
+  getColumns,
   createColumn,
   updateColumn,
   deleteColumn
@@ -42,7 +42,7 @@ function deleteSheet (db, name) {
   return db.schema.dropTable(name)
 }
 
-function getSheetColumns (db, sheetName) {
+function getColumns (db, sheetName) {
   return db.raw(`
     SELECT
         cols.column_name AS name,
