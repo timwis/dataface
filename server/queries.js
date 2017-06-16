@@ -12,7 +12,8 @@ module.exports = {
   deleteColumn,
   getRows,
   createRow,
-  updateRow
+  updateRow,
+  deleteRow
 }
 
 function listSheets (db) {
@@ -112,4 +113,10 @@ function updateRow (db, sheetName, conditions, payload) {
     .where(conditions)
     .update(payload)
     .returning('*')
+}
+
+function deleteRow (db, sheetName, conditions) {
+  return db(sheetName)
+    .where(conditions)
+    .del()
 }

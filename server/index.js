@@ -78,6 +78,9 @@ router.patch(
   handlers.updateRow
 )
 
+// delete row
+router.delete('/sheets/:sheetName/rows', handlers.deleteRow)
+
 // global handler
 app.use(async (ctx, next) => {
   ctx.type = 'application/json'

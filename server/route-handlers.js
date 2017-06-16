@@ -12,7 +12,8 @@ module.exports = {
   deleteColumn,
   getRows,
   createRow,
-  updateRow
+  updateRow,
+  deleteRow
 }
 
 async function listSheets (ctx) {
@@ -96,4 +97,17 @@ async function updateRow (ctx) {
 
   const row = await actions.updateRow(ctx.db, sheetName, query, payload)
   ctx.body = row
+}
+
+async function deleteRow (ctx) {
+  const sheetName = ctx.params.sheetName
+  const query = ctx.request.query
+
+  if (Object.keys(query).length < 1) {
+    ctx.throw(400, 'Missing conditions')
+    return
+  }
+
+  await actions.deleteRow(ctx.db, sheetName, query)
+  ctx.status = 204
 }
