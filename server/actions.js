@@ -42,7 +42,9 @@ async function getColumns (db, name) {
 
 async function createColumn (db, sheetName, { name, type = 'text' }) {
   const dbType = encodeType(type)
-  return queries.createColumn(db, sheetName, { name, dbType })
+  await queries.createColumn(db, sheetName, { name, dbType })
+  const column = await getColumn(db, sheetName, name)
+  return column
 }
 
 async function getColumn (db, sheetName, columnName) {
@@ -54,8 +56,10 @@ async function getColumn (db, sheetName, columnName) {
 async function updateColumn (db, sheetName, columnName, { name, type }) {
   const dbType = type ? encodeType(type) : undefined
   await queries.updateColumn(db, sheetName, columnName, { name, dbType })
+
   const finalName = name || sheetName
-  return getColumn(db, sheetName, finalName)
+  const column = await getColumn(db, sheetName, finalName)
+  return column
 }
 
 function _firstResult (fn) {
