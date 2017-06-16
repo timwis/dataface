@@ -10,7 +10,8 @@ module.exports = {
   createColumn,
   updateColumn,
   deleteColumn,
-  getRows
+  getRows,
+  createRow
 }
 
 async function listSheets (ctx) {
@@ -73,4 +74,11 @@ async function getRows (ctx) {
   const sheetName = ctx.params.sheetName
   const rows = await actions.getRows(ctx.db, sheetName)
   ctx.body = rows
+}
+
+async function createRow (ctx) {
+  const sheetName = ctx.params.sheetName
+  const payload = ctx.request.body
+  const row = await actions.createRow(ctx.db, sheetName, payload)
+  ctx.body = row
 }

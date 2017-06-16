@@ -10,7 +10,8 @@ module.exports = {
   createColumn,
   updateColumn,
   deleteColumn,
-  getRows
+  getRows,
+  createRow
 }
 
 function listSheets (db) {
@@ -96,4 +97,11 @@ function getRows (db, sheetName) {
     .select()
     .from(sheetName)
     .orderByRaw(1) // first column
+}
+
+function createRow (db, sheetName, payload) {
+  return db
+    .insert(payload)
+    .into(sheetName)
+    .returning('*')
 }

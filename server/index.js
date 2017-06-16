@@ -64,6 +64,13 @@ router.delete('/sheets/:sheetName/columns/:columnName', handlers.deleteColumn)
 // get rows
 router.get('/sheets/:sheetName/rows', handlers.getRows)
 
+// create row
+router.post(
+  '/sheets/:sheetName/rows',
+  bodyParser, // validation handled by db
+  handlers.createRow
+)
+
 // global handler
 app.use(async (ctx, next) => {
   ctx.type = 'application/json'
@@ -90,6 +97,11 @@ function translateErrorCode (code) {
     case '42P01':
     case '42703':
       return 404
+    case '22P01':
+    case '22P02':
+    case '22P03':
+    case '22P05':
+      return 422
     default:
       return 500
   }

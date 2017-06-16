@@ -11,7 +11,8 @@ module.exports = {
   createColumn,
   updateColumn,
   deleteColumn: queries.deleteColumn,
-  getRows: queries.getRows
+  getRows: queries.getRows,
+  createRow
 }
 
 async function createSheet (db, { name }) {
@@ -53,6 +54,11 @@ async function updateColumn (db, sheetName, columnName, { name, type }) {
   await queries.updateColumn(db, sheetName, columnName, { name, dbType })
   const finalName = name || sheetName
   return getColumn(db, sheetName, finalName)
+}
+
+async function createRow (db, sheetName, payload) {
+  const rows = await queries.createRow(db, sheetName, payload)
+  return rows.length ? rows[0] : null
 }
 
 function _mergeCustomProps (column) {
