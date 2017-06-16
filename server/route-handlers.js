@@ -11,7 +11,8 @@ module.exports = {
   updateColumn,
   deleteColumn,
   getRows,
-  createRow
+  createRow,
+  updateRow
 }
 
 async function listSheets (ctx) {
@@ -80,5 +81,19 @@ async function createRow (ctx) {
   const sheetName = ctx.params.sheetName
   const payload = ctx.request.body
   const row = await actions.createRow(ctx.db, sheetName, payload)
+  ctx.body = row
+}
+
+async function updateRow (ctx) {
+  const sheetName = ctx.params.sheetName
+  const query = ctx.request.query
+  const payload = ctx.request.body
+
+  if (Object.keys(query).length < 1) {
+    ctx.throw(400, 'Missing conditions')
+    return
+  }
+
+  const row = await actions.updateRow(ctx.db, sheetName, query, payload)
   ctx.body = row
 }

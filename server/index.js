@@ -71,6 +71,13 @@ router.post(
   handlers.createRow
 )
 
+// update row
+router.patch(
+  '/sheets/:sheetName/rows', // filtering handled by querystrings
+  bodyParser, // validation handled by db
+  handlers.updateRow
+)
+
 // global handler
 app.use(async (ctx, next) => {
   ctx.type = 'application/json'
