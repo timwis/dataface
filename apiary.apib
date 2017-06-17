@@ -93,10 +93,7 @@ Use this method to rename a column, alter its type or metadata.
 Filter the rows by adding conditions on columns through the querystring parameters.
 For example:
 
-+ `?first_name=eq.John&last_name=eq.Doe`
-+ `?age=gt.10&email=like.*doe.com`
-
-See the full list of querystring operators in the [PostgREST docs](https://postgrest.com/en/v0.4/api.html#horizontal-filtering-rows).
++ `?first_name=John&last_name=Doe`
 
 + Parameters
   + sheet_name (string) - Name of the sheet
@@ -105,15 +102,9 @@ See the full list of querystring operators in the [PostgREST docs](https://postg
 
 + Request
   + Headers
-    Range-Unit: items
-    Range: 0-29
-    X-Order: first_name DESC
 
 + Response 200 (application/json)
   + Headers
-    Range-Unit: items
-    Content-Range: 0-29/*
-    X-Order: first_name DESC
   + Attributes (array[Sample Row])
 
 ### Add a Row to a Sheet [POST]
@@ -125,12 +116,12 @@ See the full list of querystring operators in the [PostgREST docs](https://postg
   + Attributes (Sample Row)
 
 ### Update a Row in a Sheet [PATCH]
-> Don't forget to include the `Range` header to ensure you're limiting your update to a single row!
+> Don't forget to filter the rows through querystrings to ensure you're limiting your update to a single row!
+
++ `?id=123`
 
 + Request (application/json)
   + Headers
-    Range-Unit: items
-    Range: 0-0
   + Body
 
     {"first_name": "Jane", "email": "jane@doe.com"}
@@ -141,6 +132,9 @@ See the full list of querystring operators in the [PostgREST docs](https://postg
     {"first_name": "Jane", "last_name": "Doe", "age": 35, "email": "jane@doe.com"}
 
 ### Delete a Row in a Sheet [DELETE]
+> Don't forget to filter the rows through querystrings to ensure you're limiting your delete to a single row!
+
++ `?id=123`
 
 + Response 204
 
@@ -156,6 +150,7 @@ See the full list of querystring operators in the [PostgREST docs](https://postg
   + Members
     + `text`
     + `number`
+    + `checkbox`
 
 ## Sample Row (object)
 + first_name: `John` (string)
