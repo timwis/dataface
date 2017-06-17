@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "nodemon index.js",
+    "test": "ava --serial --verbose"
   },
   "dependencies": {
     "boom": "^5.1.0",
@@ -9,9 +10,11 @@
     "koa-body": "^2.1.0",
     "koa-json-schema": "timwis/koa-json-schema#koa-v2",
     "koa-router": "^7.2.0",
-    "pg": "^6.2.4"
+    "pg": "^6.2.4",
+    "supertest": "^3.0.0"
   },
   "devDependencies": {
+    "ava": "^0.19.1",
     "nodemon": "^1.11.0"
   }
 }
