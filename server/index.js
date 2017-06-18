@@ -13,8 +13,8 @@ const router = new Router()
 const bodyParser = new KoaBody()
 
 const PORT = process.env.PORT || 3000
-const DB_URI = process.env.DB_URI
-const db = knex({ client: 'pg', connection: DB_URI, ssl: true })
+const DB_URL = process.env.DB_URL
+const db = knex({ client: 'pg', connection: DB_URL, ssl: true })
 app.context.db = db
 
 // list sheets

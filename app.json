@@ -1,0 +1,15 @@
+{
+  "name": "Dataface",
+  "repository": "https://github.com/timwis/dataface",
+  "buildpacks": [
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-nodejs"
+    }
+  ],
+  "addons": [
+    {
+      "plan": "heroku-postgresql",
+      "as": "db"
+    }
+  ]
+}

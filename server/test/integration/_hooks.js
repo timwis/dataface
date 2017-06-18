@@ -7,9 +7,9 @@ const dbHelper = require('../helpers/db')
 let db
 
 hooks.beforeAll(async function (transactions, done) {
-  const DB_URI = process.env.DB_URI
-  assert(DB_URI, 'DB_URI environment variable must be set')
-  db = knex({ client: 'pg', connection: DB_URI, ssl: true })
+  const DB_URL = process.env.DB_URL
+  assert(DB_URL, 'DB_URL environment variable must be set')
+  db = knex({ client: 'pg', connection: DB_URL, ssl: true })
   await dbHelper.teardown(db)
   done()
 })

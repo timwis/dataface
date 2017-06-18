@@ -26,7 +26,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DB_URI: "postgres://postgres:pwd@postgres:5432/postgres"
+      DB_URL: "postgres://postgres:pwd@postgres:5432/postgres"
       PORT: 3000
   client:
     depends_on:
