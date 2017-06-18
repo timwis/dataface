@@ -2,7 +2,7 @@ const Vue = require('vue')
 const pick = require('lodash/pick')
 
 const router = require('../../router')
-const api = require('../../api/postgrest')
+const api = require('../../api')
 
 module.exports = {
   state: {
@@ -57,7 +57,7 @@ module.exports = {
     async getSheetList ({ commit, dispatch }) {
       let sheets
       try {
-        sheets = await api.getTables()
+        sheets = await api.getSheets()
       } catch (err) {
         console.error(err)
         dispatch('notify', { msg: `Failed to get sheets` })
@@ -70,7 +70,7 @@ module.exports = {
     async getSheet ({ commit, dispatch }, { name }) {
       let rows, columns
       try {
-        columns = await api.getSchema(name)
+        columns = await api.getColumns(name)
         const firstColumnName = (columns.length) ? columns[0].name : ''
         rows = await api.getRows(name, firstColumnName) // order by
       } catch (err) {
@@ -93,9 +93,11 @@ module.exports = {
       let newRow
       try {
         if (isNewRow && newValue) {
-          newRow = await api.insert(sheetName, updates)
+          console.log('create')
+          newRow = await api.createRow(sheetName, updates)
         } else {
-          newRow = await api.update(sheetName, updates, conditions)
+          console.log('update')
+          newRow = await api.updateRow(sheetName, updates, conditions)
         }
       } catch (err) {
         console.error(err)
@@ -132,7 +134,7 @@ module.exports = {
 
       let newColumn
       try {
-        newColumn = await api.insertColumn(sheetName, newColumnName)
+        newColumn = await api.createColumn(sheetName, newColumnName)
       } catch (err) {
         console.error(err)
         dispatch('notify', { msg: `Error adding column` })
@@ -144,8 +146,9 @@ module.exports = {
     },
     async renameColumn ({ state, commit, dispatch }, { columnIndex, oldValue, newValue }) {
       const sheetName = state.activeSheet.name
+      const updates = { name: newValue }
       try {
-        await api.renameColumn(sheetName, oldValue, newValue)
+        await api.updateColumn(sheetName, oldValue, updates)
       } catch (err) {
         console.error(err)
         dispatch('notify', { msg: `Failed to rename column ${oldValue} to ${newValue}` })
@@ -175,7 +178,7 @@ module.exports = {
       const name = `sheet_${nextInSeq}`
 
       try {
-        await api.insertTable(name)
+        await api.createSheet({ name })
       } catch (err) {
         console.error(err)
         dispatch('notify', { msg: `Failed to add sheet` })
@@ -188,8 +191,9 @@ module.exports = {
       router.push(`/${name}`)
     },
     async renameSheet ({ state, commit, dispatch }, { oldName, newName }) {
+      const payload = { name: newName }
       try {
-        await api.renameTable(oldName, newName)
+        await api.updateSheet(oldName, payload)
       } catch (err) {
         console.error(err)
         dispatch('notify', { msg: `Failed to rename sheet` })
@@ -201,7 +205,7 @@ module.exports = {
     },
     async removeSheet ({ state, commit, dispatch }, name) {
       try {
-        await api.deleteTable(name)
+        await api.deleteSheet(name)
       } catch (err) {
         console.error(err)
         dispatch('notify', { msg: `Failed to remove sheet ${name}` })

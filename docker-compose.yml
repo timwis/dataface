@@ -20,20 +20,21 @@ services:
   server:
     depends_on:
       - postgres
-    image: erasche/postgrest
+    image: jsixc/node-yarn-app:7
+    volumes:
+      - ./server:/home/app
     ports:
       - "3000:3000"
     environment:
-      DB_URI: "postgres://postgres:pwd@postgres:5433/postgres"
-      DB_SCHEMA: public
-      DB_ANON_ROLE: postgres
+      DB_URI: "postgres://postgres:pwd@postgres:5432/postgres"
+      PORT: 3000
   client:
     depends_on:
       - server
     image: jsixc/node-yarn-app:7
     volumes:
-      - ./:/home/app
+      - ./client:/home/app
     ports:
       - "9966:9966"
     environment:
-      POSTGREST_HOST: "http://localhost:3000"
+      API_HOST: "http://localhost:3000"
