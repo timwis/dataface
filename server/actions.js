@@ -37,6 +37,7 @@ async function getColumns (db, name) {
     .getColumns(db, name)
     .map(_mergeCustomProps)
     .map(_addFriendlyType)
+    .map(_addEditable)
   return columns
 }
 
@@ -77,5 +78,14 @@ function _mergeCustomProps (column) {
 
 function _addFriendlyType (column) {
   column.type = decodeType(column.db_type)
+  return column
+}
+
+function _addEditable (column) {
+  if (column.default && column.default.startsWith('nextval')) {
+    column.editable = false
+  } else {
+    column.editable = true
+  }
   return column
 }

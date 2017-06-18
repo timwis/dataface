@@ -3,6 +3,7 @@ const Router = require('koa-router')
 const KoaBody = require('koa-body')
 const knex = require('knex')
 const validate = require('koa-json-schema')
+const cors = require('kcors')
 
 const handlers = require('./route-handlers')
 const schemas = require('./schemas')
@@ -95,6 +96,7 @@ app.use(async (ctx, next) => {
   }
 })
 
+app.use(cors())
 app.use(router.routes())
 app.use(router.allowedMethods())
 
