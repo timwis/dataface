@@ -1,9 +1,10 @@
 {
   "name": "Dataface",
+  "description": "Build and manage data with a spreadsheet-like interface",
   "repository": "https://github.com/timwis/dataface",
   "buildpacks": [
     {
-      "url": "https://github.com/heroku/heroku-buildpack-nodejs"
+      "url": "heroku/nodejs"
     }
   ],
   "addons": [
