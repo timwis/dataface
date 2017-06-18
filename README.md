@@ -6,16 +6,32 @@ Build and manage data in a Postgres database with a spreadsheet-like interface.
 
 ## Development
 The `docker-compose.yml` file provides a postgres container, a
-[PostgREST][PostgREST] container, and a node-yarn-app container. To spin them
-all up, [install docker](https://www.docker.com/community-edition) and run
-`docker-compose up`.
-
-To run the client application by itself, pointing to a standalone PostgREST
-server, install dependencies via `yarn install`, then specify the
-`POSTGREST_ENVIRONMENT` variable and run `yarn start`, i.e.:
+server container, and a client container. To spin them
+all up, [install docker](https://www.docker.com/community-edition) and run:
 
 ```bash
-POSTGREST_HOST="http://localhost:3000" yarn start
+docker-compose up
 ```
 
-[PostgREST]: https://postgrest.com
+## Testing
+To test the client, navigate to the `client` directory and run:
+
+```bash
+yarn test
+```
+
+To test the server, you'll need a throwaway postgres database running
+(the tests will wipe it clean afterwards). To run one using docker, use:
+
+```bash
+docker run -p 5434:5432 postgres
+```
+
+(For convenience, this is also available as `yarn run test:db`.
+
+Once a postgres database is available, run the server tests from within
+the `server` directory, passing the `DB_URI` environment variable:
+
+```bash
+DB_URI="postgres://postgres:pwd@localhost:5434/postgres" yarn test
+```

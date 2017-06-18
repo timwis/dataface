@@ -7,108 +7,98 @@ const validate = require('koa-json-schema')
 const handlers = require('./route-handlers')
 const schemas = require('./schemas')
 
-module.exports = createServer
+const app = new Koa()
+const router = new Router()
+const bodyParser = new KoaBody()
 
-// Only run the server if called directly (not within tests).
-// Otherwise just export the server instance
-if (!module.parent) {
-  const PORT = process.env.PORT
-  const DB_URI = process.env.DB_URI
-  const db = knex({ client: 'pg', connection: DB_URI, ssl: true })
-  const app = createServer(db)
-  app.listen(PORT)
-}
+const PORT = process.env.PORT || 3000
+const DB_URI = process.env.DB_URI
+const db = knex({ client: 'pg', connection: DB_URI, ssl: true })
+app.context.db = db
 
-function createServer (db) {
-  const app = new Koa()
-  const router = new Router()
-  const bodyParser = new KoaBody()
-  app.context.db = db
+// list sheets
+router.get('/sheets', handlers.listSheets)
 
-  // list sheets
-  router.get('/sheets', handlers.listSheets)
+// create sheet
+router.post(
+  '/sheets',
+  bodyParser,
+  validate(schemas.sheet),
+  handlers.createSheet
+)
 
-  // create sheet
-  router.post(
-    '/sheets',
-    bodyParser,
-    validate(schemas.sheet),
-    handlers.createSheet
-  )
+// get sheet
+router.get('/sheets/:sheetName', handlers.getSheet)
 
-  // get sheet
-  router.get('/sheets/:sheetName', handlers.getSheet)
+// update sheet
+router.patch(
+  '/sheets/:sheetName',
+  bodyParser,
+  validate(schemas.sheet),
+  handlers.updateSheet
+)
 
-  // update sheet
-  router.patch(
-    '/sheets/:sheetName',
-    bodyParser,
-    validate(schemas.sheet),
-    handlers.updateSheet
-  )
+// delete sheet
+router.delete('/sheets/:sheetName', handlers.deleteSheet)
 
-  // delete sheet
-  router.delete('/sheets/:sheetName', handlers.deleteSheet)
+// get columns
+router.get('/sheets/:sheetName/columns', handlers.getColumns)
 
-  // get columns
-  router.get('/sheets/:sheetName/columns', handlers.getColumns)
+// create column
+router.post(
+  '/sheets/:sheetName/columns',
+  bodyParser,
+  validate(schemas.column),
+  handlers.createColumn
+)
 
-  // create column
-  router.post(
-    '/sheets/:sheetName/columns',
-    bodyParser,
-    validate(schemas.column),
-    handlers.createColumn
-  )
+// update column
+router.patch(
+  '/sheets/:sheetName/columns/:columnName',
+  bodyParser,
+  validate(schemas.column),
+  handlers.updateColumn
+)
 
-  // update column
-  router.patch(
-    '/sheets/:sheetName/columns/:columnName',
-    bodyParser,
-    validate(schemas.column),
-    handlers.updateColumn
-  )
+// delete column
+router.delete('/sheets/:sheetName/columns/:columnName', handlers.deleteColumn)
 
-  // delete column
-  router.delete('/sheets/:sheetName/columns/:columnName', handlers.deleteColumn)
+// get rows
+router.get('/sheets/:sheetName/rows', handlers.getRows)
 
-  // get rows
-  router.get('/sheets/:sheetName/rows', handlers.getRows)
+// create row
+router.post(
+  '/sheets/:sheetName/rows',
+  bodyParser, // validation handled by db
+  handlers.createRow
+)
 
-  // create row
-  router.post(
-    '/sheets/:sheetName/rows',
-    bodyParser, // validation handled by db
-    handlers.createRow
-  )
+// update row
+router.patch(
+  '/sheets/:sheetName/rows', // filtering handled by querystrings
+  bodyParser, // validation handled by db
+  handlers.updateRow
+)
 
-  // update row
-  router.patch(
-    '/sheets/:sheetName/rows', // filtering handled by querystrings
-    bodyParser, // validation handled by db
-    handlers.updateRow
-  )
+// delete row
+router.delete('/sheets/:sheetName/rows', handlers.deleteRow)
 
-  // delete row
-  router.delete('/sheets/:sheetName/rows', handlers.deleteRow)
+// global handler
+app.use(async (ctx, next) => {
+  ctx.type = 'application/json'
+  try {
+    await next()
+  } catch (err) {
+    // console.error(err)
+    const statusCode = err.status || translateErrorCode(err.code)
+    ctx.throw(statusCode)
+  }
+})
 
-  // global handler
-  app.use(async (ctx, next) => {
-    ctx.type = 'application/json'
-    try {
-      await next()
-    } catch (err) {
-      console.error(err)
-      const statusCode = err.status || translateErrorCode(err.code)
-      ctx.throw(statusCode)
-    }
-  })
+app.use(router.routes())
+app.use(router.allowedMethods())
 
-  app.use(router.routes())
-  app.use(router.allowedMethods())
-
-  return app
-}
+app.listen(PORT)
 
 // Translate postgres error codes to http status codes
 function translateErrorCode (code) {

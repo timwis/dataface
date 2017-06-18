@@ -25,6 +25,8 @@ async function createSheet (ctx) {
   const payload = ctx.request.body
   const sheet = await actions.createSheet(ctx.db, payload)
   ctx.body = sheet
+  ctx.status = 201
+  ctx.set('Location', `/sheets/${payload.name}`)
 }
 
 async function getSheet (ctx) {
@@ -57,6 +59,8 @@ async function createColumn (ctx) {
   const payload = ctx.request.body
   const column = await actions.createColumn(ctx.db, sheetName, payload)
   ctx.body = column
+  ctx.status = 201
+  ctx.set('Location', `/sheets/${sheetName}/columns/${payload.name}`)
 }
 
 async function updateColumn (ctx) {
@@ -83,6 +87,7 @@ async function createRow (ctx) {
   const payload = ctx.request.body
   const row = await actions.createRow(ctx.db, sheetName, payload)
   ctx.body = row
+  ctx.status = 201
 }
 
 async function updateRow (ctx) {

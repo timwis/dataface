@@ -33,17 +33,43 @@ test('list sheets', async (t) => {
     })
 })
 
-test('get sheet', async (t) => {
+test('create sheet', async (t) => {
+  const payload = { name: 'tags' }
   return t.context.request
-    .get('/sheets/people')
-    .expect(200)
+    .post('/sheets')
+    .send(payload)
+    .expect(201)
     .then((res) => {
-      t.is(res.body.name, 'people')
+      t.is(res.body.name, 'tags')
     })
 })
 
-test.failing('get sheet: invalid name returns 404', async (t) => {
+test('create sheet: missing name yields validation error', async (t) => {
   return t.context.request
-    .get('/sheets/foo')
-    .expect(404)
+    .post('/sheets')
+    .send({})
+    .expect(422)
+    .then(() => t.pass())
+})
+
+test('get sheet', async (t) => {
+  return t.context.request
+    .get('/sheets/people')
+    .expect(200, { name: 'people' })
+    .then(() => t.pass())
+})
+
+// test.failing('get sheet: invalid name returns 404', async (t) => {
+//   return t.context.request
+//     .get('/sheets/foo')
+//     .expect(404)
+// })
+
+test('update sheet', async (t) => {
+  const payload = { name: 'people_renamed' }
+  return t.context.request
+    .patch('/sheets/people')
+    .send(payload)
+    .expect(200, { name: 'people_renamed' })
+    .then(() => t.pass())
 })

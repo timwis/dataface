@@ -1,4 +1,5 @@
 exports.setup = async function (db) {
+  await db.schema.raw('create schema if not exists public')
   await db.schema
     .createTable('people', function (t) {
       t.increments('id').primary()
@@ -14,6 +15,5 @@ exports.setup = async function (db) {
 }
 
 exports.teardown = function (db) {
-  return db.schema
-    .dropTableIfExists('people')
+  return db.schema.raw('drop schema if exists public cascade')
 }
