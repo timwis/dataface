@@ -12,12 +12,13 @@ all up, [install docker](https://www.docker.com/community-edition) and run:
 ```bash
 docker-compose up
 ```
+Then navigate to `localhost:9966` in the browser.
 
 ## Testing
-To test the client, navigate to the `client` directory and run:
+To test the client, run:
 
 ```bash
-yarn test
+yarn test:client
 ```
 
 To test the server, you'll need a throwaway postgres database running
@@ -27,11 +28,16 @@ To test the server, you'll need a throwaway postgres database running
 docker run -p 5434:5432 postgres
 ```
 
-(For convenience, this is also available as `yarn run test:db`.
-
-Once a postgres database is available, run the server tests from within
-the `server` directory, passing the `DB_URI` environment variable:
+Once a postgres database is available, run the server tests while 
+passing the `DB_URL` environment variable:
 
 ```bash
-DB_URI="postgres://postgres:pwd@localhost:5434/postgres" yarn test
+DB_URL="postgres://postgres:pwd@localhost:5434/postgres" yarn test:server
+```
+
+You can run both the client and server tests together with `yarn test`;
+just don't forget the `DB_URL` environment variable:
+
+```bash
+DB_URL="postgres://postgres:pwd@localhost:5434/postgres" yarn test
 ```
