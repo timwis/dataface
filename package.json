@@ -12,7 +12,8 @@
     "build:client": "NODE_ENV=production browserify client/src/main.js -o client/dist/build.js",
     "test": "run-s test:*",
     "test:server": "dredd",
-    "test:client": "ava test/client/**/*.spec.js"
+    "test:client": "ava test/client/**/*.spec.js",
+    "heroku-postbuild": "yarn run build:client"
   },
   "dependencies": {
     "axios": "^0.16.1",
