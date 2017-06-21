@@ -4,12 +4,13 @@ const KoaBody = require('koa-body')
 const knex = require('knex')
 const validate = require('koa-json-schema')
 const cors = require('kcors')
+const koastatic = require('koa-static')
 
 const handlers = require('./route-handlers')
 const schemas = require('./schemas')
 
 const app = new Koa()
-const router = new Router()
+const router = new Router({ prefix: '/api' })
 const bodyParser = new KoaBody()
 
 const PORT = process.env.PORT || 3000
@@ -96,6 +97,7 @@ app.use(async (ctx, next) => {
   }
 })
 
+app.use(koastatic('./client'))
 app.use(cors())
 app.use(router.routes())
 app.use(router.allowedMethods())

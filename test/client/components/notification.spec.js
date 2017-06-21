@@ -1,7 +1,7 @@
 const test = require('ava')
 
 const { mount } = require('../util')
-const Notification = require('../../src/components/notification.vue')
+const Notification = require('../../../client/src/components/notification.vue')
 
 test('displays message', (t) => {
   const vm = mount(Notification, { msg: 'Foo' })
