@@ -1,0 +1,74 @@
+{
+  "name": "dataface",
+  "description": "Build and manage data with a spreadsheet-like interface",
+  "author": "timwis <tim@timwis.com>",
+  "private": true,
+  "main": "server/index.js",
+  "browser": "client/src/main.js",
+  "scripts": {
+    "start": "run-p start:* --npm-path /usr/local/bin/yarn",
+    "start:server": "nodemon --watch server server/index.js",
+    "start:client": "budo client/src/main.js:dist/build.js --live --pushstate --dir client",
+    "build:client": "NODE_ENV=production browserify client/src/main.js -o client/dist/build.js",
+    "test": "run-s test:*",
+    "test:server": "dredd",
+    "test:client": "ava test/client/**/*.spec.js",
+    "heroku-postbuild": "yarn run build:client"
+  },
+  "dependencies": {
+    "axios": "^0.16.1",
+    "bulma": "^0.4.2",
+    "kcors": "^2.2.1",
+    "knex": "^0.13.0",
+    "koa": "^2.2.0",
+    "koa-body": "^2.1.0",
+    "koa-json-schema": "^2.0.0",
+    "koa-router": "^7.2.0",
+    "koa-static": "^3.0.0",
+    "koa2-history-api-fallback": "^0.0.5",
+    "lodash": "^4.17.4",
+    "pg": "^6.2.4",
+    "shortid": "^2.2.8",
+    "url-join": "^2.0.2",
+    "vue": "^2.0.1",
+    "vue-lil-context-menu": "^1.1.0",
+    "vue-router": "^2.5.3",
+    "vuex": "^2.3.1"
+  },
+  "devDependencies": {
+    "ava": "^0.19.1",
+    "babel-core": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babelify": "^7.3.0",
+    "browser-env": "^2.0.31",
+    "browserify": "^13.0.1",
+    "budo": "^10.0.3",
+    "dredd": "^3.5.1",
+    "localenvify": "^1.0.1",
+    "nodemon": "^1.11.0",
+    "npm-run-all": "^4.0.2",
+    "require-extension-hooks": "^0.2.0",
+    "require-extension-hooks-babel": "^0.1.1",
+    "require-extension-hooks-vue": "^0.3.1",
+    "uglify-js": "^2.5.0",
+    "vueify": "^9.1.0",
+    "vuenit": "^0.4.2"
+  },
+  "ava": {
+    "require": [
+      "babel-register",
+      "./test/client/helpers/setup.js"
+    ],
+    "source": [
+      "client/**/*.{js,vue}",
+      "!client/dist/**/*"
+    ]
+  },
+  "browserify": {
+    "transform": [
+      "vueify",
+      "babelify",
+      "localenvify"
+    ]
+  }
+}

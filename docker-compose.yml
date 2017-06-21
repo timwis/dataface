@@ -3,13 +3,6 @@ services:
   postgres:
     image: postgres
     volumes:
-      - ./db/get-schema.sql:/docker-entrypoint-initdb.d/get-schema.sql
-      - ./db/rename-column.sql:/docker-entrypoint-initdb.d/rename-column.sql
-      - ./db/insert-column.sql:/docker-entrypoint-initdb.d/insert-column.sql
-      - ./db/drop-column.sql:/docker-entrypoint-initdb.d/drop-column.sql
-      - ./db/rename-table.sql:/docker-entrypoint-initdb.d/rename-table.sql
-      - ./db/insert-table.sql:/docker-entrypoint-initdb.d/insert-table.sql
-      - ./db/drop-table.sql:/docker-entrypoint-initdb.d/drop-table.sql
       - ./db/contacts.sql:/docker-entrypoint-initdb.d/contacts.sql
       - ./db/projects.sql:/docker-entrypoint-initdb.d/projects.sql
     ports:
@@ -22,19 +15,11 @@ services:
       - postgres
     image: jsixc/node-yarn-app:7
     volumes:
-      - ./server:/home/app
+      - ./:/home/app
     ports:
       - "3000:3000"
+      - "9966:9966"
     environment:
       DB_URL: "postgres://postgres:pwd@postgres:5432/postgres"
       PORT: 3000
-  client:
-    depends_on:
-      - server
-    image: jsixc/node-yarn-app:7
-    volumes:
-      - ./client:/home/app
-    ports:
-      - "9966:9966"
-    environment:
-      API_HOST: "http://localhost:3000"
+      API_HOST: "http://localhost:3000/api"
