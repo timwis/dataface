@@ -13,7 +13,7 @@
     "test": "run-s test:*",
     "test:server": "dredd",
     "test:client": "ava test/client/**/*.spec.js",
-    "heroku-postbuild": "yarn run build:client"
+    "heroku-postbuild": "postinstall-build client/dist --script build:client"
   },
   "dependencies": {
     "axios": "^0.16.1",
@@ -28,6 +28,7 @@
     "koa2-history-api-fallback": "^0.0.5",
     "lodash": "^4.17.4",
     "pg": "^6.2.4",
+    "postinstall-build-yarn": "^0.0.2",
     "shortid": "^2.2.8",
     "url-join": "^2.0.2",
     "vue": "^2.0.1",
