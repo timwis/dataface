@@ -5,6 +5,7 @@ const knex = require('knex')
 const validate = require('koa-json-schema')
 const cors = require('kcors')
 const koastatic = require('koa-static')
+const history = require('koa2-history-api-fallback')
 
 const handlers = require('./route-handlers')
 const schemas = require('./schemas')
@@ -97,10 +98,11 @@ app.use(async (ctx, next) => {
   }
 })
 
-app.use(koastatic('./client'))
 app.use(cors())
 app.use(router.routes())
 app.use(router.allowedMethods())
+app.use(history())
+app.use(koastatic('./client'))
 
 app.listen(PORT)
 

@@ -3669,6 +3669,12 @@ koa-static@^3.0.0:
     debug "*"
     koa-send "^3.2.0"
 
+koa2-history-api-fallback@^0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/koa2-history-api-fallback/-/koa2-history-api-fallback-0.0.5.tgz#71a949900403ce794e5891d40b3da599a6d58343"
+  dependencies:
+    url "^0.11.0"
+
 koa@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/koa/-/koa-2.2.0.tgz#b055933187849d540ad8b9f731baaa4be97c652d"
@@ -6311,7 +6317,7 @@ url-trim@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/url-trim/-/url-trim-1.0.0.tgz#40057e2f164b88e5daca7269da47e6d1dd837adc"
 
-url@~0.11.0:
+url@^0.11.0, url@~0.11.0:
   version "0.11.0"
   resolved "https://registry.yarnpkg.com/url/-/url-0.11.0.tgz#3838e97cfc60521eb73c525a8e55bfdd9e2e28f1"
   dependencies:
