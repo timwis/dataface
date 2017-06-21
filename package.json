@@ -13,7 +13,7 @@
     "test": "run-s test:*",
     "test:server": "dredd",
     "test:client": "ava test/client/**/*.spec.js",
-    "heroku-postbuild": "postinstall-build-yarn client/dist --script build:client"
+    "heroku-postbuild": "yarn run build:client"
   },
   "dependencies": {
     "axios": "^0.16.1",

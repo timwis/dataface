@@ -12,5 +12,11 @@
       "plan": "heroku-postgresql",
       "as": "db"
     }
-  ]
+  ],
+  "env": {
+    "NPM_CONFIG_PRODUCTION": {
+      "description": "Leave this false in order to install devDependencies necessary to build the client app",
+      "value": "false"
+    }
+  }
 }
