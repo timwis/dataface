@@ -1,7 +1,7 @@
 const axios = require('axios')
 const urlJoin = require('url-join')
 
-const apiHost = process.env.API_HOST
+const apiHost = process.env.API_HOST || '/api'
 
 module.exports = {
   async getSheets () {
