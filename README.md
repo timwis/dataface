@@ -7,9 +7,9 @@ Build and manage data in a Postgres database with a spreadsheet-like interface.
 [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 ## Development
-The `docker-compose.yml` file provides a postgres container, a
-server container, and a client container. To spin them
-all up, [install docker](https://www.docker.com/community-edition) and run:
+The `docker-compose.yml` file provides a postgres container, and an
+application container. To spin them up, [install docker](https://www.docker.com/community-edition)
+and run:
 
 ```bash
 docker-compose up
