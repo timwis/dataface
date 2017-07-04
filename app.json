@@ -1,0 +1,22 @@
+{
+  "name": "Dataface",
+  "description": "Build and manage data with a spreadsheet-like interface",
+  "repository": "https://github.com/timwis/dataface",
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "addons": [
+    {
+      "plan": "heroku-postgresql",
+      "as": "db"
+    }
+  ],
+  "env": {
+    "NPM_CONFIG_PRODUCTION": {
+      "description": "Leave this false in order to install devDependencies necessary to build the client app",
+      "value": "false"
+    }
+  }
+}

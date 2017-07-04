@@ -34,7 +34,7 @@ module.exports = {
     getActiveSheet () {
       const route = this.$route.params.sheetName
       const activeSheetName = determineActiveSheet(route, this.sheets)
-      this.getSheet({ name: activeSheetName })
+      if (activeSheetName) this.getSheet({ name: activeSheetName })
     }
   },
   async created () {
@@ -55,13 +55,11 @@ function determineActiveSheet (route, sheets) {
     return route
   } else if (sheets.length > 0) {
     return sheets[0].name
-  } else {
-    return ''
   }
 }
 </script>
 
-<style src="../../node_modules/bulma/css/bulma.css"></style>
+<style src="../../../node_modules/bulma/css/bulma.css"></style>
 <style>
 html,
 body,

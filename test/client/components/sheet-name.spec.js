@@ -1,7 +1,7 @@
 const test = require('ava')
 const { mount, trigger, mockStore } = require('vuenit')
 
-const SheetName = require('../../src/components/sheet-name.vue')
+const SheetName = require('../../../client/src/components/sheet-name.vue')
 
 test('renders sheet name', (t) => {
   const $store = mockStore({

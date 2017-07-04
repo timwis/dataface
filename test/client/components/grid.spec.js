@@ -2,7 +2,7 @@ const test = require('ava')
 const { mount, trigger, mockStore } = require('vuenit')
 const keyCodes = require('../helpers/keycodes')
 
-const Grid = require('../../src/components/grid.vue')
+const Grid = require('../../../client/src/components/grid.vue')
 const fixtures = {
   columns: require('../fixtures/schema.json'),
   rows: require('../fixtures/rows.json')

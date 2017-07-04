@@ -4,18 +4,42 @@ Build and manage data in a Postgres database with a spreadsheet-like interface.
 
 ![screenshot of spreadsheet-like interface](http://i.imgur.com/3SX1UCo.png)
 
-## Development
-The `docker-compose.yml` file provides a postgres container, a
-[PostgREST][PostgREST] container, and a node-yarn-app container. To spin them
-all up, [install docker](https://www.docker.com/community-edition) and run
-`docker-compose up`.
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
-To run the client application by itself, pointing to a standalone PostgREST
-server, install dependencies via `yarn install`, then specify the
-`POSTGREST_ENVIRONMENT` variable and run `yarn start`, i.e.:
+## Development
+The `docker-compose.yml` file provides a postgres container, and an
+application container. To spin them up, [install docker](https://www.docker.com/community-edition)
+and run:
 
 ```bash
-POSTGREST_HOST="http://localhost:3000" yarn start
+docker-compose up
+```
+Then navigate to `localhost:9966` in the browser.
+
+## Testing
+To test the client, run:
+
+```bash
+yarn test:client
 ```
 
-[PostgREST]: https://postgrest.com
+To test the server, you'll need a throwaway postgres database running
+(the tests will wipe it clean afterwards). To run one using docker, use:
+
+```bash
+docker run -p 5434:5432 postgres
+```
+
+Once a postgres database is available, run the server tests while 
+passing the `DB_URL` environment variable:
+
+```bash
+DB_URL="postgres://postgres:pwd@localhost:5434/postgres" yarn test:server
+```
+
+You can run both the client and server tests together with `yarn test`;
+just don't forget the `DB_URL` environment variable:
+
+```bash
+DB_URL="postgres://postgres:pwd@localhost:5434/postgres" yarn test
+```

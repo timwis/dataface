@@ -1,0 +1,166 @@
+FORMAT: 1A
+
+# Dataface
+
+Build and manage data with a spreadsheet-like interface.
+
+# Group Sheets
+
+Resources related to sheets (which is what dataface calls database tables).
+
+## Sheet Collection [/sheets]
+
+### List All Sheets [GET]
+
++ Response 200 (application/json; charset=utf-8)
+  + Attributes (array[Sheet])
+
+### Create a New Sheet [POST]
+
++ Request (application/json)
+
+        {"name": "invoices"}
+
++ Response 201 (application/json; charset=utf-8)
+  + Headers
+
+            Location: /sheets/{sheet_name}
+
+  + Body
+
+            {"name": "invoices"}
+
+## Sheet [/sheets/{sheet_name}]
+
++ Parameters
+  + sheet_name: `people` (string) - Name of the sheet
+
+### Get basic information about a Sheet [GET]
+
++ Response 200 (application/json; charset=utf-8)
+  + Attributes (Sheet)
+
+### Update a Sheet [PATCH]
+To update a Sheet send a JSON payload with the updated value for one or more attributes.
+
++ Request (application/json)
+
+        {"name": "persons"}
+
++ Response 200 (application/json; charset=utf-8)
+
+        {"name": "persons"}
+
+### Delete a Sheet [DELETE]
+
++ Response 204
+
+## Sheet Column Collection [/sheets/{sheet_name}/columns]
+
++ Parameters
+  + sheet_name: `people` (string) - Name of the sheet
+
+### Get a Sheet's Columns [GET]
+
++ Response 200 (application/json; charset=utf-8)
+  + Attributes (array[Column])
+
+### Create a Column [POST]
+
++ Request (application/json)
+
+        {"name": "email"}
+
++ Response 201 (application/json; charset=utf-8)
+  + Headers
+
+            Location: /sheets/{sheet_name}/columns/{column_name}
+
+  + Body
+
+            {"name": "email", "type": "text"}
+
+## Sheet Column [/sheets/{sheet_name}/columns/{column_name}]
+
++ Parameters
+  + sheet_name: `people` (string) - Name of the sheet
+  + column_name: `name` (string) - Name of the column
+
+### Update a Column [PATCH]
+Use this method to rename a column, alter its type or metadata.
+
++ Request (application/json)
+
+        {"name": "full_name"}
+
++ Response 200 (application/json; charset=utf-8)
+
+        {"name": "full_name", "type": "text"}
+
+### Delete a Column [DELETE]
+
++ Response 204
+
+## Sheet Row Collection [/sheets/{sheet_name}/rows{?id}]
+Filter the rows by adding conditions on columns through the querystring parameters.
+For example:
+
++ `?name=John&age=20`
+
++ Parameters
+  + sheet_name: `people` (string) - Name of the sheet
+  + id: `2` (number) - Example of filtering the rows by the `id` column
+
+### Get a Sheet's Rows [GET]
+
++ Response 200 (application/json; charset=utf-8)
+  + Headers
+  + Attributes (array[Sample Row])
+
+### Add a Row to a Sheet [POST]
+
++ Request (application/json)
+  + Attributes (Sample Row)
+
++ Response 201 (application/json; charset=utf-8)
+  + Attributes (Sample Row)
+
+### Update a Row in a Sheet [PATCH]
+> Don't forget to filter the rows through querystrings to ensure you're limiting your update to a single row!
+
++ `?id=2`
+
++ Request (application/json)
+  + Headers
+  + Body
+
+            {"name": "Jane"}
+
++ Response 200 (application/json; charset=utf-8)
+  + Body
+
+            {"name": "Jane", "age": 35}
+
+### Delete a Row in a Sheet [DELETE]
+> Don't forget to filter the rows through querystrings to ensure you're limiting your delete to a single row!
+
++ `?id=2`
+
++ Response 204
+
+# Data Structures
+
+## Sheet (object)
++ name: `people` (string) - Name of the sheet. Should be a valid database table name.
+
+## Column (object)
++ name: `name` (string) - Name of the column. Should be a valid database column name.
++ type: `text` (enum[string]) - The type of data stored in the column
+  + Members
+    + `text`
+    + `number`
+    + `checkbox`
+
+## Sample Row (object)
++ name: `John` (string)
++ age: `35` (number)
