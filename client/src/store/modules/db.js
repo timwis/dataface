@@ -44,8 +44,11 @@ module.exports = {
     receiveColumn (state, column) {
       state.activeSheet.columns.push(column)
     },
-    receiveColumnRename (state, { columnIndex, oldValue, newValue }) {
-      state.activeSheet.columns[columnIndex].name = newValue
+    receiveColumnUpdate (state, { columnIndex, newColumn }) {
+      Vue.set(state.activeSheet.columns, columnIndex, newColumn)
+    },
+    receiveColumnRename (state, { oldValue, newValue }) {
+      // state.activeSheet.columns[columnIndex].name = newValue
       const rename = createRename(oldValue, newValue)
       state.activeSheet.rows = state.activeSheet.rows.map(rename)
     },
@@ -147,15 +150,34 @@ module.exports = {
     async renameColumn ({ state, commit, dispatch }, { columnIndex, oldValue, newValue }) {
       const sheetName = state.activeSheet.name
       const updates = { name: newValue }
+
+      let newColumn
       try {
-        await api.updateColumn(sheetName, oldValue, updates)
+        newColumn = await api.updateColumn(sheetName, oldValue, updates)
       } catch (err) {
         console.error(err)
         dispatch('notify', { msg: `Failed to rename column ${oldValue} to ${newValue}` })
         return
       }
 
-      commit('receiveColumnRename', { columnIndex, oldValue, newValue })
+      commit('receiveColumnUpdate', { columnIndex, newColumn })
+      commit('receiveColumnRename', { oldValue, newValue })
+    },
+    async setColumnType ({ state, commit, dispatch }, { columnIndex, type }) {
+      const sheetName = state.activeSheet.name
+      const columnName = state.activeSheet.columns[columnIndex].name
+      const updates = { type }
+
+      let newColumn
+      try {
+        newColumn = await api.updateColumn(sheetName, columnName, updates)
+      } catch (err) {
+        console.error(err)
+        dispatch('notify', { msg: `Failed to set column ${columnName} to type ${type}` })
+        return
+      }
+
+      commit('receiveColumnUpdate', { columnIndex, newColumn })
     },
     async removeColumn ({ state, commit, dispatch }, columnIndex) {
       if (columnIndex === null) return

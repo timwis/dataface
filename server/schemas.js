@@ -2,14 +2,13 @@ const { typeMap } = require('./type-map')
 
 const validTypes = Object.keys(typeMap)
 
-module.exports = {
+const schemas = {
   sheet: {
     properties: {
       name: {
         type: 'string'
       }
-    },
-    required: ['name']
+    }
   },
   column: {
     properties: {
@@ -19,7 +18,21 @@ module.exports = {
       type: {
         enum: validTypes
       }
-    },
-    required: ['name']
+    }
   }
+}
+
+module.exports = {
+  sheet: {
+    create: addRequired(schemas.sheet, ['name']),
+    update: schemas.sheet
+  },
+  column: {
+    create: addRequired(schemas.column, ['name']),
+    update: schemas.column
+  }
+}
+
+function addRequired (source, required) {
+  return Object.assign({}, source, { required })
 }

@@ -1,3 +1,5 @@
+const mapValues = require('lodash/mapValues')
+
 const queries = require('./queries')
 const { encodeType, decodeType } = require('./type-map')
 
@@ -12,8 +14,8 @@ module.exports = {
   updateColumn,
   deleteColumn: queries.deleteColumn,
   getRows: queries.getRows,
-  createRow: _firstResult(queries.createRow),
-  updateRow: _firstResult(queries.updateRow),
+  createRow,
+  updateRow,
   deleteRow: queries.deleteRow
 }
 
@@ -58,16 +60,21 @@ async function updateColumn (db, sheetName, columnName, { name, type }) {
   const dbType = type ? encodeType(type) : undefined
   await queries.updateColumn(db, sheetName, columnName, { name, dbType })
 
-  const finalName = name || sheetName
+  const finalName = name || columnName
   const column = await getColumn(db, sheetName, finalName)
   return column
 }
 
-function _firstResult (fn) {
-  return async function (...args) {
-    const results = await fn(...args)
-    return results.length ? results[0] : null
-  }
+async function createRow (db, sheetName, payload) {
+  const payloadNoEmptyValues = mapValues(payload, _convertEmptyToNull)
+  const results = await queries.createRow(db, sheetName, payloadNoEmptyValues)
+  return results.length ? results[0] : null
+}
+
+async function updateRow (db, sheetName, conditions, payload) {
+  const payloadNoEmptyValues = mapValues(payload, _convertEmptyToNull)
+  const results = await queries.updateRow(db, sheetName, conditions, payloadNoEmptyValues)
+  return results.length ? results[0] : null
 }
 
 function _mergeCustomProps (column) {
@@ -88,4 +95,8 @@ function _addEditable (column) {
     column.editable = true
   }
   return column
+}
+
+function _convertEmptyToNull (value) {
+  return (value === '') ? null : value
 }

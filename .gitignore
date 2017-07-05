@@ -3,3 +3,4 @@ node_modules/
 client/dist/build.js
 npm-debug.log
 yarn-error.log
+.env
