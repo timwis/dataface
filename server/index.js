@@ -26,7 +26,7 @@ router.get('/sheets', handlers.listSheets)
 router.post(
   '/sheets',
   bodyParser,
-  validate(schemas.sheet),
+  validate(schemas.sheet.create),
   handlers.createSheet
 )
 
@@ -37,7 +37,7 @@ router.get('/sheets/:sheetName', handlers.getSheet)
 router.patch(
   '/sheets/:sheetName',
   bodyParser,
-  validate(schemas.sheet),
+  validate(schemas.sheet.update),
   handlers.updateSheet
 )
 
@@ -51,7 +51,7 @@ router.get('/sheets/:sheetName/columns', handlers.getColumns)
 router.post(
   '/sheets/:sheetName/columns',
   bodyParser,
-  validate(schemas.column),
+  validate(schemas.column.create),
   handlers.createColumn
 )
 
@@ -59,7 +59,7 @@ router.post(
 router.patch(
   '/sheets/:sheetName/columns/:columnName',
   bodyParser,
-  validate(schemas.column),
+  validate(schemas.column.update),
   handlers.updateColumn
 )
 

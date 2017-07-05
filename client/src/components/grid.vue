@@ -244,7 +244,7 @@ module.exports = {
     },
     onClickChangeType (columnIndex) {
       const column = this.columns[columnIndex]
-      this.$refs.typeModal.open(column)
+      this.$refs.typeModal.open(columnIndex, column)
     },
     getCurrentHeaderValue (columnIndex) {
       // always return string for comparison

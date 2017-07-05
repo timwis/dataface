@@ -58,7 +58,7 @@ async function updateColumn (db, sheetName, columnName, { name, type }) {
   const dbType = type ? encodeType(type) : undefined
   await queries.updateColumn(db, sheetName, columnName, { name, dbType })
 
-  const finalName = name || sheetName
+  const finalName = name || columnName
   const column = await getColumn(db, sheetName, finalName)
   return column
 }
