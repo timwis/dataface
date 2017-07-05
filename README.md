@@ -1,6 +1,6 @@
 # Dataface
 Build and manage data in a Postgres database with a spreadsheet-like interface.
-[Demo](http://dataface.surge.sh).
+[Demo](https://dataface-demo.herokuapp.com).
 
 ![screenshot of spreadsheet-like interface](http://i.imgur.com/3SX1UCo.png)
 
@@ -30,7 +30,7 @@ To test the server, you'll need a throwaway postgres database running
 docker run -p 5434:5432 postgres
 ```
 
-Once a postgres database is available, run the server tests while 
+Once a postgres database is available, run the server tests while
 passing the `DB_URL` environment variable:
 
 ```bash
