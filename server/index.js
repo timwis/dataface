@@ -6,6 +6,9 @@ const validate = require('koa-json-schema')
 const cors = require('kcors')
 const koastatic = require('koa-static')
 const history = require('koa2-history-api-fallback')
+const passport = require('koa-passport')
+const Auth0Strategy = require('passport-auth0')
+const session = require('koa-session')
 
 const handlers = require('./route-handlers')
 const schemas = require('./schemas')
@@ -14,8 +17,14 @@ const app = new Koa()
 const router = new Router({ prefix: '/api' })
 const bodyParser = new KoaBody()
 
-const PORT = process.env.PORT || 3000
-const DB_URL = process.env.DB_URL
+const {
+  PORT = 3000,
+  DB_URL,
+  AUTH0_DOMAIN,
+  AUTH0_CLIENT_ID,
+  AUTH0_CLIENT_SECRET,
+  AUTH0_CALLBACK_URL
+} = process.env
 const db = knex({ client: 'pg', connection: DB_URL, ssl: true })
 app.context.db = db
 
@@ -92,11 +101,45 @@ app.use(async (ctx, next) => {
   try {
     await next()
   } catch (err) {
-    // console.error(err)
+    console.error(err)
     const statusCode = err.status || translateErrorCode(err.code)
     ctx.throw(statusCode)
   }
 })
+
+const strategy = new Auth0Strategy({
+  domain: AUTH0_DOMAIN,
+  clientID: AUTH0_CLIENT_ID,
+  clientSecret: AUTH0_CLIENT_SECRET,
+  callbackURL: AUTH0_CALLBACK_URL
+}, function (accessToken, refreshToken, extraParams, profile, done) {
+  console.log('in', accessToken, profile)
+  done(null, profile)
+})
+
+passport.use(strategy)
+passport.serializeUser(function (user, done) {
+  done(null, user.displayName)
+})
+passport.deserializeUser(function (user, done) {
+  done(null, user)
+})
+app.keys = ['secret here']
+app.use(session({}, app))
+app.use(passport.initialize())
+app.use(passport.session())
+
+const authenticate = passport.authenticate('auth0', {
+  clientID: AUTH0_CLIENT_ID,
+  domain: AUTH0_DOMAIN,
+  redirectUri: AUTH0_CALLBACK_URL,
+  audience: `https://${AUTH0_DOMAIN}/userinfo`,
+  responseType: 'code',
+  scope: 'openid profile'
+})
+router.get('/login', authenticate)
+
+router.get('/callback', passport.authenticate('auth0'))
 
 app.use(cors())
 app.use(router.routes())
