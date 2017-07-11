@@ -11,6 +11,9 @@ Ideally all data would be managed in a purpose-built application backed by a dat
 
 Dataface aims to be an alternative tool that IT departments can offer non-IT staff to empower them to easily manage their data in a system the IT department would support. For the non-IT staff, dataface is a spreadsheet-like interface for data that lets you create columns and rows, even linking columns between sheets. For the IT department, dataface is a vanilla PostgreSQL database with a REST API and web app on top. This way, the non-IT staff can get started building a database on their own while keeping it standard and portable under the hood, for when the time comes for it to graduate to a full-fledged application.
 
+## Roadmap
+See the [milestones](https://github.com/timwis/dataface/milestones?direction=asc&sort=due_date) for the major features roadmap.
+
 ## Development
 The `docker-compose.yml` file provides a postgres container, and an
 application container. To spin them up, [install docker](https://www.docker.com/community-edition)
