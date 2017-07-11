@@ -2,7 +2,7 @@
 Build and manage data in a Postgres database with a spreadsheet-like interface.
 [Demo](https://dataface-demo.herokuapp.com).
 
-![screenshot of spreadsheet-like interface](http://i.imgur.com/3SX1UCo.png)
+![screencast of a user editing a spreadsheet-like interface](https://i.imgur.com/qoB2Tji.png)
 
 [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
