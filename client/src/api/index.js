@@ -74,6 +74,12 @@ module.exports = {
   async deleteColumn (sheetName, columnName) {
     const url = constructUrl(`/sheets/${sheetName}/columns/${columnName}`)
     return axios.delete(url)
+  },
+
+  async authenticate (authCode) {
+    const url = constructUrl(`/authenticate/?code=${authCode}`)
+    const response = await axios.get(url)
+    return response.data
   }
 }
 

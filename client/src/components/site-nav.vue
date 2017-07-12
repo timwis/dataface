@@ -6,6 +6,11 @@
           Dataface
         </a>
       </div>
+      <div class="nav-right nav-menu">
+        <a class="nav-item" href="/login">
+          Login
+        </a>
+      </div>
     </div>
   </nav>
 </template>
