@@ -13,6 +13,7 @@ const app = new Koa()
 const {
   PORT = 3000,
   DB_URL,
+  SESSION_KEY,
   NODE_ENV
 } = process.env
 const DEBUG = (NODE_ENV !== 'production')
@@ -34,7 +35,7 @@ app.use(async (ctx, next) => {
   }
 })
 
-app.keys = ['secret here']
+app.keys = [SESSION_KEY]
 app.use(cors())
 app.use(session({}, app))
 app.use(passport.initialize())

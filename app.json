@@ -14,6 +14,10 @@
     }
   ],
   "env": {
+    "SESSION_KEY": {
+      "description": "A secret key for verifying the integrity of signed cookies",
+      "generator": "secret"
+    },
     "NPM_CONFIG_PRODUCTION": {
       "description": "Leave this false in order to install devDependencies necessary to build the client app",
       "value": "false"
