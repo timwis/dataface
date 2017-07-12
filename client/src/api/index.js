@@ -89,6 +89,12 @@ module.exports = {
     const url = constructUrl(`/authenticate/?code=${authCode}`)
     const response = await axios.get(url)
     return response.data
+  },
+
+  async getCurrentUser () {
+    const url = constructUrl(`/user`)
+    const response = await axios.get(url)
+    return response.data
   }
 }
 

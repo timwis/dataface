@@ -7,7 +7,7 @@ const store = new Vuex.Store({
   modules: {
     db: require('./modules/db'),
     ui: require('./modules/ui'),
-    auth: require('./modules/auth')
+    user: require('./modules/user')
   },
   strict: (process.env.NODE_ENV !== 'production')
 })

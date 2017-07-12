@@ -7,13 +7,27 @@
         </a>
       </div>
       <div class="nav-right nav-menu">
-        <a class="nav-item" href="/login">
+        <li v-if="isAuthenticated" class="nav-item">
+          {{ nickname }}
+        </li>
+        <a v-else class="nav-item" href="/login">
           Login
         </a>
       </div>
     </div>
   </nav>
 </template>
+
+<script>
+const { mapState } = require('vuex')
+
+module.exports = {
+  computed: mapState({
+    isAuthenticated: (state) => state.user.isAuthenticated,
+    nickname: (state) => state.user.nickname
+  })
+}
+</script>
 
 <style scoped>
 nav {

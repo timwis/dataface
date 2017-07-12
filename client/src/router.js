@@ -8,13 +8,27 @@ const { initiateLogin } = require('./helpers/auth0')
 Vue.use(VueRouter)
 
 const routes = [
-  { path: '/', component: Sheet },
+  { path: '/', component: Sheet, beforeEnter: auth },
   { path: '/login', beforeEnter: initiateLogin },
   { path: '/login/callback', component: LoginCallback },
-  { path: '/sheets/:sheetName', component: Sheet }
+  { path: '/sheets/:sheetName', component: Sheet, beforeEnter: auth }
 ]
 
-module.exports = new VueRouter({
+const router = new VueRouter({
   mode: 'history',
   routes
 })
+
+module.exports = router
+
+function auth (to, from, next) {
+  const store = router.app.$store
+  if (!store.state.user.isAuthenticated) {
+    next({
+      path: '/login',
+      query: { redirect: to.fullPath }
+    })
+  } else {
+    next()
+  }
+}

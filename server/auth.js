@@ -1,5 +1,6 @@
 const passport = require('koa-passport')
 const Auth0Strategy = require('passport-auth0')
+const pick = require('lodash/pick')
 
 const {
   AUTH0_DOMAIN,
@@ -20,7 +21,8 @@ if (AUTH0_DOMAIN && AUTH0_CLIENT_ID && AUTH0_CLIENT_SECRET && AUTH0_CALLBACK_URL
 
   passport.use(strategy)
   passport.serializeUser(function (user, done) {
-    done(null, user.displayName)
+    const profile = pick(user, ['displayName', 'picture', 'nickname'])
+    done(null, profile)
   })
   passport.deserializeUser(function (user, done) {
     done(null, user)
