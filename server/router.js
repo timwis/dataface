@@ -32,6 +32,7 @@ router.get(
 // list sheets
 router.get(
   '/sheets',
+  requireAuth,
   async function listSheets (ctx) {
     const sheets = await actions.listSheets(ctx.db)
     ctx.body = sheets
@@ -41,6 +42,7 @@ router.get(
 // create sheet
 router.post(
   '/sheets',
+  requireAuth,
   bodyParser,
   validate(schemas.sheet.create),
   async function createSheet (ctx) {
@@ -55,6 +57,7 @@ router.post(
 // get sheet
 router.get(
   '/sheets/:sheetName',
+  requireAuth,
   async function getSheet (ctx) {
     const sheetName = ctx.params.sheetName
     const sheet = await actions.getSheet(ctx.db, sheetName)
@@ -65,6 +68,7 @@ router.get(
 // update sheet
 router.patch(
   '/sheets/:sheetName',
+  requireAuth,
   bodyParser,
   validate(schemas.sheet.update),
   async function updateSheet (ctx) {
@@ -78,6 +82,7 @@ router.patch(
 // delete sheet
 router.delete(
   '/sheets/:sheetName',
+  requireAuth,
   async function deleteSheet (ctx) {
     const sheetName = ctx.params.sheetName
     await actions.deleteSheet(ctx.db, sheetName)
@@ -88,6 +93,7 @@ router.delete(
 // get columns
 router.get(
   '/sheets/:sheetName/columns',
+  requireAuth,
   async function getColumns (ctx) {
     const sheetName = ctx.params.sheetName
     const columns = await actions.getColumns(ctx.db, sheetName)
@@ -98,6 +104,7 @@ router.get(
 // create column
 router.post(
   '/sheets/:sheetName/columns',
+  requireAuth,
   bodyParser,
   validate(schemas.column.create),
   async function createColumn (ctx) {
@@ -113,6 +120,7 @@ router.post(
 // update column
 router.patch(
   '/sheets/:sheetName/columns/:columnName',
+  requireAuth,
   bodyParser,
   validate(schemas.column.update),
   async function updateColumn (ctx) {
@@ -126,6 +134,7 @@ router.patch(
 // delete column
 router.delete(
   '/sheets/:sheetName/columns/:columnName',
+  requireAuth,
   async function deleteColumn (ctx) {
     const { sheetName, columnName } = ctx.params
     await actions.deleteColumn(ctx.db, sheetName, columnName)
@@ -136,6 +145,7 @@ router.delete(
 // get rows
 router.get(
   '/sheets/:sheetName/rows',
+  requireAuth,
   async function getRows (ctx) {
     const sheetName = ctx.params.sheetName
     const rows = await actions.getRows(ctx.db, sheetName)
@@ -146,6 +156,7 @@ router.get(
 // create row
 router.post(
   '/sheets/:sheetName/rows',
+  requireAuth,
   bodyParser, // validation handled by db
   async function createRow (ctx) {
     const sheetName = ctx.params.sheetName
@@ -159,6 +170,7 @@ router.post(
 // update row
 router.patch(
   '/sheets/:sheetName/rows', // filtering handled by querystrings
+  requireAuth,
   bodyParser, // validation handled by db
   async function updateRow (ctx) {
     const sheetName = ctx.params.sheetName
@@ -178,6 +190,7 @@ router.patch(
 // delete row
 router.delete(
   '/sheets/:sheetName/rows',
+  requireAuth,
   async function deleteRow (ctx) {
     const sheetName = ctx.params.sheetName
     const query = ctx.request.query
