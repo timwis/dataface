@@ -2,6 +2,15 @@ const axios = require('axios')
 const urlJoin = require('url-join')
 
 const apiHost = process.env.API_HOST || '/api'
+const NODE_ENV = process.env.NODE_ENV
+const DEBUG = (NODE_ENV !== 'production')
+
+if (DEBUG) {
+  axios.interceptors.request.use(function (config) {
+    config.withCredentials = true
+    return config
+  })
+}
 
 module.exports = {
   async getSheets () {

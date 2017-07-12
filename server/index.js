@@ -1,6 +1,5 @@
 const Koa = require('koa')
 const knex = require('knex')
-const cors = require('kcors')
 const koastatic = require('koa-static')
 const history = require('koa2-history-api-fallback')
 const session = require('koa-session')
@@ -36,7 +35,7 @@ app.use(async (ctx, next) => {
 })
 
 app.keys = [SESSION_KEY]
-app.use(cors())
+if (DEBUG) app.use(require('kcors')({ credentials: true }))
 app.use(session({}, app))
 app.use(passport.initialize())
 app.use(passport.session())
