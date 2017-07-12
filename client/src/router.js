@@ -11,7 +11,7 @@ const routes = [
   { path: '/', component: Sheet },
   { path: '/login', beforeEnter: initiateLogin },
   { path: '/login/callback', component: LoginCallback },
-  { path: '/:sheetName', component: Sheet }
+  { path: '/sheets/:sheetName', component: Sheet }
 ]
 
 module.exports = new VueRouter({
