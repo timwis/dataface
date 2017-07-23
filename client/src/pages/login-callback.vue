@@ -11,9 +11,10 @@ module.exports = {
   methods: mapActions([
     'finishLogin'
   ]),
-  created () {
+  async created () {
     const authCode = this.$route.query.code
-    this.finishLogin(authCode)
+    await this.finishLogin(authCode)
+    this.$router.push('/sheets')
   }
 }
 </script>
