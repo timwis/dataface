@@ -1,16 +1,18 @@
 const Vue = require('vue')
 const VueRouter = require('vue-router')
 
+const Home = require('./pages/home.vue')
 const Sheet = require('./pages/sheet.vue')
 const LoginCallback = require('./pages/login-callback.vue')
-const { initiateLogin } = require('./helpers/auth0')
+const auth0Url = require('./helpers/auth0')
 
 Vue.use(VueRouter)
 
 const routes = [
-  { path: '/', component: Sheet, beforeEnter: auth },
+  { path: '/', component: Home, name: 'home' },
   { path: '/login', beforeEnter: initiateLogin },
   { path: '/login/callback', component: LoginCallback },
+  { path: '/sheets', component: Sheet, beforeEnter: auth },
   { path: '/sheets/:sheetName', component: Sheet, beforeEnter: auth }
 ]
 
@@ -31,4 +33,8 @@ function auth (to, from, next) {
   } else {
     next()
   }
+}
+
+function initiateLogin () {
+  window.location.href = auth0Url
 }

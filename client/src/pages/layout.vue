@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <site-nav></site-nav>
+    <site-nav v-if="showNav"></site-nav>
     <notification
        v-for="item in notifications"
        :msg="item.msg"
@@ -19,9 +19,14 @@ const Notification = require('../components/notification.vue')
 
 module.exports = {
   name: 'Layout',
-  computed: mapState({
-    notifications: (state) => values(state.ui.notifications)
-  }),
+  computed: {
+    ...mapState({
+      notifications: (state) => values(state.ui.notifications)
+    }),
+    showNav () {
+      return (this.$router.currentRoute.name !== 'home')
+    }
+  },
   methods: mapMutations([
     'dismissNotification'
   ]),

@@ -10,12 +10,5 @@ const loginParams = {
   client_id: AUTH0_CLIENT_ID,
   redirect_uri: AUTH0_CALLBACK_URL
 }
-const loginUrl = `https://${AUTH0_DOMAIN}/authorize?${stringify(loginParams)}`
 
-function initiateLogin () {
-  window.location.href = loginUrl
-}
-
-module.exports = {
-  initiateLogin
-}
+module.exports = `https://${AUTH0_DOMAIN}/authorize?${stringify(loginParams)}`
