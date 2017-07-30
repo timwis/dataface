@@ -12,7 +12,7 @@ const bodyParser = new KoaBody()
 module.exports = router
 
 // authenticate auth code
-router.get(
+router.post(
   '/authenticate',
   passport.authenticate('auth0'),
   function user (ctx) {

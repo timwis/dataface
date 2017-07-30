@@ -87,7 +87,7 @@ module.exports = {
 
   async authenticate (authCode) {
     const url = constructUrl(`/authenticate/?code=${authCode}`)
-    const response = await axios.get(url)
+    const response = await axios.post(url)
     return response.data
   },
 
