@@ -4,6 +4,7 @@ const VueRouter = require('vue-router')
 const Home = require('./pages/home.vue')
 const Sheet = require('./pages/sheet.vue')
 const LoginCallback = require('./pages/login-callback.vue')
+const Logout = require('./pages/logout.vue')
 const auth0Url = require('./helpers/auth0')
 
 Vue.use(VueRouter)
@@ -12,6 +13,7 @@ const routes = [
   { path: '/', component: Home, name: 'home' },
   { path: '/login', beforeEnter: initiateLogin },
   { path: '/login/callback', component: LoginCallback },
+  { path: '/logout', component: Logout },
   { path: '/sheets', component: Sheet, beforeEnter: auth },
   { path: '/sheets/:sheetName', component: Sheet, beforeEnter: auth }
 ]

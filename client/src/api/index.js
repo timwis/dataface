@@ -91,6 +91,11 @@ module.exports = {
     return response.data
   },
 
+  async logout () {
+    const url = constructUrl(`/logout`)
+    return await axios.post(url)
+  },
+
   async getCurrentUser () {
     const url = constructUrl(`/user`)
     const response = await axios.get(url)

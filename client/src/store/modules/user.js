@@ -13,6 +13,12 @@ module.exports = {
       state.displayName = user.displayName
       state.nickname = user.nickname
       state.picture = user.picture
+    },
+    resetUser (state) {
+      state.isAuthenticated = false
+      state.displayName = null
+      state.nickname = null
+      state.picture = null
     }
   },
   actions: {
@@ -30,7 +36,16 @@ module.exports = {
         const user = await api.getCurrentUser()
         commit('receiveUser', user)
       } catch (err) {
-        console.log('Not logged in')
+        // Not logged in
+      }
+    },
+    async logout ({ commit, dispatch }) {
+      try {
+        await api.logout()
+        commit('resetUser')
+      } catch (err) {
+        console.error(err)
+        dispatch('notify', { msg: `Logout failed` })
       }
     }
   }

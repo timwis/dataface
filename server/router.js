@@ -20,6 +20,16 @@ router.post(
   }
 )
 
+// logout
+router.post(
+  '/logout',
+  function logout (ctx) {
+    console.log('logging out')
+    ctx.logout()
+    ctx.status = 200
+  }
+)
+
 // current user
 router.get(
   '/user',

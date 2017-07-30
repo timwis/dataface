@@ -6,11 +6,16 @@
           Dataface
         </a>
       </div>
-      <div class="nav-right nav-menu">
-        <li v-if="isAuthenticated" class="nav-item">
+      <div v-if="isAuthenticated" class="nav-right nav-menu">
+        <li class="nav-item">
           {{ nickname }}
         </li>
-        <a v-else class="nav-item" href="/login">
+        <a href="/logout" class="nav-item">
+          Logout
+        </a>
+      </div>
+      <div v-else class="nav-right nav-menu">
+        <a class="nav-item" href="/login">
           Login
         </a>
       </div>
