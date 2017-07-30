@@ -10,9 +10,12 @@ services:
     restart: always
     environment:
       POSTGRES_USER: postgres
+  redis:
+    image: redis
   server:
     depends_on:
       - postgres
+      - redis
     image: jsixc/node-yarn-app:7
     volumes:
       - ./:/home/app
@@ -23,6 +26,7 @@ services:
       DB_URL: "postgres://postgres:pwd@postgres:5432/postgres"
       PORT: 3000
       API_HOST: "http://localhost:3000/api"
+      REDIS_URL: "redis://redis:6379"
       SESSION_KEY: secret # fake key for development environment
       AUTH0_CLIENT_ID: $AUTH0_CLIENT_ID
       AUTH0_CLIENT_SECRET: $AUTH0_CLIENT_SECRET

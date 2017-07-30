@@ -3,6 +3,7 @@ const knex = require('knex')
 const koastatic = require('koa-static')
 const history = require('koa2-history-api-fallback')
 const session = require('koa-session')
+const redisStore = require('koa-redis')
 
 const router = require('./router')
 const passport = require('./auth')
@@ -13,6 +14,7 @@ const {
   PORT = 3000,
   DB_URL,
   SESSION_KEY,
+  REDIS_URL,
   NODE_ENV
 } = process.env
 const DEBUG = (NODE_ENV !== 'production')
@@ -36,7 +38,9 @@ app.use(async (ctx, next) => {
 
 app.keys = [SESSION_KEY]
 if (DEBUG) app.use(require('kcors')({ credentials: true }))
-app.use(session({}, app))
+app.use(session({
+  store: redisStore({ url: REDIS_URL })
+}, app))
 app.use(passport.initialize())
 app.use(passport.session())
 
