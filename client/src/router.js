@@ -12,7 +12,7 @@ Vue.use(VueRouter)
 const routes = [
   { path: '/', component: Home, name: 'home' },
   { path: '/login', beforeEnter: initiateLogin },
-  { path: '/login/callback', component: LoginCallback },
+  { path: '/callback', component: LoginCallback },
   { path: '/logout', component: Logout },
   { path: '/sheets', component: Sheet, beforeEnter: auth },
   { path: '/sheets/:sheetName', component: Sheet, beforeEnter: auth }
