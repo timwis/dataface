@@ -11,6 +11,12 @@
     {
       "plan": "heroku-postgresql",
       "as": "db"
+    },
+    {
+      "plan": "heroku-redis:hobby-dev"
+    },
+    {
+      "plan": "auth0:free"
     }
   ],
   "env": {
