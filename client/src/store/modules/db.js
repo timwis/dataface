@@ -210,7 +210,7 @@ module.exports = {
       commit('receiveSheetInsertion', { name })
       await dispatch('getSheet', { name })
       await dispatch('insertColumn')
-      router.push(`/${name}`)
+      router.push(`/sheets/${name}`)
     },
     async renameSheet ({ state, commit, dispatch }, { oldName, newName }) {
       const payload = { name: newName }
@@ -223,7 +223,7 @@ module.exports = {
       }
 
       commit('receiveSheetRename', { oldName, newName })
-      router.push(`/${newName}`)
+      router.push(`/sheets/${newName}`)
     },
     async removeSheet ({ state, commit, dispatch }, name) {
       try {
@@ -239,7 +239,7 @@ module.exports = {
 
       const newActiveSheetName = determineNextActiveSheet(state, index)
       if (newActiveSheetName) {
-        router.push(`/${newActiveSheetName}`)
+        router.push(`/sheets/${newActiveSheetName}`)
       } else {
         const emptyPayload = { rows: [], columns: [], name: null }
         commit('receiveActiveSheet', emptyPayload)

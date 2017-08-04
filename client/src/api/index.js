@@ -2,6 +2,15 @@ const axios = require('axios')
 const urlJoin = require('url-join')
 
 const apiHost = process.env.API_HOST || '/api'
+const NODE_ENV = process.env.NODE_ENV
+const DEBUG = (NODE_ENV !== 'production')
+
+if (DEBUG) {
+  axios.interceptors.request.use(function (config) {
+    config.withCredentials = true
+    return config
+  })
+}
 
 module.exports = {
   async getSheets () {
@@ -74,6 +83,23 @@ module.exports = {
   async deleteColumn (sheetName, columnName) {
     const url = constructUrl(`/sheets/${sheetName}/columns/${columnName}`)
     return axios.delete(url)
+  },
+
+  async authenticate (authCode) {
+    const url = constructUrl(`/authenticate/?code=${authCode}`)
+    const response = await axios.post(url)
+    return response.data
+  },
+
+  async logout () {
+    const url = constructUrl(`/logout`)
+    return await axios.post(url)
+  },
+
+  async getCurrentUser () {
+    const url = constructUrl(`/user`)
+    const response = await axios.get(url)
+    return response.data
   }
 }
 

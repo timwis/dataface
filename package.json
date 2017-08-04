@@ -11,7 +11,7 @@
     "start:client": "budo client/src/main.js:dist/build.js --live --pushstate --dir client",
     "build:client": "NODE_ENV=production browserify client/src/main.js -o client/dist/build.js",
     "test": "run-s test:*",
-    "test:server": "dredd",
+    "test:server": "NODE_ENV=test dredd",
     "test:client": "ava test/client/**/*.spec.js",
     "heroku-postbuild": "yarn run build:client"
   },
@@ -19,6 +19,7 @@
     "node": "7.7.x"
   },
   "dependencies": {
+    "auth0-lock": "^10.19.0",
     "axios": "^0.16.1",
     "bulma": "^0.4.2",
     "kcors": "^2.2.1",
@@ -26,12 +27,17 @@
     "koa": "^2.2.0",
     "koa-body": "^2.1.0",
     "koa-json-schema": "^2.0.0",
+    "koa-passport": "^3.0.0",
+    "koa-redis": "^3.0.0",
     "koa-router": "^7.2.0",
+    "koa-session": "^5.4.0",
     "koa-static": "^3.0.0",
     "koa2-history-api-fallback": "^0.0.5",
     "lodash": "^4.17.4",
+    "passport-auth0": "^0.6.0",
     "pg": "^6.2.4",
     "postinstall-build-yarn": "^0.0.2",
+    "query-string": "^4.3.4",
     "shortid": "^2.2.8",
     "url-join": "^2.0.2",
     "vue": "^2.0.1",
@@ -54,6 +60,7 @@
     "require-extension-hooks": "^0.2.0",
     "require-extension-hooks-babel": "^0.1.1",
     "require-extension-hooks-vue": "^0.3.1",
+    "tough-cookie": "^2.3.2",
     "uglify-js": "^2.5.0",
     "vueify": "^9.1.0",
     "vuenit": "^0.4.2"

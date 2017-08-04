@@ -5,7 +5,7 @@
     </p>
     <ul class="menu-list">
       <li v-for="sheet in sheets">
-        <router-link :to="'/' + sheet.name"
+        <router-link :to="'/sheets/' + sheet.name"
            :class="{ 'is-active': sheet.name === activeSheetName }">
           {{ sheet.name }}
           <button class="delete" @click.prevent.stop="removeSheet(sheet.name)"></button>

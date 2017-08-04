@@ -3,10 +3,13 @@ const Vuex = require('vuex')
 
 Vue.use(Vuex)
 
-module.exports = new Vuex.Store({
+const store = new Vuex.Store({
   modules: {
     db: require('./modules/db'),
-    ui: require('./modules/ui')
+    ui: require('./modules/ui'),
+    user: require('./modules/user')
   },
   strict: (process.env.NODE_ENV !== 'production')
 })
+
+module.exports = store
