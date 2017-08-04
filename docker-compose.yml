@@ -30,5 +30,5 @@ services:
       SESSION_KEY: secret # fake key for development environment
       AUTH0_CLIENT_ID: $AUTH0_CLIENT_ID
       AUTH0_CLIENT_SECRET: $AUTH0_CLIENT_SECRET
-      AUTH0_CALLBACK_URL: $AUTH0_CALLBACK_URL
+      AUTH0_CALLBACK_URL: "http://localhost:9966/callback"
       AUTH0_DOMAIN: $AUTH0_DOMAIN

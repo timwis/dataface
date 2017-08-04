@@ -9,6 +9,8 @@ const passport = require('./auth')
 const router = new Router({ prefix: '/api' })
 const bodyParser = new KoaBody()
 
+const NODE_ENV = process.env.NODE_ENV
+
 module.exports = router
 
 // authenticate auth code
@@ -19,6 +21,16 @@ router.post(
     ctx.body = ctx.state.user
   }
 )
+
+if (NODE_ENV === 'test') {
+  router.post(
+    '/authenticate-test',
+    async function user (ctx) {
+      await ctx.login()
+      ctx.status = 200
+    }
+  )
+}
 
 // logout
 router.post(

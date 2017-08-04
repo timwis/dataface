@@ -1,3 +1,4 @@
+const assert = require('assert')
 const Koa = require('koa')
 const knex = require('knex')
 const koastatic = require('koa-static')
@@ -8,16 +9,12 @@ const redisStore = require('koa-redis')
 const router = require('./router')
 const passport = require('./auth')
 
-const app = new Koa()
-
-const {
-  PORT = 3000,
-  DB_URL,
-  SESSION_KEY,
-  REDIS_URL,
-  NODE_ENV
-} = process.env
+const { PORT = 3000, DB_URL, SESSION_KEY, REDIS_URL, NODE_ENV } = process.env
 const DEBUG = (NODE_ENV !== 'production')
+assert(DB_URL, 'DB_URL environment variable must be set')
+assert(SESSION_KEY || DEBUG, 'SESSION_KEY environment variable must be set')
+
+const app = new Koa()
 app.context.db = knex({
   client: 'pg',
   connection: DB_URL,
@@ -36,11 +33,12 @@ app.use(async (ctx, next) => {
   }
 })
 
-app.keys = [SESSION_KEY]
+app.keys = [SESSION_KEY || '']
 if (DEBUG) app.use(require('kcors')({ credentials: true }))
-app.use(session({
-  store: redisStore({ url: REDIS_URL })
-}, app))
+
+const sessionOpts = {}
+if (REDIS_URL) sessionOpts.store = redisStore({ url: REDIS_URL })
+app.use(session(sessionOpts, app))
 app.use(passport.initialize())
 app.use(passport.session())
 

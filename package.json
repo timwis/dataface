@@ -11,7 +11,7 @@
     "start:client": "budo client/src/main.js:dist/build.js --live --pushstate --dir client",
     "build:client": "NODE_ENV=production browserify client/src/main.js -o client/dist/build.js",
     "test": "run-s test:*",
-    "test:server": "dredd",
+    "test:server": "NODE_ENV=test dredd",
     "test:client": "ava test/client/**/*.spec.js",
     "heroku-postbuild": "yarn run build:client"
   },
@@ -60,6 +60,7 @@
     "require-extension-hooks": "^0.2.0",
     "require-extension-hooks-babel": "^0.1.1",
     "require-extension-hooks-vue": "^0.3.1",
+    "tough-cookie": "^2.3.2",
     "uglify-js": "^2.5.0",
     "vueify": "^9.1.0",
     "vuenit": "^0.4.2"
